@@ -4,9 +4,9 @@ import { SpriteEditor } from './SpriteEditor';
 
 export const SpriteMain = () => {
   return (
-    <div className="flex flex-wrap w-[70%] w-min-[955px] bg-[#ffffff] rounded-md">
+    <main className="flex flex-col w-[70%] w-min-[955px] bg-[#ffffff] rounded-md shadow-md">
       <Navbar />
       <SpriteEditor />
-    </div>
+    </main>
   );
 };
