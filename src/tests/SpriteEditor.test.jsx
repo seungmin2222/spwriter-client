@@ -1,3 +1,10 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import App from '../components/SpriteEditor';
+import { SpriteEditor } from '../components/SpriteEditor';
+
+test('renders Footer in SpriteEditor', () => {
+  render(<SpriteEditor />);
+
+  expect(screen.getByTestId('footer')).toBeInTheDocument();
+});
