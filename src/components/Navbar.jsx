@@ -17,6 +17,13 @@ export const Navbar = () => {
   const toast = useFileStore(state => state.toast);
   const setToast = useFileStore(state => state.setToast);
 
+  const sortAndSetCoordinates = newCoords => {
+    const sortedCoordinates = [...coordinates, ...newCoords].sort(
+      (a, b) => b.width * b.height - a.width * a.height
+    );
+    setCoordinates(sortedCoordinates);
+  };
+
   const handleFileChange = event => {
     const files = Array.from(event.target.files);
     setFiles(files);
@@ -29,7 +36,6 @@ export const Navbar = () => {
         img.onload = () => {
           newImages.push(img);
           if (newImages.length === files.length) {
-            newImages.sort((a, b) => b.width * b.height - a.width * a.height);
             const newCoordinates = newImages.map((img, index) => ({
               index: Date.now() + index,
               x: 0,
@@ -38,10 +44,7 @@ export const Navbar = () => {
               height: img.height,
               img,
             }));
-            const sortedCoordinates = [...coordinates, ...newCoordinates].sort(
-              (a, b) => b.width * b.height - a.width * a.height
-            );
-            setCoordinates(sortedCoordinates);
+            sortAndSetCoordinates(newCoordinates);
           }
         };
         img.src = reader.result;
@@ -112,65 +115,69 @@ export const Navbar = () => {
 
   return (
     <nav
-      className="flex w-full h-[10%] h-min-[50px] py-[10px] bg-white rounded-t-md items-center justify-around shadow-md select-none"
+      className="flex w-full h-[10%] h-min-[50px] px-[1rem] py-[10px] bg-white rounded-t-md items-center justify-between shadow-md select-none"
       data-testid="navbar"
     >
-      <div className="relative inline-block bg-[#1f77b4] hover:bg-[#1a5a91] transition-colors duration-300 rounded-md">
-        <input
-          type="file"
-          id="fileInput"
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          multiple
-          onChange={handleFileChange}
-        />
-        <label
-          htmlFor="fileInput"
-          className="p-2 w-full h-full text-white font-semibold cursor-pointer flex items-center justify-center"
-        >
-          Open files
-        </label>
-      </div>
-      <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
-        <label className="text-gray-700">Padding :</label>
-        <div className="flex items-center space-x-1">
+      <div className="flex gap-4">
+        <div className="relative inline-block bg-[#1f77b4] hover:bg-[#1a5a91] transition-colors duration-300 rounded-md">
           <input
-            type="number"
-            value={padding}
-            onChange={handlePaddingChange}
-            className="w-16 p-1 border rounded-md text-center"
+            type="file"
+            id="fileInput"
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            multiple
+            onChange={handleFileChange}
           />
-          <span className="text-gray-700">px</span>
+          <label
+            htmlFor="fileInput"
+            className="p-2 w-full h-full text-white font-semibold cursor-pointer flex items-center justify-center"
+          >
+            Open files
+          </label>
+        </div>
+        <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
+          <label className="text-gray-700">Padding :</label>
+          <div className="flex items-center space-x-1">
+            <input
+              type="number"
+              value={padding}
+              onChange={handlePaddingChange}
+              className="w-16 p-1 border rounded-md text-center"
+            />
+            <span className="text-gray-700">px</span>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
+          <label htmlFor="align-elements" className="text-gray-700">
+            Align-elements :
+          </label>
+          <select
+            id="align-elements"
+            value={option}
+            onChange={e => setOption(e.target.value)}
+            className="w-40 p-1 border rounded-md"
+          >
+            <option value="Binary Tree">Binary Tree</option>
+            <option value="left-right">left-right</option>
+            <option value="top-bottom">top-bottom</option>
+          </select>
         </div>
       </div>
-      <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
-        <label htmlFor="align-elements" className="text-gray-700">
-          Align-elements :
-        </label>
-        <select
-          id="align-elements"
-          value={option}
-          onChange={e => setOption(e.target.value)}
-          className="w-40 p-1 border rounded-md"
-        >
-          <option value="Binary Tree">Binary Tree</option>
-          <option value="left-right">left-right</option>
-          <option value="top-bottom">top-bottom</option>
-        </select>
-      </div>
-      <div className="flex items-center space-x-2 h-[40px]">
-        <input
-          type="text"
-          className="flex-grow focus:outline-none h-full p-2 border-b-2 border-gray-400 focus-within:border-gray-600"
-          placeholder="파일 이름을 입력해주세요."
-          value={fileName}
-          onChange={e => setFileName(e.target.value)}
-        />
-        <button
-          onClick={handleDownload}
-          className="p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300"
-        >
-          <img src={downloadIcon} alt="Download Icon" className="h-6 w-6" />
-        </button>
+      <div className="flex gap-4">
+        <div className="flex items-center space-x-2 h-[40px]">
+          <input
+            type="text"
+            className="flex-grow focus:outline-none h-full p-2 border-b-2 border-gray-400 focus-within:border-gray-600"
+            placeholder="파일 이름을 입력해주세요."
+            value={fileName}
+            onChange={e => setFileName(e.target.value)}
+          />
+          <button
+            onClick={handleDownload}
+            className="p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300"
+          >
+            <img src={downloadIcon} alt="Download Icon" className="h-6 w-6" />
+          </button>
+        </div>
       </div>
       {toast && (
         <Toast
