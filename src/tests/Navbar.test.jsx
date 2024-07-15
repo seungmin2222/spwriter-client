@@ -47,7 +47,7 @@ describe('Navbar', () => {
     render(<Navbar />);
 
     const fileNameInput =
-      screen.getByPlaceholderText(/파일 이름을 입력해주세요./i);
+      screen.getByPlaceholderText(/원하시는 파일 이름을 입력해주세요./i);
     fireEvent.change(fileNameInput, { target: { value: 'test-file' } });
 
     expect(fileNameInput.value).toBe('test-file');
