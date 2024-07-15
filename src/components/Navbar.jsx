@@ -7,13 +7,13 @@ export const Navbar = () => {
 
   return (
     <nav
-      className="flex w-full h-[10%] min-h-[60px] py-[20px] bg-white rounded-t-md items-center justify-around shadow-md"
+      className="flex w-full h-[10%] h-min-[50px] py-[10px] bg-white rounded-t-md items-center justify-around shadow-md"
       data-testid="navbar"
     >
       <button className="p-2 rounded-md bg-[#1f77b4] text-white font-semibold hover:bg-[#1a5a91] transition-colors duration-300">
         Open files
       </button>
-      <div className="flex items-center space-x-2 p-2 border rounded-md shadow-sm bg-[#ffffff] h-full">
+      <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
         <label className="text-gray-700">Padding between elements :</label>
         <div className="flex items-center space-x-1">
           <input
@@ -25,7 +25,7 @@ export const Navbar = () => {
           <span className="text-gray-700">px</span>
         </div>
       </div>
-      <div className="flex items-center space-x-2 p-2 border rounded-md shadow-sm bg-[#ffffff] h-full">
+      <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
         <label className="text-gray-700">Align-elements :</label>
         <select
           value={option}
@@ -37,16 +37,16 @@ export const Navbar = () => {
           <option value="top-bottom">top-bottom</option>
         </select>
       </div>
-      <div className="flex items-center space-x-2 p-2 border-b-2 border-gray-400 focus-within:border-gray-600 bg-[#ffffff] h-full">
+      <div className="flex items-center space-x-2 h-[40px]">
         <input
           type="text"
-          className="flex-grow focus:outline-none h-full"
+          className="flex-grow focus:outline-none h-full p-2 border-b-2 border-gray-400 focus-within:border-gray-600"
           placeholder="파일 이름을 입력해주세요."
         />
+        <button className="p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300">
+          <img src={downloadIcon} alt="Download Icon" className="h-6 w-6" />
+        </button>
       </div>
-      <button className="p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300">
-        <img src={downloadIcon} alt="Download Icon" className="h-6 w-6" />
-      </button>
     </nav>
   );
 };
