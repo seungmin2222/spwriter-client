@@ -59,7 +59,7 @@ export const ImageList = () => {
             aria-label="cross"
           >
             <svg
-              className="h-6 w-6 bg-[#1f77b4] group-hover:fill-current group-hover:text-white group-hover:bg-[#1a5a91] rounded-full"
+              className="h-6 w-6 bg-[#1f77b4] transition-colors duration-300 group-hover:fill-current group-hover:text-white group-hover:bg-[#07427e] rounded-full"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="#ffffff"
