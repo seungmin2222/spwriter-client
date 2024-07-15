@@ -3,9 +3,8 @@ import { Footer } from './Footer';
 
 export const SpriteEditor = () => {
   return (
-    <div className="relative w-full h-[90%]" data-testid="sprite-editor">
-      <div className="flex w-full h-[90%] bg-[#f0f4f8]"></div>
-      <Footer />
+    <div className="relative w-full h-full" data-testid="sprite-editor">
+      <canvas className="flex w-full h-full bg-[#f0f4f8]"></canvas>
     </div>
   );
 };

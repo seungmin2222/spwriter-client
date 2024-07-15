@@ -15,13 +15,12 @@ export const ImageList = () => {
   };
 
   const handleConfirm = () => {
-    // 삭제 확인 로직을 여기에 추가
     console.log('삭제가 확인되었습니다.');
     setShowModal(false);
   };
 
   return (
-    <aside className="flex flex-col w-[26%] h-full mr-[4%] bg-[#f9fafb] rounded-md shadow-md">
+    <aside className="flex flex-col w-[26%] h-full mr-[2%] bg-[#f9fafb] rounded-md shadow-md">
       <header className="flex w-full h-[10%] justify-center items-center text-3xl font-semibold text-gray-800">
         Image List
       </header>
@@ -60,10 +59,10 @@ export const ImageList = () => {
             aria-label="cross"
           >
             <svg
-              className="h-6 w-6 group-hover:fill-current group-hover:text-[#5a5252]"
+              className="h-6 w-6 bg-[#1f77b4] group-hover:fill-current group-hover:text-white group-hover:bg-[#1a5a91] rounded-full"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
-              fill="#808080"
+              fill="#ffffff"
             >
               <path d="M12 10.586l4.95-4.95 1.414 1.414L13.414 12l4.95 4.95-1.414 1.414L12 13.414l-4.95 4.95-1.414-1.414L10.586 12 5.636 7.05l1.414-1.414z" />
             </svg>
