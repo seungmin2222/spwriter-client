@@ -162,12 +162,12 @@ export const Navbar = () => {
           </select>
         </div>
       </div>
-      <div className="flex gap-4">
-        <div className="flex items-center space-x-2 h-[40px]">
+      <div className="flex gap-4 w-[28%]">
+        <div className="flex items-center space-x-2 h-[40px]  w-full">
           <input
             type="text"
             className="flex-grow focus:outline-none h-full p-2 border-b-2 border-gray-400 focus-within:border-gray-600"
-            placeholder="파일 이름을 입력해주세요."
+            placeholder="원하시는 파일 이름을 입력해주세요."
             value={fileName}
             onChange={e => setFileName(e.target.value)}
           />
