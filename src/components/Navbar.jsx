@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import downloadIcon from '../assets/images/download-solid.svg';
 import { useFileStore } from '../../store';
 import { Toast } from './Toast';
@@ -8,11 +8,14 @@ export const Navbar = () => {
   const setFiles = useFileStore(state => state.setFiles);
   const addCoordinates = useFileStore(state => state.addCoordinates);
   const coordinates = useFileStore(state => state.coordinates);
+  const setCoordinates = useFileStore(state => state.setCoordinates);
   const padding = useFileStore(state => state.padding);
   const setPadding = useFileStore(state => state.setPadding);
   const canvasRef = useFileStore(state => state.canvasRef);
   const [fileName, setFileName] = useState('');
-  const [toast, setToast] = useState(null);
+  const addToast = useFileStore(state => state.addToast);
+  const toast = useFileStore(state => state.toast);
+  const setToast = useFileStore(state => state.setToast);
 
   const handleFileChange = event => {
     const files = Array.from(event.target.files);
@@ -35,7 +38,10 @@ export const Navbar = () => {
               height: img.height,
               img,
             }));
-            addCoordinates(newCoordinates);
+            const sortedCoordinates = [...coordinates, ...newCoordinates].sort(
+              (a, b) => b.width * b.height - a.width * a.height
+            );
+            setCoordinates(sortedCoordinates);
           }
         };
         img.src = reader.result;
@@ -98,11 +104,6 @@ export const Navbar = () => {
     });
   };
 
-  const addToast = message => {
-    const id = Date.now();
-    setToast({ id, message });
-  };
-
   const removeToast = id => {
     if (toast && toast.id === id) {
       setToast(null);
@@ -111,7 +112,7 @@ export const Navbar = () => {
 
   return (
     <nav
-      className="flex w-full h-[10%] h-min-[50px] py-[10px] bg-white rounded-t-md items-center justify-around shadow-md"
+      className="flex w-full h-[10%] h-min-[50px] py-[10px] bg-white rounded-t-md items-center justify-around shadow-md select-none"
       data-testid="navbar"
     >
       <div className="relative inline-block bg-[#1f77b4] hover:bg-[#1a5a91] transition-colors duration-300 rounded-md">
@@ -142,8 +143,11 @@ export const Navbar = () => {
         </div>
       </div>
       <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
-        <label className="text-gray-700">Align-elements :</label>
+        <label htmlFor="align-elements" className="text-gray-700">
+          Align-elements :
+        </label>
         <select
+          id="align-elements"
           value={option}
           onChange={e => setOption(e.target.value)}
           className="w-40 p-1 border rounded-md"
@@ -173,7 +177,7 @@ export const Navbar = () => {
           key={toast.id}
           id={toast.id}
           message={toast.message}
-          onClose={removeToast}
+          onClose={() => removeToast(toast.id)}
         />
       )}
     </nav>

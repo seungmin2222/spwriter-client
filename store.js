@@ -11,4 +11,7 @@ export const useFileStore = create(set => ({
     set(state => ({ coordinates: [...state.coordinates, ...newCoords] })),
   canvasRef: null,
   setCanvasRef: canvasRef => set({ canvasRef }),
+  toast: null,
+  setToast: toast => set({ toast }),
+  addToast: message => set(state => ({ toast: { id: Date.now(), message } })),
 }));
