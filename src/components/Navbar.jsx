@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import downloadIcon from '../assets/images/download-solid.svg';
 import { useFileStore } from '../../store';
+import { Toast } from './Toast';
 
 export const Navbar = () => {
   const [option, setOption] = useState('Binary Tree');
@@ -11,6 +12,7 @@ export const Navbar = () => {
   const setPadding = useFileStore(state => state.setPadding);
   const canvasRef = useFileStore(state => state.canvasRef);
   const [fileName, setFileName] = useState('');
+  const [toast, setToast] = useState(null);
 
   const handleFileChange = event => {
     const files = Array.from(event.target.files);
@@ -42,12 +44,16 @@ export const Navbar = () => {
   };
 
   const handlePaddingChange = event => {
-    setPadding(Number(event.target.value));
+    if (event.target.value <= 0) {
+      addToast('1 보다 작게 설정 할 수 없습니다.');
+    } else {
+      setPadding(Number(event.target.value));
+    }
   };
 
   const handleDownload = () => {
     if (coordinates.length === 0) {
-      alert('다운로드할 이미지가 없습니다.');
+      addToast('다운로드할 이미지가 없습니다.');
       return;
     }
 
@@ -90,9 +96,20 @@ export const Navbar = () => {
     });
   };
 
+  const addToast = message => {
+    const id = Date.now();
+    setToast({ id, message });
+  };
+
+  const removeToast = id => {
+    if (toast && toast.id === id) {
+      setToast(null);
+    }
+  };
+
   return (
     <nav
-      className="flex w-full h-[10%] h-min-[50px] py-[10px] bg-white rounded-t-md items-center justify-around shadow-md select-none"
+      className="flex w-full h-[10%] h-min-[50px] py-[10px] bg-white rounded-t-md items-center justify-around shadow-md"
       data-testid="navbar"
     >
       <div className="relative inline-block bg-[#1f77b4] hover:bg-[#1a5a91] transition-colors duration-300 rounded-md">
@@ -149,6 +166,14 @@ export const Navbar = () => {
           <img src={downloadIcon} alt="Download Icon" className="h-6 w-6" />
         </button>
       </div>
+      {toast && (
+        <Toast
+          key={toast.id}
+          id={toast.id}
+          message={toast.message}
+          onClose={removeToast}
+        />
+      )}
     </nav>
   );
 };
