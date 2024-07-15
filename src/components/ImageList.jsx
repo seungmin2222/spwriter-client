@@ -27,7 +27,7 @@ export const ImageList = () => {
       <section className="flex flex-col w-full h-[90%] px-[20px] pb-[20px] text-lg font-light space-y-3 overflow-y-auto">
         <article
           className={`flex w-full h-[70px] bg-[#f0f4f8] rounded-md transition-colors duration-300 shadow-sm ${
-            !isButtonHovered ? 'hover:bg-[#d9e2ec]' : ''
+            !isButtonHovered ? 'hover:bg-[#e2e8f0]' : ''
           }`}
         >
           <figure className="flex w-[20%]">

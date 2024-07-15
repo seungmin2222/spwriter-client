@@ -26,6 +26,7 @@ export const Navbar = () => {
         img.onload = () => {
           newImages.push(img);
           if (newImages.length === files.length) {
+            newImages.sort((a, b) => b.width * b.height - a.width * a.height);
             const newCoordinates = newImages.map((img, index) => ({
               index: Date.now() + index,
               x: 0,
