@@ -92,7 +92,7 @@ export const Navbar = () => {
 
   return (
     <nav
-      className="flex w-full h-[10%] h-min-[50px] py-[10px] bg-white rounded-t-md items-center justify-around shadow-md"
+      className="flex w-full h-[10%] h-min-[50px] py-[10px] bg-white rounded-t-md items-center justify-around shadow-md select-none"
       data-testid="navbar"
     >
       <div className="relative inline-block bg-[#1f77b4] hover:bg-[#1a5a91] transition-colors duration-300 rounded-md">
