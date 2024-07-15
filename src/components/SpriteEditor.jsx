@@ -28,7 +28,8 @@ export const SpriteEditor = () => {
       (acc, coord) => acc + coord.width + padding,
       -padding
     );
-    const maxHeight = Math.max(...coordinates.map(coord => coord.height));
+    const maxHeight =
+      Math.max(...coordinates.map(coord => coord.height)) + padding * 2;
     canvas.width = totalWidth;
     canvas.height = maxHeight;
 
@@ -40,9 +41,9 @@ export const SpriteEditor = () => {
 
     let xOffset = 0;
     coordinates.forEach(coord => {
-      ctx.drawImage(coord.img, xOffset, 0, coord.width, coord.height);
+      ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
       coord.x = xOffset;
-      coord.y = 0;
+      coord.y = padding;
       xOffset += coord.width + padding;
     });
   };

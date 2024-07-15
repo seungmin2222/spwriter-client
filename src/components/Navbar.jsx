@@ -83,15 +83,16 @@ export const Navbar = () => {
       (acc, coord) => acc + coord.width + padding,
       -padding
     );
-    const maxHeight = Math.max(...coordinates.map(coord => coord.height));
+    const maxHeight =
+      Math.max(...coordinates.map(coord => coord.height)) + padding * 2;
     canvasRef.current.width = totalWidth;
     canvasRef.current.height = maxHeight;
 
     let xOffset = 0;
     coordinates.forEach(coord => {
-      ctx.drawImage(coord.img, xOffset, 0, coord.width, coord.height);
+      ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
       coord.x = xOffset;
-      coord.y = 0;
+      coord.y = padding;
       xOffset += coord.width + padding;
     });
   };
@@ -128,7 +129,7 @@ export const Navbar = () => {
         </label>
       </div>
       <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
-        <label className="text-gray-700">Padding between elements :</label>
+        <label className="text-gray-700">Padding :</label>
         <div className="flex items-center space-x-1">
           <input
             type="number"
