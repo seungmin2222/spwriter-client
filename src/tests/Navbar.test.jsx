@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { Navbar } from '../components/Navbar';
 import { useFileStore } from '../../store';
 
@@ -11,7 +11,7 @@ describe('Navbar', () => {
 
     expect(screen.getByTestId('navbar')).toBeInTheDocument();
     expect(screen.getByText('Open files')).toBeInTheDocument();
-    expect(screen.getByText('Padding between elements :')).toBeInTheDocument();
+    expect(screen.getByText('Padding :')).toBeInTheDocument();
     expect(screen.getByText('Align-elements :')).toBeInTheDocument();
   });
 
@@ -54,13 +54,26 @@ describe('Navbar', () => {
   });
 
   it('alerts when download button is clicked with no coordinates', () => {
-    global.alert = vi.fn();
+    const addToast = vi.fn();
+    useFileStore.setState({ coordinates: [], addToast });
 
     render(<Navbar />);
 
     const downloadButton = screen.getByRole('button', { name: /download/i });
     fireEvent.click(downloadButton);
 
-    expect(global.alert).toHaveBeenCalledWith('다운로드할 이미지가 없습니다.');
+    expect(addToast).toHaveBeenCalledWith('다운로드할 이미지가 없습니다.');
+  });
+
+  it('renders Align-elements options correctly', () => {
+    render(<Navbar />);
+
+    const selectElement = screen.getByLabelText('Align-elements :');
+    const options = selectElement.querySelectorAll('option');
+
+    expect(options).toHaveLength(3);
+    expect(options[0].value).toBe('Binary Tree');
+    expect(options[1].value).toBe('left-right');
+    expect(options[2].value).toBe('top-bottom');
   });
 });
