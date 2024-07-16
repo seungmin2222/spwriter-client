@@ -4,7 +4,10 @@ import { SpriteMain } from './SpriteMain';
 
 export const App = () => {
   return (
-    <div className="flex justify-between w-screen h-screen bg-slate-200 p-[4%]">
+    <div
+      className="flex justify-between w-screen h-screen bg-slate-200 p-[4%]"
+      data-testid="app"
+    >
       <ImageList />
       <SpriteMain />
     </div>
