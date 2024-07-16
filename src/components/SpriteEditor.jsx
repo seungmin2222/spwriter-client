@@ -74,7 +74,7 @@ export const SpriteEditor = () => {
       className="relative w-full h-[80%] overflow-auto bg-[#f0f4f8]"
       data-testid="sprite-editor"
     >
-      <canvas ref={canvasRef} className="flex"></canvas>
+      <canvas ref={canvasRef} className="flex" data-testid="canvas"></canvas>
     </div>
   );
 };
