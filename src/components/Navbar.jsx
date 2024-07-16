@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import downloadIcon from '../assets/images/download-solid.svg';
 import { useFileStore } from '../../store';
 import { Toast } from './Toast';
@@ -54,10 +54,11 @@ export const Navbar = () => {
   };
 
   const handlePaddingChange = event => {
-    if (event.target.value <= 0) {
+    const value = Number(event.target.value);
+    if (value <= 0) {
       addToast('1 보다 작게 설정 할 수 없습니다.');
     } else {
-      setPadding(Number(event.target.value));
+      setPadding(value);
     }
   };
 
@@ -163,7 +164,7 @@ export const Navbar = () => {
         </div>
       </div>
       <div className="flex gap-4 w-[28%]">
-        <div className="flex items-center space-x-2 h-[40px]  w-full">
+        <div className="flex items-center space-x-2 h-[40px] w-full">
           <input
             type="text"
             className="flex-grow focus:outline-none h-full p-2 border-b-2 border-gray-400 focus-within:border-gray-600"
