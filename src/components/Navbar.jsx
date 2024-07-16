@@ -108,7 +108,7 @@ export const Navbar = () => {
 
   const handleFileChange = event => {
     const files = Array.from(event.target.files);
-    setFiles(files);
+    setFiles(prevFiles => [...prevFiles, ...files]);
 
     const newImages = [];
     files.forEach(file => {
@@ -120,7 +120,7 @@ export const Navbar = () => {
             newImages.push(trimmedImg);
             if (newImages.length === files.length) {
               const newCoordinates = calculateCoordinates(newImages, padding);
-              sortAndSetCoordinates(newCoordinates);
+              sortAndSetCoordinates([...coordinates, ...newCoordinates]);
             }
           });
         };
