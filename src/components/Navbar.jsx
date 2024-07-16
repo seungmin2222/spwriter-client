@@ -5,14 +5,13 @@ import { Toast } from './Toast';
 
 export const Navbar = () => {
   const [option, setOption] = useState('Binary Tree');
+  const [fileName, setFileName] = useState('');
   const setFiles = useFileStore(state => state.setFiles);
-  const addCoordinates = useFileStore(state => state.addCoordinates);
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
   const padding = useFileStore(state => state.padding);
   const setPadding = useFileStore(state => state.setPadding);
   const canvasRef = useFileStore(state => state.canvasRef);
-  const [fileName, setFileName] = useState('');
   const addToast = useFileStore(state => state.addToast);
   const toast = useFileStore(state => state.toast);
   const setToast = useFileStore(state => state.setToast);
@@ -22,6 +21,57 @@ export const Navbar = () => {
       (a, b) => b.width * b.height - a.width * a.height
     );
     setCoordinates(sortedCoordinates);
+  };
+
+  const trimImage = img => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+    let left = canvas.width,
+      right = 0,
+      top = canvas.height,
+      bottom = 0;
+
+    for (let y = 0; y < canvas.height; y++) {
+      for (let x = 0; x < canvas.width; x++) {
+        const index = (y * canvas.width + x) * 4;
+        if (pixels[index + 3] > 0) {
+          if (x < left) left = x;
+          if (x > right) right = x;
+          if (y < top) top = y;
+          if (y > bottom) bottom = y;
+        }
+      }
+    }
+
+    const trimmedWidth = right - left + 1;
+    const trimmedHeight = bottom - top + 1;
+    const trimmedCanvas = document.createElement('canvas');
+    const trimmedCtx = trimmedCanvas.getContext('2d');
+    trimmedCanvas.width = trimmedWidth;
+    trimmedCanvas.height = trimmedHeight;
+    trimmedCtx.drawImage(
+      canvas,
+      left,
+      top,
+      trimmedWidth,
+      trimmedHeight,
+      0,
+      0,
+      trimmedWidth,
+      trimmedHeight
+    );
+
+    const trimmedImg = new Image();
+    trimmedImg.src = trimmedCanvas.toDataURL();
+    return new Promise(resolve => {
+      trimmedImg.onload = () => resolve(trimmedImg);
+    });
   };
 
   const handleFileChange = event => {
@@ -34,18 +84,20 @@ export const Navbar = () => {
       reader.onload = () => {
         const img = new Image();
         img.onload = () => {
-          newImages.push(img);
-          if (newImages.length === files.length) {
-            const newCoordinates = newImages.map((img, index) => ({
-              index: Date.now() + index,
-              x: 0,
-              y: 0,
-              width: img.width,
-              height: img.height,
-              img,
-            }));
-            sortAndSetCoordinates(newCoordinates);
-          }
+          trimImage(img).then(trimmedImg => {
+            newImages.push(trimmedImg);
+            if (newImages.length === files.length) {
+              const newCoordinates = newImages.map((img, index) => ({
+                index: Date.now() + index,
+                x: 0,
+                y: 0,
+                width: img.width,
+                height: img.height,
+                img,
+              }));
+              sortAndSetCoordinates(newCoordinates);
+            }
+          });
         };
         img.src = reader.result;
       };
