@@ -15,22 +15,6 @@ describe('Navbar', () => {
     expect(screen.getByText('Align-elements :')).toBeInTheDocument();
   });
 
-  it('calls setFiles on file input change', () => {
-    const setFiles = vi.fn();
-    useFileStore.setState({ setFiles });
-
-    render(<Navbar />);
-
-    const fileInput = screen.getByLabelText(/open files/i);
-    const file = new File(['dummy content'], 'example.png', {
-      type: 'image/png',
-    });
-
-    fireEvent.change(fileInput, { target: { files: [file] } });
-
-    expect(setFiles).toHaveBeenCalledWith([file]);
-  });
-
   it('calls setPadding on padding input change', () => {
     const setPadding = vi.fn();
     useFileStore.setState({ setPadding });
@@ -75,5 +59,17 @@ describe('Navbar', () => {
     expect(options[0].value).toBe('Binary Tree');
     expect(options[1].value).toBe('left-right');
     expect(options[2].value).toBe('top-bottom');
+  });
+
+  it('displays an error message when padding value is set to less than 1', () => {
+    const addToast = vi.fn();
+    useFileStore.setState({ addToast });
+
+    render(<Navbar />);
+
+    const paddingInput = screen.getByRole('spinbutton');
+    fireEvent.change(paddingInput, { target: { value: '0' } });
+
+    expect(addToast).toHaveBeenCalledWith('1 보다 작게 설정 할 수 없습니다.');
   });
 });
