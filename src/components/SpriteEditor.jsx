@@ -2,10 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import { useFileStore } from '../../store';
 
 export const SpriteEditor = () => {
-  const canvasRef = useRef();
+  const canvasRef = useRef(null);
   const setCanvasRef = useFileStore(state => state.setCanvasRef);
   const coordinates = useFileStore(state => state.coordinates);
   const padding = useFileStore(state => state.padding);
+  const setCoordinates = useFileStore(state => state.setCoordinates);
 
   useEffect(() => {
     setCanvasRef(canvasRef);
@@ -18,9 +19,9 @@ export const SpriteEditor = () => {
   }, [coordinates, padding]);
 
   const drawImages = () => {
-    if (!canvasRef.current) return;
-
     const canvas = canvasRef.current;
+    if (!canvas) return;
+
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -40,14 +41,19 @@ export const SpriteEditor = () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let xOffset = 0;
-    coordinates.forEach(coord => {
+    const updatedCoordinates = coordinates.map(coord => {
       if (coord.img.complete) {
         ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
-        coord.x = xOffset;
-        coord.y = padding;
+        const updatedCoord = { ...coord, x: xOffset, y: padding };
         xOffset += coord.width + padding;
+        return updatedCoord;
       }
+      return coord;
     });
+
+    if (JSON.stringify(coordinates) !== JSON.stringify(updatedCoordinates)) {
+      setCoordinates(updatedCoordinates);
+    }
   };
 
   const createCheckerboardPattern = () => {
