@@ -77,7 +77,10 @@ export const ImageList = () => {
   };
 
   return (
-    <aside className="flex flex-col w-[26%] h-full mr-[2%] bg-[#f9fafb] rounded-md shadow-md">
+    <aside
+      className="flex flex-col w-[26%] h-full mr-[2%] bg-[#f9fafb] rounded-md shadow-md"
+      data-testid="image-list"
+    >
       <header className="flex w-full h-[10%] justify-center items-center text-3xl font-semibold text-gray-800">
         Image List
       </header>
