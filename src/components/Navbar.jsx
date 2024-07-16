@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import downloadIcon from '../assets/images/download-solid.svg';
 import { useFileStore } from '../../store';
 import { Toast } from './Toast';
@@ -16,8 +16,24 @@ export const Navbar = () => {
   const toast = useFileStore(state => state.toast);
   const setToast = useFileStore(state => state.setToast);
 
+  const initialRender = useRef(true);
+
+  useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = false;
+    } else {
+      if (coordinates.length > 0) {
+        const newCoordinates = calculateCoordinates(
+          coordinates.map(coord => coord.img),
+          padding
+        );
+        setCoordinates(newCoordinates);
+      }
+    }
+  }, [padding]);
+
   const sortAndSetCoordinates = newCoords => {
-    const sortedCoordinates = [...coordinates, ...newCoords].sort(
+    const sortedCoordinates = [...newCoords].sort(
       (a, b) => b.width * b.height - a.width * a.height
     );
     setCoordinates(sortedCoordinates);
@@ -74,6 +90,22 @@ export const Navbar = () => {
     });
   };
 
+  const calculateCoordinates = (images, padding) => {
+    let xOffset = 0;
+    return images.map((img, index) => {
+      const coord = {
+        index: Date.now() + index,
+        x: xOffset,
+        y: padding,
+        width: img.width,
+        height: img.height,
+        img,
+      };
+      xOffset += img.width + padding;
+      return coord;
+    });
+  };
+
   const handleFileChange = event => {
     const files = Array.from(event.target.files);
     setFiles(files);
@@ -87,14 +119,7 @@ export const Navbar = () => {
           trimImage(img).then(trimmedImg => {
             newImages.push(trimmedImg);
             if (newImages.length === files.length) {
-              const newCoordinates = newImages.map((img, index) => ({
-                index: Date.now() + index,
-                x: 0,
-                y: 0,
-                width: img.width,
-                height: img.height,
-                img,
-              }));
+              const newCoordinates = calculateCoordinates(newImages, padding);
               sortAndSetCoordinates(newCoordinates);
             }
           });
