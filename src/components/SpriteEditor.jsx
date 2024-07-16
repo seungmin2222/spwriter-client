@@ -41,10 +41,12 @@ export const SpriteEditor = () => {
 
     let xOffset = 0;
     coordinates.forEach(coord => {
-      ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
-      coord.x = xOffset;
-      coord.y = padding;
-      xOffset += coord.width + padding;
+      if (coord.img.complete) {
+        ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
+        coord.x = xOffset;
+        coord.y = padding;
+        xOffset += coord.width + padding;
+      }
     });
   };
 
