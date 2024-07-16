@@ -14,6 +14,7 @@ export const Modal = ({ showModal, handleClose, handleConfirm }) => {
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+      data-testid="modal"
       onClick={handleBackgroundClick}
     >
       <div

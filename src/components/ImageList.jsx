@@ -65,6 +65,7 @@ export const ImageList = () => {
         >
           <svg
             className="h-6 w-6 bg-[#1f77b4] transition-colors duration-300 group-hover:fill-current group-hover:text-white group-hover:bg-[#07427e] rounded-full"
+            aria-label="cross"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="#ffffff"
@@ -85,7 +86,9 @@ export const ImageList = () => {
         Image List
       </header>
       <section className="flex flex-col w-full h-[90%] px-[20px] pb-[20px] text-lg font-light space-y-3 overflow-y-auto">
-        {coordinates.map((image, index) => renderImageList(image, index))}
+        {Array.isArray(coordinates)
+          ? coordinates.map((image, index) => renderImageList(image, index))
+          : null}
       </section>
       <Modal
         showModal={showModal}
