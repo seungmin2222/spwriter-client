@@ -24,6 +24,7 @@ describe('ImageList component', () => {
         { img: { src: 'image2.png' }, width: 50, height: 50, x: 0, y: 0 },
       ],
       setCoordinates: vi.fn(),
+      handleImageClick: vi.fn(),
     });
   });
 
@@ -49,5 +50,13 @@ describe('ImageList component', () => {
     expect(images).toHaveLength(2);
     expect(images[0]).toHaveAttribute('src', 'image1.png');
     expect(images[1]).toHaveAttribute('src', 'image2.png');
+  });
+  it('does not call handleImageClick when non-image button is clicked', () => {
+    render(<ImageList />);
+
+    const deleteButtons = screen.getAllByRole('button', { name: /cross/i });
+    fireEvent.click(deleteButtons[0]);
+
+    expect(useFileStore.getState().handleImageClick).not.toHaveBeenCalled();
   });
 });
