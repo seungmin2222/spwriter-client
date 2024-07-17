@@ -8,6 +8,8 @@ function ImageList() {
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState(null);
   const coordinates = useFileStore(state => state.coordinates);
+  const lastClickedIndex = useFileStore(state => state.lastClickedIndex);
+  const setLastClickedIndex = useFileStore(state => state.setLastClickedIndex);
 
   const handleOpenModal = () => {
     setShowModal(true);
@@ -33,6 +35,8 @@ function ImageList() {
 
   const handleImageClick = (image, index) => {
     const cssText = generateCSS(image, index);
+    setLastClickedIndex(index);
+
     navigator.clipboard
       .writeText(cssText)
       .then(() => {
@@ -58,12 +62,13 @@ function ImageList() {
   };
 
   const renderImageList = (image, index) => {
+    const isSelected = index === lastClickedIndex;
     return (
       <article
         key={index}
         className={`flex w-full h-[70px] bg-[#f0f4f8] rounded-md transition-colors duration-300 shadow-sm ${
           !isButtonHovered ? 'hover:bg-[#e2e8f0]' : ''
-        }`}
+        } ${isSelected ? 'border border-blue-500' : ''}`}
       >
         <button
           className="flex w-[20%] items-center justify-center"
@@ -72,7 +77,7 @@ function ImageList() {
           <img
             src={image.img.src}
             alt={`Thumbnail ${index}`}
-            className="p-[5px] border shadow-sm"
+            className="p-[5px] border shadow-sm rounded-md"
           />
         </button>
         <button
