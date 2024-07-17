@@ -5,7 +5,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ImageList from '../components/ImageList';
 import useFileStore from '../../store';
 
-// Modal 컴포넌트 모킹
 vi.mock('../components/Modal', () => ({
   __esModule: true,
   default: ({ showModal, handleClose, handleConfirm }) => {
