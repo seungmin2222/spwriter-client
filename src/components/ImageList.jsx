@@ -46,6 +46,11 @@ function ImageList() {
       });
   };
 
+  const handleButtonClick = event => {
+    event.stopPropagation();
+    handleOpenModal();
+  };
+
   const renderImageList = (image, index) => {
     return (
       <article
@@ -77,7 +82,7 @@ function ImageList() {
           className="flex justify-center items-center w-[9%] h-full group"
           onMouseEnter={() => setIsButtonHovered(true)}
           onMouseLeave={() => setIsButtonHovered(false)}
-          onClick={handleOpenModal}
+          onClick={handleButtonClick}
           aria-label="cross"
         >
           <svg
