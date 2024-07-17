@@ -53,7 +53,7 @@ function ImageList() {
         }`}
       >
         <button
-          className="flex w-[20%]"
+          className="flex w-[20%] items-center justify-center"
           onClick={() => handleImageClick(image, index)}
         >
           <img
