@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi } from 'vitest';
-import { Navbar } from '../components/Navbar';
-import { useFileStore } from '../../store';
+import Navbar from '../components/Navbar';
+import useFileStore from '../../store';
 
 describe('Navbar', () => {
   it('renders correctly', () => {

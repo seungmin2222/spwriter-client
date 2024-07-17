@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SpriteEditor } from '../components/SpriteEditor';
-import { useFileStore } from '../../store';
+import SpriteEditor from '../components/SpriteEditor';
+import useFileStore from '../../store';
 
 describe('SpriteEditor component', () => {
   let getContextMock;

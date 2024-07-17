@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-export const Toast = ({ id, message, onClose }) => {
+function Toast({ id, message, onClose }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -23,4 +23,6 @@ export const Toast = ({ id, message, onClose }) => {
       {message}
     </div>
   );
-};
+}
+
+export default Toast;

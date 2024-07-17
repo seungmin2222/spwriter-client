@@ -4,7 +4,7 @@ import cloneIcon from '../assets/images/copy-regular.svg';
 import leftIcon from '../assets/images/angles-left-solid.svg';
 import rightIcon from '../assets/images/angles-right-solid.svg';
 
-export const Footer = () => {
+function Footer() {
   const buttonStyle =
     'p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300';
 
@@ -31,4 +31,6 @@ export const Footer = () => {
       </div>
     </footer>
   );
-};
+}
+
+export default Footer;

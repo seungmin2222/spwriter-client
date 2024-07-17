@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export const useFileStore = create(set => ({
+const useFileStore = create(set => ({
   files: [],
   setFiles: files => set({ files }),
   padding: 10,
@@ -13,5 +13,7 @@ export const useFileStore = create(set => ({
   setCanvasRef: canvasRef => set({ canvasRef }),
   toast: null,
   setToast: toast => set({ toast }),
-  addToast: message => set(state => ({ toast: { id: Date.now(), message } })),
+  addToast: message => set(() => ({ toast: { id: Date.now(), message } })),
 }));
+
+export default useFileStore;

@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import downloadIcon from '../assets/images/download-solid.svg';
-import { useFileStore } from '../../store';
-import { Toast } from './Toast';
+import useFileStore from '../../store';
+import Toast from './Toast';
 
-export const Navbar = () => {
+function Navbar() {
   const [option, setOption] = useState('Binary Tree');
   const [fileName, setFileName] = useState('');
   const setFiles = useFileStore(state => state.setFiles);
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
-  const padding = useFileStore(state => state.padding);
+  const paddingValue = useFileStore(state => state.padding);
   const setPadding = useFileStore(state => state.setPadding);
   const canvasRef = useFileStore(state => state.canvasRef);
   const addToast = useFileStore(state => state.addToast);
@@ -18,19 +18,54 @@ export const Navbar = () => {
 
   const initialRender = useRef(true);
 
+  const calculateCoordinates = (images, padding) => {
+    let xOffset = 0;
+    return images.map((img, index) => {
+      const coord = {
+        index: Date.now() + index,
+        x: xOffset,
+        y: padding,
+        width: img.width,
+        height: img.height,
+        img,
+      };
+      xOffset += img.width + padding;
+      return coord;
+    });
+  };
+
+  const drawImagesWithoutBackground = ctx => {
+    const { coordinates: coords } = useFileStore.getState();
+    const { padding: pad } = useFileStore.getState();
+
+    const totalWidth = coords.reduce(
+      (acc, coord) => acc + coord.width + pad,
+      -pad
+    );
+    const maxHeight = Math.max(...coords.map(coord => coord.height)) + pad * 2;
+    canvasRef.current.width = totalWidth;
+    canvasRef.current.height = maxHeight;
+
+    let xOffset = 0;
+    coords.forEach(coord => {
+      ctx.drawImage(coord.img, xOffset, pad, coord.width, coord.height);
+      coord.x = xOffset;
+      coord.y = pad;
+      xOffset += coord.width + pad;
+    });
+  };
+
   useEffect(() => {
     if (initialRender.current) {
       initialRender.current = false;
-    } else {
-      if (coordinates.length > 0) {
-        const newCoordinates = calculateCoordinates(
-          coordinates.map(coord => coord.img),
-          padding
-        );
-        setCoordinates(newCoordinates);
-      }
+    } else if (coordinates.length > 0) {
+      const newCoordinates = calculateCoordinates(
+        coordinates.map(coord => coord.img),
+        paddingValue
+      );
+      setCoordinates(newCoordinates);
     }
-  }, [padding]);
+  }, [paddingValue]);
 
   const sortAndSetCoordinates = newCoords => {
     const sortedCoordinates = [...newCoords].sort(
@@ -48,10 +83,10 @@ export const Navbar = () => {
 
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const pixels = imageData.data;
-    let left = canvas.width,
-      right = 0,
-      top = canvas.height,
-      bottom = 0;
+    let left = canvas.width;
+    let right = 0;
+    let top = canvas.height;
+    let bottom = 0;
 
     for (let y = 0; y < canvas.height; y++) {
       for (let x = 0; x < canvas.width; x++) {
@@ -90,22 +125,6 @@ export const Navbar = () => {
     });
   };
 
-  const calculateCoordinates = (images, padding) => {
-    let xOffset = 0;
-    return images.map((img, index) => {
-      const coord = {
-        index: Date.now() + index,
-        x: xOffset,
-        y: padding,
-        width: img.width,
-        height: img.height,
-        img,
-      };
-      xOffset += img.width + padding;
-      return coord;
-    });
-  };
-
   const handleFileChange = event => {
     const files = Array.from(event.target.files);
     setFiles(prevFiles => [...prevFiles, ...files]);
@@ -119,7 +138,10 @@ export const Navbar = () => {
           trimImage(img).then(trimmedImg => {
             newImages.push(trimmedImg);
             if (newImages.length === files.length) {
-              const newCoordinates = calculateCoordinates(newImages, padding);
+              const newCoordinates = calculateCoordinates(
+                newImages,
+                paddingValue
+              );
               sortAndSetCoordinates([...coordinates, ...newCoordinates]);
             }
           });
@@ -163,28 +185,6 @@ export const Navbar = () => {
     ctx.putImageData(imageData, 0, 0);
   };
 
-  const drawImagesWithoutBackground = ctx => {
-    const coordinates = useFileStore.getState().coordinates;
-    const padding = useFileStore.getState().padding;
-
-    const totalWidth = coordinates.reduce(
-      (acc, coord) => acc + coord.width + padding,
-      -padding
-    );
-    const maxHeight =
-      Math.max(...coordinates.map(coord => coord.height)) + padding * 2;
-    canvasRef.current.width = totalWidth;
-    canvasRef.current.height = maxHeight;
-
-    let xOffset = 0;
-    coordinates.forEach(coord => {
-      ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
-      coord.x = xOffset;
-      coord.y = padding;
-      xOffset += coord.width + padding;
-    });
-  };
-
   const removeToast = id => {
     if (toast && toast.id === id) {
       setToast(null);
@@ -213,11 +213,14 @@ export const Navbar = () => {
           </label>
         </div>
         <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
-          <label className="text-gray-700">Padding :</label>
+          <label htmlFor="paddingInput" className="text-gray-700">
+            Padding :
+          </label>
           <div className="flex items-center space-x-1">
             <input
               type="number"
-              value={padding}
+              id="paddingInput"
+              value={paddingValue}
               onChange={handlePaddingChange}
               className="w-16 p-1 border rounded-md text-center"
             />
@@ -267,4 +270,6 @@ export const Navbar = () => {
       )}
     </nav>
   );
-};
+}
+
+export default Navbar;

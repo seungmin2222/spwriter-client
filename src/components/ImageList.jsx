@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Modal } from './Modal';
-import { useFileStore } from '../../store';
+import Modal from './Modal';
+import useFileStore from '../../store';
 
-export const ImageList = () => {
+function ImageList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const coordinates = useFileStore(state => state.coordinates);
@@ -16,7 +16,7 @@ export const ImageList = () => {
   };
 
   const handleConfirm = () => {
-    console.log('삭제가 확인되었습니다.');
+    // console.log('삭제가 확인되었습니다.');
     setShowModal(false);
   };
 
@@ -41,7 +41,7 @@ export const ImageList = () => {
         <figure className="flex w-[20%]">
           <img
             src={image.img.src}
-            alt={`Image ${index}`}
+            alt={`Thumbnail ${index}`}
             className="p-[5px] border shadow-sm"
           />
         </figure>
@@ -97,4 +97,6 @@ export const ImageList = () => {
       />
     </aside>
   );
-};
+}
+
+export default ImageList;

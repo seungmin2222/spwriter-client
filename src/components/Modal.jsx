@@ -1,9 +1,9 @@
 import React from 'react';
 
-export const Modal = ({ showModal, handleClose, handleConfirm }) => {
+function Modal({ showModal, handleClose, handleConfirm }) {
   if (!showModal) return null;
 
-  const handleBackgroundClick = e => {
+  const handleBackgroundClick = () => {
     handleClose();
   };
 
@@ -16,10 +16,20 @@ export const Modal = ({ showModal, handleClose, handleConfirm }) => {
       className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
       data-testid="modal"
       onClick={handleBackgroundClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => {
+        if (e.key === 'Escape') handleClose();
+      }}
     >
       <div
         className="bg-white rounded-lg shadow-lg p-6 w-[300px]"
         onClick={handleContentClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => {
+          if (e.key === 'Escape') handleClose();
+        }}
       >
         <h2 className="text-xl mb-4">
           Are you sure you want to delete the image file?
@@ -41,4 +51,6 @@ export const Modal = ({ showModal, handleClose, handleConfirm }) => {
       </div>
     </div>
   );
-};
+}
+
+export default Modal;
