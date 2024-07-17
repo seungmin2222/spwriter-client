@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
 import useFileStore from '../../store';
+import Toast from './Toast';
 
 function ImageList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const coordinates = useFileStore(state => state.coordinates);
+  const [toastVisible, setToastVisible] = useState(false);
 
   const handleOpenModal = () => {
     setShowModal(true);
@@ -16,7 +18,6 @@ function ImageList() {
   };
 
   const handleConfirm = () => {
-    // console.log('삭제가 확인되었습니다.');
     setShowModal(false);
   };
 
@@ -30,6 +31,21 @@ function ImageList() {
     `;
   };
 
+  const handleClickOutside = () => {
+    const cssText = coordinates
+      .map((image, index) => generateCSS(image, index))
+      .join('\n');
+    navigator.clipboard
+      .writeText(cssText)
+      .then(() => {
+        setToastVisible(true);
+        setTimeout(() => setToastVisible(false), 2000);
+      })
+      .catch(err => {
+        console.error('클립보드 복사 실패:', err);
+      });
+  };
+
   const renderImageList = (image, index) => {
     return (
       <article
@@ -37,6 +53,7 @@ function ImageList() {
         className={`flex w-full h-[70px] bg-[#f0f4f8] rounded-md transition-colors duration-300 shadow-sm ${
           !isButtonHovered ? 'hover:bg-[#e2e8f0]' : ''
         }`}
+        onClick={handleClickOutside}
       >
         <figure className="flex w-[20%]">
           <img
@@ -95,6 +112,9 @@ function ImageList() {
         handleClose={handleCloseModal}
         handleConfirm={handleConfirm}
       />
+      {toastVisible && (
+        <Toast message="CSS 정보가 클립보드에 복사되었습니다." />
+      )}
     </aside>
   );
 }
