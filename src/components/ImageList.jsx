@@ -77,7 +77,7 @@ function ImageList() {
           <img
             src={image.img.src}
             alt={`Thumbnail ${index}`}
-            className="p-[5px] border shadow-sm rounded-md"
+            className="max-h-[60px] p-[5px] border shadow-sm rounded-md"
           />
         </button>
         <button
