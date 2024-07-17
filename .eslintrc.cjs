@@ -45,6 +45,7 @@ module.exports = {
     'no-underscore-dangle': 'off',
     'jsx-a11y/label-has-associated-control': 'off',
     'no-plusplus': 'off',
+    'jsx-a11y/click-events-have-key-events': 'off',
   },
   settings: {
     react: {
