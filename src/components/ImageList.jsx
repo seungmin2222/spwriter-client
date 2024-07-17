@@ -6,8 +6,8 @@ import Toast from './Toast';
 function ImageList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const coordinates = useFileStore(state => state.coordinates);
   const [toastVisible, setToastVisible] = useState(false);
+  const coordinates = useFileStore(state => state.coordinates);
 
   const handleOpenModal = () => {
     setShowModal(true);
@@ -31,10 +31,8 @@ function ImageList() {
     `;
   };
 
-  const handleClickOutside = () => {
-    const cssText = coordinates
-      .map((image, index) => generateCSS(image, index))
-      .join('\n');
+  const handleImageClick = (image, index) => {
+    const cssText = generateCSS(image, index);
     navigator.clipboard
       .writeText(cssText)
       .then(() => {
@@ -46,11 +44,6 @@ function ImageList() {
       });
   };
 
-  const handleButtonClick = event => {
-    event.stopPropagation();
-    handleOpenModal();
-  };
-
   const renderImageList = (image, index) => {
     return (
       <article
@@ -58,16 +51,18 @@ function ImageList() {
         className={`flex w-full h-[70px] bg-[#f0f4f8] rounded-md transition-colors duration-300 shadow-sm ${
           !isButtonHovered ? 'hover:bg-[#e2e8f0]' : ''
         }`}
-        onClick={handleClickOutside}
       >
-        <figure className="flex w-[20%]">
+        <button
+          className="flex w-[20%]"
+          onClick={() => handleImageClick(image, index)}
+        >
           <img
             src={image.img.src}
             alt={`Thumbnail ${index}`}
             className="p-[5px] border shadow-sm"
           />
-        </figure>
-        <div
+        </button>
+        <button
           className="flex w-[71%] h-full pl-[5px] text-[12px] leading-[24px] text-gray-700 overflow-hidden"
           style={{
             display: '-webkit-box',
@@ -75,14 +70,19 @@ function ImageList() {
             WebkitLineClamp: 3,
             textOverflow: 'ellipsis',
           }}
+          onClick={() => handleImageClick(image, index)}
         >
           {generateCSS(image, index)}
-        </div>
+        </button>
+
         <button
           className="flex justify-center items-center w-[9%] h-full group"
           onMouseEnter={() => setIsButtonHovered(true)}
           onMouseLeave={() => setIsButtonHovered(false)}
-          onClick={handleButtonClick}
+          onClick={e => {
+            e.stopPropagation();
+            handleOpenModal();
+          }}
           aria-label="cross"
         >
           <svg
