@@ -13,10 +13,13 @@ describe('Footer component', () => {
     render(<Footer />);
 
     const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(4);
+    expect(buttons).toHaveLength(5);
 
     const rotateIcon = screen.getByAltText('Rotate Icon');
     expect(rotateIcon).toBeInTheDocument();
+
+    const inversion = screen.getByAltText('Inversion Icon');
+    expect(inversion).toBeInTheDocument();
 
     const cloneIcon = screen.getByAltText('Clone Icon');
     expect(cloneIcon).toBeInTheDocument();
