@@ -1,5 +1,6 @@
 import React from 'react';
 import rotateIcon from '../assets/images/arrows-spin-solid.svg';
+import inversionIcon from '../assets/images/right-left-solid.svg';
 import cloneIcon from '../assets/images/copy-regular.svg';
 import leftIcon from '../assets/images/angles-left-solid.svg';
 import rightIcon from '../assets/images/angles-right-solid.svg';
@@ -16,6 +17,9 @@ function Footer() {
       <div className="flex space-x-4">
         <button className={buttonStyle}>
           <img src={rotateIcon} alt="Rotate Icon" className="h-6 w-6" />
+        </button>
+        <button className={buttonStyle}>
+          <img src={inversionIcon} alt="Inversion Icon" className="h-6 w-6" />
         </button>
         <button className={buttonStyle}>
           <img src={cloneIcon} alt="Clone Icon" className="h-6 w-6" />
