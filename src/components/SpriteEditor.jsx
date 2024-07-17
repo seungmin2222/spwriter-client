@@ -7,6 +7,7 @@ function SpriteEditor() {
   const coordinates = useFileStore(state => state.coordinates);
   const padding = useFileStore(state => state.padding);
   const setCoordinates = useFileStore(state => state.setCoordinates);
+  const lastClickedIndex = useFileStore(state => state.lastClickedIndex);
 
   const createCheckerboardPattern = () => {
     const patternCanvas = document.createElement('canvas');
@@ -44,9 +45,15 @@ function SpriteEditor() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let xOffset = 0;
-    const updatedCoordinates = coordinates.map(coord => {
+    const updatedCoordinates = coordinates.map((coord, index) => {
       if (coord.img.complete) {
         ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
+        // 선택된 이미지에 파란색 보더 추가
+        if (index === lastClickedIndex) {
+          ctx.strokeStyle = 'blue';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(xOffset, padding, coord.width, coord.height);
+        }
         const updatedCoord = { ...coord, x: xOffset, y: padding };
         xOffset += coord.width + padding;
         return updatedCoord;
@@ -67,7 +74,7 @@ function SpriteEditor() {
     if (canvasRef.current && coordinates.length > 0) {
       drawImages();
     }
-  }, [coordinates, padding]);
+  }, [coordinates, padding, lastClickedIndex]);
 
   return (
     <div
