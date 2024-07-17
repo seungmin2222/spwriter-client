@@ -179,7 +179,7 @@ function Navbar() {
 
     const link = document.createElement('a');
     link.href = canvas.toDataURL('image/png');
-    link.download = `${fileName}.png`;
+    link.download = fileName ? `${fileName}.png` : 'sprite.png';
     link.click();
 
     ctx.putImageData(imageData, 0, 0);
