@@ -49,7 +49,7 @@ function SpriteEditor() {
     const updatedCoordinates = coordinates.map((coord, index) => {
       if (coord.img.complete) {
         ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
-        // 선택된 이미지에 파란색 보더 추가
+
         if (index === lastClickedIndex) {
           ctx.strokeStyle = 'blue';
           ctx.lineWidth = 1;
@@ -92,12 +92,6 @@ function SpriteEditor() {
     }
   };
 
-  const handleKeyDown = event => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      handleCanvasClick(event);
-    }
-  };
-
   useEffect(() => {
     setCanvasRef(canvasRef);
   }, [setCanvasRef]);
@@ -113,7 +107,6 @@ function SpriteEditor() {
       className="relative w-full h-[80%] overflow-auto bg-[#f0f4f8]"
       data-testid="sprite-editor"
       onClick={handleCanvasClick}
-      onKeyDown={handleKeyDown}
       role="button"
       tabIndex={0}
       aria-label="Sprite Editor Canvas"
