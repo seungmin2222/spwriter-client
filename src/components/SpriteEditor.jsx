@@ -8,6 +8,7 @@ function SpriteEditor() {
   const padding = useFileStore(state => state.padding);
   const setCoordinates = useFileStore(state => state.setCoordinates);
   const lastClickedIndex = useFileStore(state => state.lastClickedIndex);
+  const setLastClickedIndex = useFileStore(state => state.setLastClickedIndex);
 
   const createCheckerboardPattern = () => {
     const patternCanvas = document.createElement('canvas');
@@ -66,6 +67,37 @@ function SpriteEditor() {
     }
   };
 
+  const handleCanvasClick = event => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    let xOffset = 0;
+    for (let i = 0; i < coordinates.length; i++) {
+      const coord = coordinates[i];
+      const startX = xOffset;
+      const endX = xOffset + coord.width;
+      const startY = padding;
+      const endY = padding + coord.height;
+
+      if (x >= startX && x <= endX && y >= startY && y <= endY) {
+        setLastClickedIndex(i);
+        break;
+      }
+
+      xOffset += coord.width + padding;
+    }
+  };
+
+  const handleKeyDown = event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      handleCanvasClick(event);
+    }
+  };
+
   useEffect(() => {
     setCanvasRef(canvasRef);
   }, [setCanvasRef]);
@@ -80,6 +112,11 @@ function SpriteEditor() {
     <div
       className="relative w-full h-[80%] overflow-auto bg-[#f0f4f8]"
       data-testid="sprite-editor"
+      onClick={handleCanvasClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label="Sprite Editor Canvas"
     >
       <canvas ref={canvasRef} className="flex" data-testid="canvas"></canvas>
     </div>
