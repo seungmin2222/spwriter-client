@@ -4,13 +4,18 @@ function Toast({ id, message, onClose }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    setVisible(true);
-    const timer = setTimeout(() => {
+    const showTimer = setTimeout(() => {
+      setVisible(true);
+    }, 10);
+
+    const hideTimer = setTimeout(() => {
       setVisible(false);
       setTimeout(() => onClose(id), 300);
     }, 2000);
+
     return () => {
-      clearTimeout(timer);
+      clearTimeout(showTimer);
+      clearTimeout(hideTimer);
     };
   }, [id, onClose]);
 

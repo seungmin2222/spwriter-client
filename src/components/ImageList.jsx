@@ -6,7 +6,7 @@ import Toast from './Toast';
 function ImageList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [toastVisible, setToastVisible] = useState(false);
+  const [toast, setToast] = useState(null);
   const coordinates = useFileStore(state => state.coordinates);
 
   const handleOpenModal = () => {
@@ -36,12 +36,25 @@ function ImageList() {
     navigator.clipboard
       .writeText(cssText)
       .then(() => {
-        setToastVisible(true);
-        setTimeout(() => setToastVisible(false), 2000);
+        const newToast = {
+          id: Date.now(),
+          message: 'CSS 정보가 클립보드에 복사되었습니다.',
+        };
+        setToast(null);
+        setToast(newToast);
       })
       .catch(err => {
+        const newToast = { id: Date.now(), message: '클립보드 복사 실패.' };
+        setToast(null);
+        setToast(newToast);
         console.error('클립보드 복사 실패:', err);
       });
+  };
+
+  const handleToastClose = id => {
+    if (toast && toast.id === id) {
+      setToast(null);
+    }
   };
 
   const renderImageList = (image, index) => {
@@ -117,8 +130,13 @@ function ImageList() {
         handleClose={handleCloseModal}
         handleConfirm={handleConfirm}
       />
-      {toastVisible && (
-        <Toast message="CSS 정보가 클립보드에 복사되었습니다." />
+      {toast && (
+        <Toast
+          key={toast.id}
+          id={toast.id}
+          message={toast.message}
+          onClose={() => handleToastClose(toast.id)}
+        />
       )}
     </aside>
   );
