@@ -1,11 +1,26 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Navbar from '../components/Navbar';
 import useFileStore from '../../store';
 
 describe('Navbar', () => {
+  beforeEach(() => {
+    useFileStore.setState({
+      setPadding: vi.fn(),
+      coordinates: [],
+      addToast: vi.fn(),
+      setFiles: vi.fn(),
+      setCoordinates: vi.fn(),
+      padding: 10,
+      canvasRef: { current: document.createElement('canvas') },
+      setCanvasRef: vi.fn(),
+      toast: null,
+      setToast: vi.fn(),
+    });
+  });
+
   it('renders correctly', () => {
     render(<Navbar />);
 
@@ -21,7 +36,7 @@ describe('Navbar', () => {
 
     render(<Navbar />);
 
-    const paddingInput = screen.getByRole('spinbutton');
+    const paddingInput = screen.getByLabelText('Padding :');
     fireEvent.change(paddingInput, { target: { value: '20' } });
 
     expect(setPadding).toHaveBeenCalledWith(20);
@@ -67,7 +82,7 @@ describe('Navbar', () => {
 
     render(<Navbar />);
 
-    const paddingInput = screen.getByRole('spinbutton');
+    const paddingInput = screen.getByLabelText('Padding :');
     fireEvent.change(paddingInput, { target: { value: '0' } });
 
     expect(addToast).toHaveBeenCalledWith('1 보다 작게 설정 할 수 없습니다.');
