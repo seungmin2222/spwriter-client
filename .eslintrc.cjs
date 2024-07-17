@@ -43,6 +43,8 @@ module.exports = {
     'no-param-reassign': 0,
     'global-require': 0,
     'no-underscore-dangle': 'off',
+    'jsx-a11y/label-has-associated-control': 'off',
+    'no-plusplus': 'off',
   },
   settings: {
     react: {

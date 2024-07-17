@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ImageList } from '../components/ImageList';
-import { useFileStore } from '../../store';
+import ImageList from '../components/ImageList';
+import useFileStore from '../../store';
 
 vi.mock('../components/Modal', () => ({
   Modal: ({ showModal }) => {

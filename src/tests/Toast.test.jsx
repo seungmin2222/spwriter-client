@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { Toast } from '../components/Toast';
+import Toast from '../components/Toast';
 
 describe('Toast component', () => {
   it('renders the Toast component with the correct message', () => {
