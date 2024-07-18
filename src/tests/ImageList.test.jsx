@@ -24,6 +24,14 @@ describe('ImageList component', () => {
       },
     });
 
+    const mockCanvas = document.createElement('canvas');
+    mockCanvas.width = 300;
+    mockCanvas.height = 150;
+    const mockContext = {
+      clearRect: vi.fn(),
+    };
+    mockCanvas.getContext = vi.fn().mockReturnValue(mockContext);
+
     useFileStore.setState({
       coordinates: [
         {
@@ -43,6 +51,7 @@ describe('ImageList component', () => {
       ],
       lastClickedIndex: null,
       setLastClickedIndex: vi.fn(),
+      canvasRef: { current: mockCanvas },
     });
   });
 
@@ -159,7 +168,7 @@ describe('ImageList component', () => {
     });
     render(<ImageList />);
     const selectedItem = screen.getAllByRole('article')[0];
-    expect(selectedItem).toHaveClass('border-blue-500');
+    expect(selectedItem).toHaveClass('border-[#1f77b4]');
   });
 
   it('handles non-array coordinates', () => {
@@ -202,5 +211,50 @@ describe('ImageList component', () => {
     );
     fireEvent.mouseLeave(deleteButton);
     expect(deleteButton.closest('article')).toHaveClass('hover:bg-[#e2e8f0]');
+  });
+
+  it('clears the canvas when the last image is deleted', async () => {
+    const setCoordinates = useFileStore.getState().setCoordinates;
+    const mockCanvas = document.createElement('canvas');
+    mockCanvas.width = 300;
+    mockCanvas.height = 150;
+    const mockContext = {
+      clearRect: vi.fn(),
+    };
+    mockCanvas.getContext = vi.fn().mockReturnValue(mockContext);
+    useFileStore.setState({ canvasRef: { current: mockCanvas } });
+
+    render(<ImageList />);
+
+    setCoordinates([
+      {
+        img: { src: 'image1.png', width: 50, height: 50, x: 0, y: 0 },
+        width: 50,
+        height: 50,
+        x: 0,
+        y: 0,
+      },
+    ]);
+
+    await waitFor(() => {
+      const deleteButtons = screen.getAllByRole('button', { name: /cross/i });
+      fireEvent.click(deleteButtons[0]);
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId('mock-modal')).toBeInTheDocument()
+    );
+    fireEvent.click(screen.getByText('Confirm'));
+
+    await waitFor(() => {
+      expect(mockContext.clearRect).toHaveBeenCalledWith(
+        0,
+        0,
+        mockCanvas.width,
+        mockCanvas.height
+      );
+    });
+
+    setCoordinates([]);
   });
 });
