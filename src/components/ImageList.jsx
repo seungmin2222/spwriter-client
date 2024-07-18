@@ -7,20 +7,32 @@ function ImageList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState(null);
+  const [indexToDelete, setIndexToDelete] = useState(null);
   const coordinates = useFileStore(state => state.coordinates);
+  const setCoordinates = useFileStore(state => state.setCoordinates);
   const lastClickedIndex = useFileStore(state => state.lastClickedIndex);
   const setLastClickedIndex = useFileStore(state => state.setLastClickedIndex);
+  const canvasRef = useFileStore(state => state.canvasRef);
 
-  const handleOpenModal = () => {
+  const handleOpenModal = index => {
     setShowModal(true);
+    setIndexToDelete(index);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
+    setIndexToDelete(null);
   };
 
   const handleConfirm = () => {
-    setShowModal(false);
+    if (indexToDelete !== null) {
+      const updatedCoordinates = coordinates.filter(
+        (_, index) => index !== indexToDelete
+      );
+      setCoordinates(updatedCoordinates);
+      setShowModal(false);
+      setIndexToDelete(null);
+    }
   };
 
   const generateCSS = (image, index) => {
@@ -99,7 +111,7 @@ function ImageList() {
           onMouseLeave={() => setIsButtonHovered(false)}
           onClick={e => {
             e.stopPropagation();
-            handleOpenModal();
+            handleOpenModal(index);
           }}
           aria-label="cross"
         >
