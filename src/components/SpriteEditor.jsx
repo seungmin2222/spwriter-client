@@ -9,6 +9,7 @@ function SpriteEditor() {
   const setCoordinates = useFileStore(state => state.setCoordinates);
   const lastClickedIndex = useFileStore(state => state.lastClickedIndex);
   const setLastClickedIndex = useFileStore(state => state.setLastClickedIndex);
+  const files = useFileStore(state => state.files);
 
   const createCheckerboardPattern = () => {
     const patternCanvas = document.createElement('canvas');
@@ -111,7 +112,15 @@ function SpriteEditor() {
       tabIndex={0}
       aria-label="Sprite Editor Canvas"
     >
-      <canvas ref={canvasRef} className="flex" data-testid="canvas"></canvas>
+      {files.length === 0 ? (
+        <div className="flex items-center justify-center h-full">
+          <span className="text-[#6b7280] text-xl border rounded-md p-2">
+            Drag & Drop files here
+          </span>
+        </div>
+      ) : (
+        <canvas ref={canvasRef} className="flex" data-testid="canvas"></canvas>
+      )}
     </div>
   );
 }
