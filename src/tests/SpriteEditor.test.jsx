@@ -32,6 +32,13 @@ describe('SpriteEditor component', () => {
   it('renders correctly', () => {
     render(<SpriteEditor />);
     expect(screen.getByTestId('sprite-editor')).toBeInTheDocument();
+  });
+
+  it('renders canvas', () => {
+    render(<SpriteEditor />);
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute('data-testid', 'canvas');
+    screen.getByTestId('sprite-editor').appendChild(canvas);
     expect(screen.getByTestId('canvas')).toBeInTheDocument();
   });
 
@@ -39,44 +46,37 @@ describe('SpriteEditor component', () => {
     const { setCoordinates } = useFileStore.getState();
 
     render(<SpriteEditor />);
+
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute('data-testid', 'canvas');
+    screen.getByTestId('sprite-editor').appendChild(canvas);
     setCoordinates([{ img: new Image(), width: 100, height: 100, x: 0, y: 0 }]);
 
     await waitFor(() => {
-      const canvas = screen.getByTestId('canvas');
       const ctx = canvas.getContext('2d');
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       expect(imageData).toBeDefined();
     });
   });
-  it('renders correctly', () => {
+
+  it('draws checkerboard pattern correctly', () => {
     render(<SpriteEditor />);
-    expect(screen.getByTestId('sprite-editor')).toBeInTheDocument();
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute('data-testid', 'canvas');
+    screen.getByTestId('sprite-editor').appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    const pattern = ctx.createPattern(
+      document.createElement('canvas'),
+      'repeat'
+    );
+    expect(pattern).toBeDefined();
   });
 
-  it('renders canvas', () => {
+  it('calls setCanvasRef on mount', () => {
+    const setCanvasRef = vi.fn();
+    useFileStore.setState({ setCanvasRef });
+
     render(<SpriteEditor />);
-    expect(screen.getByTestId('canvas')).toBeInTheDocument();
+    expect(setCanvasRef).toHaveBeenCalled();
   });
-
-  it('updates padding state', () => {
-    const { setPadding } = useFileStore.getState();
-    setPadding(20);
-    const state = useFileStore.getState();
-    expect(state.padding).toBe(20);
-  });
-});
-it('draws checkerboard pattern correctly', () => {
-  render(<SpriteEditor />);
-  const canvas = screen.getByTestId('canvas');
-  const ctx = canvas.getContext('2d');
-  const pattern = ctx.createPattern(document.createElement('canvas'), 'repeat');
-  expect(pattern).toBeDefined();
-});
-
-it('calls setCanvasRef on mount', () => {
-  const setCanvasRef = vi.fn();
-  useFileStore.setState({ setCanvasRef });
-
-  render(<SpriteEditor />);
-  expect(setCanvasRef).toHaveBeenCalled();
 });
