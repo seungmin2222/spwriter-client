@@ -27,7 +27,12 @@ function Toast({ id, message, onClose }) {
       }`}
     >
       {message}
-      <button onClick={() => onClose(id)} aria-label="close" className="ml-4">
+      <button
+        onClick={() => onClose(id)}
+        aria-label="close"
+        className="ml-4"
+        data-testid="toast-close-button"
+      >
         Close
       </button>
     </div>
