@@ -10,7 +10,14 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['tailwind.config.js', 'postcss.config.js'],
+      exclude: [
+        'tailwind.config.js',
+        'postcss.config.js',
+        '.eslintrc.cjs',
+        'vite.config.js',
+        'src/main.jsx',
+        'src/tests/**/*',
+      ],
     },
   },
 });
