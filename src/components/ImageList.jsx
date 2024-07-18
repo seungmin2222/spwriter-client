@@ -32,6 +32,11 @@ function ImageList() {
       setCoordinates(updatedCoordinates);
       setShowModal(false);
       setIndexToDelete(null);
+
+      if (updatedCoordinates.length === 0 && canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      }
     }
   };
 
