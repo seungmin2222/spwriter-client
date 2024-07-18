@@ -25,7 +25,7 @@ function ImageList() {
 
   const generateCSS = (image, index) => {
     return `
-      .bg-${index} {
+      .sprite-${index} {
         width: ${image.width}px;
         height: ${image.height}px;
         background: url('css_sprites.png') -${image.x}px -${image.y}px;

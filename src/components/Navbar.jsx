@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import downloadIcon from '../assets/images/download-solid.svg';
 import useFileStore from '../../store';
 import Toast from './Toast';
+import { handleFiles, trimImage } from '../utils/utils';
 
 function Navbar() {
   const [option, setOption] = useState('Binary Tree');
@@ -11,146 +12,9 @@ function Navbar() {
   const setCoordinates = useFileStore(state => state.setCoordinates);
   const paddingValue = useFileStore(state => state.padding);
   const setPadding = useFileStore(state => state.setPadding);
-  const canvasRef = useFileStore(state => state.canvasRef);
   const addToast = useFileStore(state => state.addToast);
   const toast = useFileStore(state => state.toast);
   const setToast = useFileStore(state => state.setToast);
-
-  const initialRender = useRef(true);
-
-  const calculateCoordinates = (images, padding) => {
-    let xOffset = 0;
-    return images.map((img, index) => {
-      const coord = {
-        index: Date.now() + index,
-        x: xOffset,
-        y: padding,
-        width: img.width,
-        height: img.height,
-        img,
-      };
-      xOffset += img.width + padding;
-      return coord;
-    });
-  };
-
-  const drawImagesWithoutBackground = ctx => {
-    const { coordinates: coords } = useFileStore.getState();
-    const { padding: pad } = useFileStore.getState();
-
-    const totalWidth = coords.reduce(
-      (acc, coord) => acc + coord.width + pad,
-      -pad
-    );
-    const maxHeight = Math.max(...coords.map(coord => coord.height)) + pad * 2;
-    canvasRef.current.width = totalWidth;
-    canvasRef.current.height = maxHeight;
-
-    let xOffset = 0;
-    coords.forEach(coord => {
-      ctx.drawImage(coord.img, xOffset, pad, coord.width, coord.height);
-      coord.x = xOffset;
-      coord.y = pad;
-      xOffset += coord.width + pad;
-    });
-  };
-
-  useEffect(() => {
-    if (initialRender.current) {
-      initialRender.current = false;
-    } else if (coordinates.length > 0) {
-      const newCoordinates = calculateCoordinates(
-        coordinates.map(coord => coord.img),
-        paddingValue
-      );
-      setCoordinates(newCoordinates);
-    }
-  }, [paddingValue]);
-
-  const sortAndSetCoordinates = newCoords => {
-    const sortedCoordinates = [...newCoords].sort(
-      (a, b) => b.width * b.height - a.width * a.height
-    );
-    setCoordinates(sortedCoordinates);
-  };
-
-  const trimImage = img => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0);
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imageData.data;
-    let left = canvas.width;
-    let right = 0;
-    let top = canvas.height;
-    let bottom = 0;
-
-    for (let y = 0; y < canvas.height; y++) {
-      for (let x = 0; x < canvas.width; x++) {
-        const index = (y * canvas.width + x) * 4;
-        if (pixels[index + 3] > 0) {
-          if (x < left) left = x;
-          if (x > right) right = x;
-          if (y < top) top = y;
-          if (y > bottom) bottom = y;
-        }
-      }
-    }
-
-    const trimmedWidth = right - left + 1;
-    const trimmedHeight = bottom - top + 1;
-    const trimmedCanvas = document.createElement('canvas');
-    const trimmedCtx = trimmedCanvas.getContext('2d');
-    trimmedCanvas.width = trimmedWidth;
-    trimmedCanvas.height = trimmedHeight;
-    trimmedCtx.drawImage(
-      canvas,
-      left,
-      top,
-      trimmedWidth,
-      trimmedHeight,
-      0,
-      0,
-      trimmedWidth,
-      trimmedHeight
-    );
-
-    const trimmedImg = new Image();
-    trimmedImg.src = trimmedCanvas.toDataURL();
-    return new Promise(resolve => {
-      trimmedImg.onload = () => resolve(trimmedImg);
-    });
-  };
-
-  const handleFileChange = event => {
-    const files = Array.from(event.target.files);
-    setFiles(prevFiles => [...prevFiles, ...files]);
-
-    const newImages = [];
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const img = new Image();
-        img.onload = () => {
-          trimImage(img).then(trimmedImg => {
-            newImages.push(trimmedImg);
-            if (newImages.length === files.length) {
-              const newCoordinates = calculateCoordinates(
-                newImages,
-                paddingValue
-              );
-              sortAndSetCoordinates([...coordinates, ...newCoordinates]);
-            }
-          });
-        };
-        img.src = reader.result;
-      };
-      reader.readAsDataURL(file);
-    });
-  };
 
   const handlePaddingChange = event => {
     const value = Number(event.target.value);
@@ -161,28 +25,48 @@ function Navbar() {
     }
   };
 
-  const handleDownload = () => {
+  const drawImagesWithoutBackground = async (ctx, coordinate, padding) => {
+    let xOffset = 0;
+    const promises = coordinate.map(async coord => {
+      const trimmedImg = await trimImage(coord.img);
+      ctx.drawImage(
+        trimmedImg,
+        xOffset,
+        padding,
+        trimmedImg.width,
+        trimmedImg.height
+      );
+      xOffset += trimmedImg.width + padding;
+    });
+    await Promise.all(promises);
+  };
+
+  const handleDownload = async () => {
     if (coordinates.length === 0) {
       addToast('다운로드할 이미지가 없습니다.');
       return;
     }
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const downloadCanvas = document.createElement('canvas');
+    const downloadCtx = downloadCanvas.getContext('2d');
 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const totalWidth = coordinates.reduce(
+      (acc, coord) => acc + coord.width + paddingValue,
+      -paddingValue
+    );
+    const maxHeight =
+      Math.max(...coordinates.map(coord => coord.height)) + paddingValue * 2;
+    downloadCanvas.width = totalWidth;
+    downloadCanvas.height = maxHeight;
 
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    downloadCtx.clearRect(0, 0, downloadCanvas.width, downloadCanvas.height);
 
-    drawImagesWithoutBackground(ctx);
+    await drawImagesWithoutBackground(downloadCtx, coordinates, paddingValue);
 
     const link = document.createElement('a');
-    link.href = canvas.toDataURL('image/png');
+    link.href = downloadCanvas.toDataURL('image/png');
     link.download = fileName ? `${fileName}.png` : 'css_sprites.png';
     link.click();
-
-    ctx.putImageData(imageData, 0, 0);
   };
 
   const removeToast = id => {
@@ -203,7 +87,15 @@ function Navbar() {
             id="fileInput"
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             multiple
-            onChange={handleFileChange}
+            onChange={event =>
+              handleFiles(
+                Array.from(event.target.files),
+                setFiles,
+                setCoordinates,
+                coordinates,
+                paddingValue
+              )
+            }
           />
           <label
             htmlFor="fileInput"
