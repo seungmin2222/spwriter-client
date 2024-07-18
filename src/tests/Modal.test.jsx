@@ -15,7 +15,7 @@ describe('Modal component', () => {
   it('renders correctly when showModal is true', () => {
     render(
       <Modal
-        showModal={true}
+        showModal
         handleClose={handleClose}
         handleConfirm={handleConfirm}
       />
@@ -37,7 +37,7 @@ describe('Modal component', () => {
   it('calls handleClose when background is clicked', () => {
     render(
       <Modal
-        showModal={true}
+        showModal
         handleClose={handleClose}
         handleConfirm={handleConfirm}
       />
@@ -49,12 +49,14 @@ describe('Modal component', () => {
   it('does not propagate click event when content is clicked', () => {
     render(
       <Modal
-        showModal={true}
+        showModal
         handleClose={handleClose}
         handleConfirm={handleConfirm}
       />
     );
-    const modalContent = screen.getByTestId('modal').firstChild;
+    const modalContent = screen.getByText(
+      'Are you sure you want to delete the image file?'
+    ).parentElement;
     fireEvent.click(modalContent);
     expect(handleClose).not.toHaveBeenCalled();
   });
@@ -62,7 +64,7 @@ describe('Modal component', () => {
   it('calls handleClose when "No" button is clicked', () => {
     render(
       <Modal
-        showModal={true}
+        showModal
         handleClose={handleClose}
         handleConfirm={handleConfirm}
       />
@@ -74,7 +76,7 @@ describe('Modal component', () => {
   it('calls handleConfirm when "Yes" button is clicked', () => {
     render(
       <Modal
-        showModal={true}
+        showModal
         handleClose={handleClose}
         handleConfirm={handleConfirm}
       />
@@ -83,10 +85,10 @@ describe('Modal component', () => {
     expect(handleConfirm).toHaveBeenCalled();
   });
 
-  it('calls handleClose when "Escape" key is pressed', () => {
+  it('calls handleClose when "Escape" key is pressed on modal background', () => {
     render(
       <Modal
-        showModal={true}
+        showModal
         handleClose={handleClose}
         handleConfirm={handleConfirm}
       />
@@ -98,23 +100,19 @@ describe('Modal component', () => {
     expect(handleClose).toHaveBeenCalled();
   });
 
-  it('handles click event on modal background and content correctly', () => {
+  it('calls handleClose when "Escape" key is pressed on modal content', () => {
     render(
       <Modal
-        showModal={true}
+        showModal
         handleClose={handleClose}
         handleConfirm={handleConfirm}
       />
     );
-    const modalBackground = screen.getByTestId('modal');
-    const modalContent = screen.getByText(
-      'Are you sure you want to delete the image file?'
-    ).parentElement;
-
-    fireEvent.click(modalBackground);
-    expect(handleClose).toHaveBeenCalledTimes(1);
-
-    fireEvent.click(modalContent);
-    expect(handleClose).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(
+      screen.getByText('Are you sure you want to delete the image file?')
+        .parentElement,
+      { key: 'Escape', code: 'Escape' }
+    );
+    expect(handleClose).toHaveBeenCalled();
   });
 });
