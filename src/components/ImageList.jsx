@@ -68,7 +68,7 @@ function ImageList() {
         key={index}
         className={`flex w-full h-[70px] bg-[#f0f4f8] rounded-md transition-colors duration-300 shadow-sm ${
           !isButtonHovered ? 'hover:bg-[#e2e8f0]' : ''
-        } ${isSelected ? 'border border-blue-500' : ''}`}
+        } ${isSelected ? 'border border-[#1f77b4] duration-250' : ''}`}
       >
         <button
           className="flex w-[20%] items-center justify-center"

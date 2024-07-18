@@ -26,7 +26,7 @@ function SpriteEditor() {
     return patternCanvas;
   };
 
-  const drawImages = () => {
+  const drawImages = (timestamp, startTime) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -49,6 +49,10 @@ function SpriteEditor() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let xOffset = 0;
+    const duration = 250;
+    const elapsed = Math.min(timestamp - startTime, duration);
+    const opacity = elapsed / duration;
+
     const updatedCoordinates = coordinates.map((coord, index) => {
       if (!coord.img.complete) {
         return coord;
@@ -56,7 +60,7 @@ function SpriteEditor() {
       ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
 
       if (index === lastClickedIndex) {
-        ctx.strokeStyle = 'blue';
+        ctx.strokeStyle = `rgba(0, 0, 255, ${opacity})`;
         ctx.lineWidth = 1;
         ctx.strokeRect(xOffset, padding, coord.width, coord.height);
       }
@@ -67,6 +71,10 @@ function SpriteEditor() {
 
     if (JSON.stringify(coordinates) !== JSON.stringify(updatedCoordinates)) {
       setCoordinates(updatedCoordinates);
+    }
+
+    if (elapsed < duration) {
+      requestAnimationFrame(timestamp => drawImages(timestamp, startTime));
     }
   };
 
@@ -88,6 +96,7 @@ function SpriteEditor() {
 
       if (x >= startX && x <= endX && y >= startY && y <= endY) {
         setLastClickedIndex(i);
+        requestAnimationFrame(timestamp => drawImages(timestamp, timestamp));
         break;
       }
 
@@ -111,7 +120,7 @@ function SpriteEditor() {
 
   useEffect(() => {
     if (canvasRef.current && coordinates.length > 0) {
-      drawImages();
+      requestAnimationFrame(timestamp => drawImages(timestamp, timestamp));
     }
   }, [coordinates, padding, lastClickedIndex]);
 
