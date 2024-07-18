@@ -179,7 +179,7 @@ function Navbar() {
 
     const link = document.createElement('a');
     link.href = canvas.toDataURL('image/png');
-    link.download = fileName ? `${fileName}.png` : 'sprite.png';
+    link.download = fileName ? `${fileName}.png` : 'css_sprites.png';
     link.click();
 
     ctx.putImageData(imageData, 0, 0);
@@ -213,7 +213,7 @@ function Navbar() {
           </label>
         </div>
         <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
-          <label htmlFor="paddingInput" className="text-gray-700">
+          <label htmlFor="paddingInput" className="text-[#374151]">
             Padding :
           </label>
           <div className="flex items-center space-x-1">
@@ -224,11 +224,11 @@ function Navbar() {
               onChange={handlePaddingChange}
               className="w-16 p-1 border rounded-md text-center"
             />
-            <span className="text-gray-700">px</span>
+            <span className="gray-[#374151]">px</span>
           </div>
         </div>
         <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
-          <label htmlFor="align-elements" className="text-gray-700">
+          <label htmlFor="align-elements" className="gray-[#374151]">
             Align-elements :
           </label>
           <select

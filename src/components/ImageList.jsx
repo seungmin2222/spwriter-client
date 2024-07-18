@@ -81,7 +81,7 @@ function ImageList() {
           />
         </button>
         <button
-          className="flex w-[71%] h-full pl-[5px] text-[12px] leading-[24px] text-gray-700 overflow-hidden"
+          className="flex w-[71%] h-full pl-[5px] text-[12px] leading-[24px] text-[#374151] overflow-hidden"
           style={{
             display: '-webkit-box',
             WebkitBoxOrient: 'vertical',
@@ -122,7 +122,7 @@ function ImageList() {
       className="flex flex-col w-[26%] h-full mr-[2%] bg-[#f9fafb] rounded-md shadow-md"
       data-testid="image-list"
     >
-      <header className="flex w-full h-[10%] justify-center items-center text-3xl font-semibold text-gray-800">
+      <header className="flex w-full h-[10%] justify-center items-center text-3xl font-semibold text-[#1f2937]">
         Image List
       </header>
       <section className="flex flex-col w-full h-[90%] px-[20px] pb-[20px] text-lg font-light space-y-3 overflow-y-auto">
