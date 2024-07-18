@@ -50,19 +50,19 @@ function SpriteEditor() {
 
     let xOffset = 0;
     const updatedCoordinates = coordinates.map((coord, index) => {
-      if (coord.img.complete) {
-        ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
-
-        if (index === lastClickedIndex) {
-          ctx.strokeStyle = 'blue';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(xOffset, padding, coord.width, coord.height);
-        }
-        const updatedCoord = { ...coord, x: xOffset, y: padding };
-        xOffset += coord.width + padding;
-        return updatedCoord;
+      if (!coord.img.complete) {
+        return coord;
       }
-      return coord;
+      ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
+
+      if (index === lastClickedIndex) {
+        ctx.strokeStyle = 'blue';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(xOffset, padding, coord.width, coord.height);
+      }
+      const updatedCoord = { ...coord, x: xOffset, y: padding };
+      xOffset += coord.width + padding;
+      return updatedCoord;
     });
 
     if (JSON.stringify(coordinates) !== JSON.stringify(updatedCoordinates)) {
