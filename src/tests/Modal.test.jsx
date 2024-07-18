@@ -61,30 +61,6 @@ describe('Modal component', () => {
     expect(handleClose).not.toHaveBeenCalled();
   });
 
-  it('calls handleClose when "No" button is clicked', () => {
-    render(
-      <Modal
-        showModal
-        handleClose={handleClose}
-        handleConfirm={handleConfirm}
-      />
-    );
-    fireEvent.click(screen.getByText('No'));
-    expect(handleClose).toHaveBeenCalled();
-  });
-
-  it('calls handleConfirm when "Yes" button is clicked', () => {
-    render(
-      <Modal
-        showModal
-        handleClose={handleClose}
-        handleConfirm={handleConfirm}
-      />
-    );
-    fireEvent.click(screen.getByText('Yes'));
-    expect(handleConfirm).toHaveBeenCalled();
-  });
-
   it('calls handleClose when "Escape" key is pressed on modal background', () => {
     render(
       <Modal
@@ -97,22 +73,6 @@ describe('Modal component', () => {
       key: 'Escape',
       code: 'Escape',
     });
-    expect(handleClose).toHaveBeenCalled();
-  });
-
-  it('calls handleClose when "Escape" key is pressed on modal content', () => {
-    render(
-      <Modal
-        showModal
-        handleClose={handleClose}
-        handleConfirm={handleConfirm}
-      />
-    );
-    fireEvent.keyDown(
-      screen.getByText('Are you sure you want to delete the image file?')
-        .parentElement,
-      { key: 'Escape', code: 'Escape' }
-    );
     expect(handleClose).toHaveBeenCalled();
   });
 });

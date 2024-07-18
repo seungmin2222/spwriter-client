@@ -2,6 +2,7 @@ module.exports = {
   env: {
     browser: true,
     es2022: true,
+    'vitest/globals': true,
   },
   extends: [
     'airbnb',
@@ -27,7 +28,7 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  plugins: ['react', 'prettier', 'react-hooks'],
+  plugins: ['react', 'prettier', 'react-hooks', 'vitest'],
   rules: {
     semi: 'warn',
     'no-unused-vars': 'warn',

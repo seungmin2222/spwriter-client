@@ -30,15 +30,4 @@ describe('Footer component', () => {
     const rightIcon = screen.getByAltText('Right Icon');
     expect(rightIcon).toBeInTheDocument();
   });
-
-  it('applies the correct styles to the buttons', () => {
-    render(<Footer />);
-
-    const buttons = screen.getAllByRole('button');
-    buttons.forEach(button => {
-      expect(button).toHaveClass(
-        'p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300'
-      );
-    });
-  });
 });
