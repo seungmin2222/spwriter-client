@@ -27,6 +27,9 @@ function Toast({ id, message, onClose }) {
       }`}
     >
       {message}
+      <button onClick={() => onClose(id)} aria-label="close" className="ml-4">
+        Close
+      </button>
     </div>
   );
 }
