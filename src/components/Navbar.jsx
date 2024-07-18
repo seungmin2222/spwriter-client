@@ -50,6 +50,11 @@ function Navbar() {
     const downloadCanvas = document.createElement('canvas');
     const downloadCtx = downloadCanvas.getContext('2d');
 
+    if (!downloadCtx) {
+      addToast('Canvas context를 생성할 수 없습니다.');
+      return;
+    }
+
     const totalWidth = coordinates.reduce(
       (acc, coord) => acc + coord.width + paddingValue,
       -paddingValue
