@@ -152,4 +152,55 @@ describe('ImageList component', () => {
       { timeout: 2000 }
     );
   });
+
+  it('renders image list with selected item', () => {
+    useFileStore.setState({
+      lastClickedIndex: 0,
+    });
+    render(<ImageList />);
+    const selectedItem = screen.getAllByRole('article')[0];
+    expect(selectedItem).toHaveClass('border-blue-500');
+  });
+
+  it('handles non-array coordinates', () => {
+    useFileStore.setState({
+      coordinates: null,
+    });
+    render(<ImageList />);
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('closes toast when handleToastClose is called', async () => {
+    render(<ImageList />);
+    const imageButtons = screen.getAllByRole('button');
+    fireEvent.click(imageButtons[0]);
+    await waitFor(() => {
+      expect(screen.getByTestId('toast')).toBeInTheDocument();
+    });
+    const toastCloseButton = screen.getByTestId('toast-close-button');
+    fireEvent.click(toastCloseButton);
+    await waitFor(() => {
+      expect(screen.queryByTestId('toast')).not.toBeInTheDocument();
+    });
+  });
+
+  it('calls setLastClickedIndex when an image is clicked', () => {
+    const setLastClickedIndex = vi.fn();
+    useFileStore.setState({ setLastClickedIndex });
+    render(<ImageList />);
+    const imageButtons = screen.getAllByRole('button');
+    fireEvent.click(imageButtons[0]);
+    expect(setLastClickedIndex).toHaveBeenCalledWith(0);
+  });
+
+  it('sets button hover state correctly', () => {
+    render(<ImageList />);
+    const deleteButton = screen.getAllByRole('button', { name: /cross/i })[0];
+    fireEvent.mouseEnter(deleteButton);
+    expect(deleteButton.closest('article')).not.toHaveClass(
+      'hover:bg-[#e2e8f0]'
+    );
+    fireEvent.mouseLeave(deleteButton);
+    expect(deleteButton.closest('article')).toHaveClass('hover:bg-[#e2e8f0]');
+  });
 });

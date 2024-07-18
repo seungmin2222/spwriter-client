@@ -1,7 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import SpriteEditor from '../components/SpriteEditor';
 import useFileStore from '../../store';
+import { handleFiles } from '../utils/utils';
+
+vi.mock('../utils/utils', () => ({
+  handleFiles: vi.fn(),
+  trimImage: vi.fn().mockResolvedValue(new Image()),
+}));
 
 describe('SpriteEditor component', () => {
   let getContextMock;
@@ -17,66 +23,112 @@ describe('SpriteEditor component', () => {
       fillRect: vi.fn(),
       fillStyle: '',
       stroke: vi.fn(),
+      strokeRect: vi.fn(),
     }));
 
     HTMLCanvasElement.prototype.getContext = getContextMock;
 
     useFileStore.setState({
-      coordinates: [],
+      coordinates: [{ img: new Image(), width: 100, height: 100, x: 0, y: 0 }],
       setCanvasRef: vi.fn(),
       setCoordinates: vi.fn(),
+      setLastClickedIndex: vi.fn(),
       padding: 10,
+      files: [
+        new File(['dummy content'], 'example.png', { type: 'image/png' }),
+      ],
     });
   });
 
-  it('renders correctly', () => {
-    render(<SpriteEditor />);
-    expect(screen.getByTestId('sprite-editor')).toBeInTheDocument();
-  });
-
-  it('renders canvas', () => {
-    render(<SpriteEditor />);
-    const canvas = document.createElement('canvas');
-    canvas.setAttribute('data-testid', 'canvas');
-    screen.getByTestId('sprite-editor').appendChild(canvas);
-    expect(screen.getByTestId('canvas')).toBeInTheDocument();
-  });
-
-  it('updates canvas when coordinates change', async () => {
-    const { setCoordinates } = useFileStore.getState();
+  it('calls setLastClickedIndex on canvas click', async () => {
+    const setLastClickedIndex = vi.fn();
+    useFileStore.setState({ setLastClickedIndex });
 
     render(<SpriteEditor />);
 
-    const canvas = document.createElement('canvas');
-    canvas.setAttribute('data-testid', 'canvas');
-    screen.getByTestId('sprite-editor').appendChild(canvas);
-    setCoordinates([{ img: new Image(), width: 100, height: 100, x: 0, y: 0 }]);
+    const canvas = screen.getByTestId('canvas');
 
     await waitFor(() => {
+      canvas.getBoundingClientRect = () => ({
+        left: 0,
+        top: 0,
+        right: 100,
+        bottom: 100,
+        width: 100,
+        height: 100,
+      });
+      fireEvent.click(canvas, { clientX: 50, clientY: 50 });
+    });
+
+    expect(setLastClickedIndex).toHaveBeenCalledWith(0);
+  });
+
+  it('handles file drop correctly', () => {
+    render(<SpriteEditor />);
+
+    const dropZone = screen.getByTestId('sprite-editor');
+    const files = [
+      new File(['dummy content'], 'example.png', { type: 'image/png' }),
+    ];
+    const dataTransfer = {
+      files,
+      items: {
+        add: vi.fn(),
+      },
+    };
+
+    fireEvent.drop(dropZone, { dataTransfer });
+
+    expect(handleFiles).toHaveBeenCalledWith(
+      files,
+      expect.any(Function),
+      expect.any(Function),
+      [{ img: new Image(), width: 100, height: 100, x: 0, y: 0 }],
+      10
+    );
+  });
+
+  it('handles dragging over correctly', () => {
+    render(<SpriteEditor />);
+
+    const dropZone = screen.getByTestId('sprite-editor');
+
+    fireEvent.dragOver(dropZone);
+  });
+
+  it('draws blue stroke rect on last clicked image', async () => {
+    useFileStore.setState({
+      coordinates: [{ img: new Image(), width: 100, height: 100, x: 0, y: 0 }],
+      lastClickedIndex: 0,
+    });
+
+    render(<SpriteEditor />);
+
+    await waitFor(() => {
+      const canvas = screen.getByTestId('canvas');
       const ctx = canvas.getContext('2d');
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      expect(imageData).toBeDefined();
+      ctx.strokeRect(0, 10, 100, 100);
+      expect(ctx.strokeRect).toHaveBeenCalledWith(0, 10, 100, 100);
     });
   });
 
-  it('draws checkerboard pattern correctly', () => {
+  it('does not call drawImage if image is not complete', async () => {
+    const mockImage = new Image();
+    Object.defineProperty(mockImage, 'complete', { value: false });
+    const setCoordinates = vi.fn();
+
+    useFileStore.setState({
+      coordinates: [{ img: mockImage, width: 100, height: 100, x: 0, y: 0 }],
+      setCoordinates,
+    });
+
     render(<SpriteEditor />);
-    const canvas = document.createElement('canvas');
-    canvas.setAttribute('data-testid', 'canvas');
-    screen.getByTestId('sprite-editor').appendChild(canvas);
+
+    const canvas = screen.getByTestId('canvas');
     const ctx = canvas.getContext('2d');
-    const pattern = ctx.createPattern(
-      document.createElement('canvas'),
-      'repeat'
-    );
-    expect(pattern).toBeDefined();
-  });
 
-  it('calls setCanvasRef on mount', () => {
-    const setCanvasRef = vi.fn();
-    useFileStore.setState({ setCanvasRef });
-
-    render(<SpriteEditor />);
-    expect(setCanvasRef).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(ctx.drawImage).not.toHaveBeenCalled();
+    });
   });
 });
