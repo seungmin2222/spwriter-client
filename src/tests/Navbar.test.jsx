@@ -43,10 +43,6 @@ describe('Navbar', () => {
     };
   });
 
-  afterEach(() => {
-    document.createElement = originalCreateElement;
-  });
-
   it('renders correctly', () => {
     render(<Navbar />);
 
