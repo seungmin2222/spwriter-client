@@ -11,6 +11,10 @@ function Modal({ showModal, handleClose, handleConfirm }) {
     e.stopPropagation();
   };
 
+  const handleKeyDown = e => {
+    if (e.key === 'Escape') handleClose();
+  };
+
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
@@ -18,18 +22,14 @@ function Modal({ showModal, handleClose, handleConfirm }) {
       onClick={handleBackgroundClick}
       role="button"
       tabIndex={0}
-      onKeyDown={e => {
-        if (e.key === 'Escape') handleClose();
-      }}
+      onKeyDown={handleKeyDown}
     >
       <div
         className="bg-white rounded-lg shadow-lg p-6 w-[300px]"
         onClick={handleContentClick}
         role="button"
         tabIndex={0}
-        onKeyDown={e => {
-          if (e.key === 'Escape') handleClose();
-        }}
+        onKeyDown={handleKeyDown}
       >
         <h2 className="text-xl mb-4">
           Are you sure you want to delete the image file?
