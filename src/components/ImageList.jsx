@@ -8,6 +8,7 @@ function ImageList() {
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [indexToDelete, setIndexToDelete] = useState(null);
+  const [selectedIndices, setSelectedIndices] = useState(new Set());
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
   const lastClickedIndex = useFileStore(state => state.lastClickedIndex);
@@ -78,8 +79,17 @@ function ImageList() {
     }
   };
 
+  const handleSelectAll = () => {
+    const indices = new Set(coordinates.map((_, index) => index));
+    setSelectedIndices(indices);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedIndices(new Set());
+  };
+
   const renderImageList = (image, index) => {
-    const isSelected = index === lastClickedIndex;
+    const isSelected = selectedIndices.has(index);
     return (
       <article
         key={index}
@@ -142,7 +152,31 @@ function ImageList() {
       <header className="flex w-full h-[10%] justify-center items-center text-3xl font-semibold text-[#1f2937]">
         Image List
       </header>
-      <section className="flex flex-col w-full h-[90%] px-[20px] pb-[20px] text-lg font-light space-y-3 overflow-y-auto">
+      <div className="flex w-full h-[5%] items-center mb-3 px-[20px] border-[#e2e8f0] bg-[#f9fafb]">
+        <div className="flex w-full justify-between">
+          <div>
+            <button
+              className="p-1 bg-[#ffffff]] mr-2 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
+              onClick={handleSelectAll}
+            >
+              전체 선택
+            </button>
+            <button
+              className="p-1 border rounded-md shadow-sm hover:bg-[#cbd5e1] transition-colors"
+              onClick={handleDeselectAll}
+            >
+              선택 해제
+            </button>
+          </div>
+          <button
+            className="p-1 border rounded-md shadow-sm hover:bg-[#cbd5e1] transition-colors"
+            onClick={handleDeselectAll}
+          >
+            좌표 복사
+          </button>
+        </div>
+      </div>
+      <section className="flex flex-col w-full h-[80%] px-[20px] pb-[20px] text-lg font-light space-y-3 overflow-y-auto">
         {Array.isArray(coordinates)
           ? coordinates.map((image, index) => renderImageList(image, index))
           : null}
