@@ -10,10 +10,8 @@ function ImageList() {
   const [indexToDelete, setIndexToDelete] = useState(null);
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
-  const selectedIndices = useFileStore(state => state.selectedIndices);
-  const toggleSelectedIndex = useFileStore(state => state.toggleSelectedIndex);
-  const setSelectedIndices = useFileStore(state => state.setSelectedIndices);
-  const canvasRef = useFileStore(state => state.canvasRef);
+  const selectedFiles = useFileStore(state => state.selectedFiles);
+  const setSelectedFiles = useFileStore(state => state.setSelectedFiles);
 
   const handleOpenModal = index => {
     setShowModal(true);
@@ -33,11 +31,6 @@ function ImageList() {
       setCoordinates(updatedCoordinates);
       setShowModal(false);
       setIndexToDelete(null);
-
-      if (updatedCoordinates.length === 0 && canvasRef.current) {
-        const ctx = canvasRef.current.getContext('2d');
-        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-      }
     }
   };
 
@@ -52,7 +45,15 @@ function ImageList() {
   };
 
   const handleImageClick = (image, index) => {
-    toggleSelectedIndex(index);
+    const newSelectedFiles = new Set(selectedFiles);
+
+    if (newSelectedFiles.has(image.img)) {
+      newSelectedFiles.delete(image.img);
+    } else {
+      newSelectedFiles.add(image.img);
+    }
+
+    setSelectedFiles(newSelectedFiles);
 
     const cssText = generateCSS(image, index);
 
@@ -63,12 +64,10 @@ function ImageList() {
           id: Date.now(),
           message: 'CSS 정보가 클립보드에 복사되었습니다.',
         };
-        setToast(null);
         setToast(newToast);
       })
       .catch(err => {
         const newToast = { id: Date.now(), message: '클립보드 복사 실패.' };
-        setToast(null);
         setToast(newToast);
         console.error('클립보드 복사 실패:', err);
       });
@@ -81,16 +80,16 @@ function ImageList() {
   };
 
   const handleSelectAll = () => {
-    const indices = new Set(coordinates.map((_, index) => index));
-    setSelectedIndices(indices);
+    const newSelectedFiles = new Set(coordinates.map(coord => coord.img));
+    setSelectedFiles(newSelectedFiles);
   };
 
   const handleDeselectAll = () => {
-    setSelectedIndices(new Set());
+    setSelectedFiles(new Set());
   };
 
   const renderImageList = (image, index) => {
-    const isSelected = selectedIndices.has(index);
+    const isSelected = selectedFiles.has(image.img);
     return (
       <article
         key={index}
@@ -157,7 +156,7 @@ function ImageList() {
         <div className="flex w-full justify-between">
           <div>
             <button
-              className="p-1 bg-[#ffffff]] mr-2 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
+              className="p-1 bg-[#ffffff] mr-2 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
               onClick={handleSelectAll}
             >
               전체 선택

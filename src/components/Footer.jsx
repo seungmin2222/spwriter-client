@@ -11,7 +11,7 @@ function Footer() {
 
   return (
     <footer
-      className="flex justify-between items-center w-full h-[10%] p-[3%]"
+      className="flex justify-between items-center w-full h-[10%] p-[3%] select-none"
       data-testid="footer"
     >
       <div className="flex space-x-4">
