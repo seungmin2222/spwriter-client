@@ -4,12 +4,11 @@ import { handleFiles } from '../utils/utils';
 
 function SpriteEditor() {
   const canvasRef = useRef(null);
-  const setCanvasRef = useFileStore(state => state.setCanvasRef);
   const coordinates = useFileStore(state => state.coordinates);
   const padding = useFileStore(state => state.padding);
   const setCoordinates = useFileStore(state => state.setCoordinates);
-  const selectedIndices = useFileStore(state => state.selectedIndices);
-  const setSelectedIndices = useFileStore(state => state.setSelectedIndices);
+  const selectedFiles = useFileStore(state => state.selectedFiles) || new Set();
+  const setSelectedFiles = useFileStore(state => state.setSelectedFiles);
   const files = useFileStore(state => state.files);
   const setFiles = useFileStore(state => state.setFiles);
 
@@ -53,12 +52,12 @@ function SpriteEditor() {
     const elapsed = Math.min(timestamp - startTime, duration);
     const opacity = elapsed / duration;
 
-    coordinates.forEach((coord, index) => {
+    coordinates.forEach(coord => {
       if (!coord.img.complete) return;
 
       ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
 
-      if (selectedIndices.has(index)) {
+      if (selectedFiles.has(coord.img)) {
         ctx.strokeStyle = `rgba(0, 0, 255, ${opacity})`;
         ctx.lineWidth = 1;
         ctx.strokeRect(xOffset, padding, coord.width, coord.height);
@@ -81,22 +80,22 @@ function SpriteEditor() {
     const y = event.clientY - rect.top;
 
     let xOffset = 0;
-    const newSelectedIndices = new Set(selectedIndices);
+    const newSelectedFiles = new Set(selectedFiles);
 
-    for (let i = 0; i < coordinates.length; i++) {
-      const coord = coordinates[i];
+    for (const coord of coordinates) {
       const startX = xOffset;
       const endX = xOffset + coord.width;
       const startY = padding;
       const endY = padding + coord.height;
 
       if (x >= startX && x <= endX && y >= startY && y <= endY) {
-        if (newSelectedIndices.has(i)) {
-          newSelectedIndices.delete(i);
+        if (newSelectedFiles.has(coord.img)) {
+          newSelectedFiles.delete(coord.img);
         } else {
-          newSelectedIndices.add(i);
+          newSelectedFiles.add(coord.img);
         }
-        setSelectedIndices(newSelectedIndices);
+
+        setSelectedFiles(newSelectedFiles);
         requestAnimationFrame(timestamp => drawImages(timestamp, timestamp));
         break;
       }
@@ -116,14 +115,10 @@ function SpriteEditor() {
   };
 
   useEffect(() => {
-    setCanvasRef(canvasRef);
-  }, [setCanvasRef]);
-
-  useEffect(() => {
-    if (canvasRef.current && coordinates.length > 0) {
+    if (canvasRef.current && files.length > 0) {
       requestAnimationFrame(timestamp => drawImages(timestamp, timestamp));
     }
-  }, [coordinates, padding, selectedIndices]);
+  }, [coordinates, padding, selectedFiles, files]);
 
   return (
     <div
@@ -135,7 +130,7 @@ function SpriteEditor() {
       tabIndex={0}
       aria-label="Sprite Editor Canvas"
     >
-      {files.length === 0 ? (
+      {coordinates.length === 0 ? (
         <div className="flex items-center justify-center h-full">
           <span className="text-[#6b7280] text-xl border rounded-md p-2">
             Drag & Drop files here

@@ -3,26 +3,29 @@ import { create } from 'zustand';
 const useFileStore = create(set => ({
   files: [],
   setFiles: files => set({ files }),
+
   padding: 10,
   setPadding: padding => set({ padding }),
+
   coordinates: [],
   setCoordinates: coordinates => set({ coordinates }),
-  canvasRef: null,
-  setCanvasRef: canvasRef => set({ canvasRef }),
+
   toast: null,
   setToast: toast => set({ toast }),
   addToast: message => set(() => ({ toast: { id: Date.now(), message } })),
-  selectedIndices: new Set(),
-  setSelectedIndices: selectedIndices => set({ selectedIndices }),
-  toggleSelectedIndex: index =>
+
+  selectedFiles: new Set(),
+  setSelectedFiles: selectedFiles => set({ selectedFiles }),
+
+  toggleSelectedFile: file =>
     set(state => {
-      const newSelectedIndices = new Set(state.selectedIndices);
-      if (newSelectedIndices.has(index)) {
-        newSelectedIndices.delete(index);
+      const newSelectedFiles = new Set(state.selectedFiles);
+      if (newSelectedFiles.has(file)) {
+        newSelectedFiles.delete(file);
       } else {
-        newSelectedIndices.add(index);
+        newSelectedFiles.add(file);
       }
-      return { selectedIndices: newSelectedIndices };
+      return { selectedFiles: newSelectedFiles };
     }),
 }));
 
