@@ -12,9 +12,8 @@ describe('useFileStore', () => {
     expect(store.files).toEqual([]);
     expect(store.padding).toBe(10);
     expect(store.coordinates).toEqual([]);
-    expect(store.canvasRef).toBeNull();
     expect(store.toast).toBeNull();
-    expect(store.lastClickedIndex).toBeNull();
+    expect(store.selectedFiles).toBeDefined();
   });
 
   it('should set files', () => {
@@ -41,16 +40,6 @@ describe('useFileStore', () => {
     expect(newState.coordinates).toEqual([{ x: 0, y: 0 }]);
   });
 
-  it('should set canvasRef', () => {
-    const canvasRef = { current: {} };
-
-    act(() => {
-      store.setCanvasRef(canvasRef);
-    });
-    const newState = useFileStore.getState();
-    expect(newState.canvasRef).toEqual(canvasRef);
-  });
-
   it('should set toast', () => {
     act(() => {
       store.setToast({ id: 1, message: 'Toast message' });
@@ -68,13 +57,5 @@ describe('useFileStore', () => {
       message: 'New toast message',
     });
     expect(newState.toast.id).toBeDefined();
-  });
-
-  it('should set lastClickedIndex', () => {
-    act(() => {
-      store.setLastClickedIndex(2);
-    });
-    const newState = useFileStore.getState();
-    expect(newState.lastClickedIndex).toBe(2);
   });
 });
