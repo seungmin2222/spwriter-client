@@ -50,9 +50,6 @@ function SpriteEditor() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let xOffset = 0;
-    const duration = 250;
-    const elapsed = Math.min(timestamp - startTime, duration);
-    const opacity = elapsed / duration;
 
     coordinates.forEach(coord => {
       if (!coord.img.complete) return;
@@ -60,20 +57,15 @@ function SpriteEditor() {
       ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
 
       const isSelected = selectedFiles.has(coord.img);
-      const borderOpacity = isSelected ? opacity : 1 - opacity;
 
-      if (borderOpacity > 0) {
-        ctx.strokeStyle = `rgba(0, 0, 255, ${borderOpacity})`;
+      if (isSelected) {
+        ctx.strokeStyle = `#1a5a91`;
         ctx.lineWidth = 1;
         ctx.strokeRect(xOffset, padding, coord.width, coord.height);
       }
 
       xOffset += coord.width + padding;
     });
-
-    if (elapsed < duration) {
-      requestAnimationFrame(timestamp => drawImages(timestamp, startTime));
-    }
   };
 
   const handleCanvasClick = event => {
@@ -133,9 +125,9 @@ function SpriteEditor() {
     >
       {coordinates.length === 0 ? (
         <div className="flex items-center justify-center h-full">
-          <span className="flex text-[#6b7280] text-xl border rounded-md p-2 animate-fadeIn">
+          <span className="flex text-[#6b7280] text-xl border rounded-md p-2">
             이미지 파일을 드래그하여 놓으세요.
-            <img src={fileImageIcon} alt="파일 아이콘" className=" h-7 ml-2" />
+            <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
           </span>
         </div>
       ) : (
