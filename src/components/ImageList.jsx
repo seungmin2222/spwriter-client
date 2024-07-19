@@ -71,6 +71,21 @@ function ImageList() {
         setToast(newToast);
         console.error('클립보드 복사 실패:', err);
       });
+
+    // Toggle selection state
+    toggleSelection(index);
+  };
+
+  const toggleSelection = index => {
+    setSelectedIndices(prevSelectedIndices => {
+      const newSelectedIndices = new Set(prevSelectedIndices);
+      if (newSelectedIndices.has(index)) {
+        newSelectedIndices.delete(index);
+      } else {
+        newSelectedIndices.add(index);
+      }
+      return newSelectedIndices;
+    });
   };
 
   const handleToastClose = id => {
@@ -156,7 +171,7 @@ function ImageList() {
         <div className="flex w-full justify-between">
           <div>
             <button
-              className="p-1 bg-[#ffffff]] mr-2 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
+              className="p-1 bg-[#ffffff] mr-2 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
               onClick={handleSelectAll}
             >
               전체 선택
