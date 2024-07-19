@@ -12,8 +12,18 @@ const useFileStore = create(set => ({
   toast: null,
   setToast: toast => set({ toast }),
   addToast: message => set(() => ({ toast: { id: Date.now(), message } })),
-  lastClickedIndex: null,
-  setLastClickedIndex: index => set({ lastClickedIndex: index }),
+  selectedIndices: new Set(),
+  setSelectedIndices: selectedIndices => set({ selectedIndices }),
+  toggleSelectedIndex: index =>
+    set(state => {
+      const newSelectedIndices = new Set(state.selectedIndices);
+      if (newSelectedIndices.has(index)) {
+        newSelectedIndices.delete(index);
+      } else {
+        newSelectedIndices.add(index);
+      }
+      return { selectedIndices: newSelectedIndices };
+    }),
 }));
 
 export default useFileStore;

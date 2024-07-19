@@ -8,11 +8,11 @@ function ImageList() {
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [indexToDelete, setIndexToDelete] = useState(null);
-  const [selectedIndices, setSelectedIndices] = useState(new Set());
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
-  const lastClickedIndex = useFileStore(state => state.lastClickedIndex);
-  const setLastClickedIndex = useFileStore(state => state.setLastClickedIndex);
+  const selectedIndices = useFileStore(state => state.selectedIndices);
+  const toggleSelectedIndex = useFileStore(state => state.toggleSelectedIndex);
+  const setSelectedIndices = useFileStore(state => state.setSelectedIndices);
   const canvasRef = useFileStore(state => state.canvasRef);
 
   const handleOpenModal = index => {
@@ -52,8 +52,9 @@ function ImageList() {
   };
 
   const handleImageClick = (image, index) => {
+    toggleSelectedIndex(index);
+
     const cssText = generateCSS(image, index);
-    setLastClickedIndex(index);
 
     navigator.clipboard
       .writeText(cssText)
@@ -71,21 +72,6 @@ function ImageList() {
         setToast(newToast);
         console.error('클립보드 복사 실패:', err);
       });
-
-    // Toggle selection state
-    toggleSelection(index);
-  };
-
-  const toggleSelection = index => {
-    setSelectedIndices(prevSelectedIndices => {
-      const newSelectedIndices = new Set(prevSelectedIndices);
-      if (newSelectedIndices.has(index)) {
-        newSelectedIndices.delete(index);
-      } else {
-        newSelectedIndices.add(index);
-      }
-      return newSelectedIndices;
-    });
   };
 
   const handleToastClose = id => {
@@ -171,7 +157,7 @@ function ImageList() {
         <div className="flex w-full justify-between">
           <div>
             <button
-              className="p-1 bg-[#ffffff] mr-2 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
+              className="p-1 bg-[#ffffff]] mr-2 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
               onClick={handleSelectAll}
             >
               전체 선택
@@ -204,7 +190,6 @@ function ImageList() {
       {toast && (
         <Toast
           key={toast.id}
-          id={toast.id}
           message={toast.message}
           onClose={() => handleToastClose(toast.id)}
         />
