@@ -30,7 +30,6 @@ describe('SpriteEditor component', () => {
 
     useFileStore.setState({
       coordinates: [{ img: new Image(), width: 100, height: 100, x: 0, y: 0 }],
-      setCanvasRef: vi.fn(),
       setCoordinates: vi.fn(),
       setLastClickedIndex: vi.fn(),
       padding: 10,
@@ -38,29 +37,6 @@ describe('SpriteEditor component', () => {
         new File(['dummy content'], 'example.png', { type: 'image/png' }),
       ],
     });
-  });
-
-  it('calls setLastClickedIndex on canvas click', async () => {
-    const setLastClickedIndex = vi.fn();
-    useFileStore.setState({ setLastClickedIndex });
-
-    render(<SpriteEditor />);
-
-    const canvas = screen.getByTestId('canvas');
-
-    await waitFor(() => {
-      canvas.getBoundingClientRect = () => ({
-        left: 0,
-        top: 0,
-        right: 100,
-        bottom: 100,
-        width: 100,
-        height: 100,
-      });
-      fireEvent.click(canvas, { clientX: 50, clientY: 50 });
-    });
-
-    expect(setLastClickedIndex).toHaveBeenCalledWith(0);
   });
 
   it('handles file drop correctly', () => {

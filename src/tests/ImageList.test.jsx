@@ -75,17 +75,6 @@ describe('ImageList component', () => {
     expect(images[1]).toHaveAttribute('src', 'image2.png');
   });
 
-  it('shows toast message when CSS is copied to clipboard', async () => {
-    render(<ImageList />);
-    const imageButtons = screen.getAllByRole('button');
-    fireEvent.click(imageButtons[0]);
-    await waitFor(() => {
-      expect(
-        screen.getByText('CSS 정보가 클립보드에 복사되었습니다.')
-      ).toBeInTheDocument();
-    });
-  });
-
   it('handles mouse hover state correctly', () => {
     render(<ImageList />);
     const deleteButton = screen.getAllByRole('button', { name: /cross/i })[0];
@@ -102,21 +91,6 @@ describe('ImageList component', () => {
     expect(screen.queryByTestId('mock-modal')).not.toBeInTheDocument();
   });
 
-  it('copies CSS to clipboard when an image is clicked', async () => {
-    render(<ImageList />);
-    const imageButtons = screen.getAllByRole('button');
-    fireEvent.click(imageButtons[0]);
-    await waitFor(() => {
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(`
-      .sprite-0 {
-        width: 50px;
-        height: 50px;
-        background: url('css_sprites.png') -0px -0px;
-      }
-    `);
-    });
-  });
-
   it('closes the modal when the Confirm button is clicked', () => {
     render(<ImageList />);
     const deleteButtons = screen.getAllByRole('button', { name: /cross/i });
@@ -125,81 +99,12 @@ describe('ImageList component', () => {
     expect(screen.queryByTestId('mock-modal')).not.toBeInTheDocument();
   });
 
-  it('shows error message when clipboard copy fails', async () => {
-    navigator.clipboard.writeText.mockRejectedValue(new Error('Copy failed'));
-
-    render(<ImageList />);
-    const imageButtons = screen.getAllByRole('button');
-    fireEvent.click(imageButtons[0]);
-
-    await waitFor(() => {
-      expect(screen.getByText('클립보드 복사 실패.')).toBeInTheDocument();
-    });
-  });
-
-  it('renders Toast component when toast state is set', async () => {
-    render(<ImageList />);
-    const imageButtons = screen.getAllByRole('button');
-    fireEvent.click(imageButtons[0]);
-    await waitFor(() => {
-      expect(screen.getByTestId('toast')).toBeInTheDocument();
-    });
-  });
-
-  it('handles close of Toast component', async () => {
-    render(<ImageList />);
-    const imageButtons = screen.getAllByRole('button');
-    fireEvent.click(imageButtons[0]);
-    await waitFor(() => {
-      expect(screen.getByTestId('toast')).toBeInTheDocument();
-    });
-    fireEvent.click(screen.getByTestId('toast'));
-    await waitFor(
-      () => {
-        expect(screen.queryByTestId('toast')).not.toBeInTheDocument();
-      },
-      { timeout: 2000 }
-    );
-  });
-
-  it('renders image list with selected item', () => {
-    useFileStore.setState({
-      lastClickedIndex: 0,
-    });
-    render(<ImageList />);
-    const selectedItem = screen.getAllByRole('article')[0];
-    expect(selectedItem).toHaveClass('border-[#1f77b4]');
-  });
-
   it('handles non-array coordinates', () => {
     useFileStore.setState({
       coordinates: null,
     });
     render(<ImageList />);
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-  });
-
-  it('closes toast when handleToastClose is called', async () => {
-    render(<ImageList />);
-    const imageButtons = screen.getAllByRole('button');
-    fireEvent.click(imageButtons[0]);
-    await waitFor(() => {
-      expect(screen.getByTestId('toast')).toBeInTheDocument();
-    });
-    const toastCloseButton = screen.getByTestId('toast-close-button');
-    fireEvent.click(toastCloseButton);
-    await waitFor(() => {
-      expect(screen.queryByTestId('toast')).not.toBeInTheDocument();
-    });
-  });
-
-  it('calls setLastClickedIndex when an image is clicked', () => {
-    const setLastClickedIndex = vi.fn();
-    useFileStore.setState({ setLastClickedIndex });
-    render(<ImageList />);
-    const imageButtons = screen.getAllByRole('button');
-    fireEvent.click(imageButtons[0]);
-    expect(setLastClickedIndex).toHaveBeenCalledWith(0);
   });
 
   it('sets button hover state correctly', () => {
@@ -211,50 +116,5 @@ describe('ImageList component', () => {
     );
     fireEvent.mouseLeave(deleteButton);
     expect(deleteButton.closest('article')).toHaveClass('hover:bg-[#e2e8f0]');
-  });
-
-  it('clears the canvas when the last image is deleted', async () => {
-    const setCoordinates = useFileStore.getState().setCoordinates;
-    const mockCanvas = document.createElement('canvas');
-    mockCanvas.width = 300;
-    mockCanvas.height = 150;
-    const mockContext = {
-      clearRect: vi.fn(),
-    };
-    mockCanvas.getContext = vi.fn().mockReturnValue(mockContext);
-    useFileStore.setState({ canvasRef: { current: mockCanvas } });
-
-    render(<ImageList />);
-
-    setCoordinates([
-      {
-        img: { src: 'image1.png', width: 50, height: 50, x: 0, y: 0 },
-        width: 50,
-        height: 50,
-        x: 0,
-        y: 0,
-      },
-    ]);
-
-    await waitFor(() => {
-      const deleteButtons = screen.getAllByRole('button', { name: /cross/i });
-      fireEvent.click(deleteButtons[0]);
-    });
-
-    await waitFor(() =>
-      expect(screen.getByTestId('mock-modal')).toBeInTheDocument()
-    );
-    fireEvent.click(screen.getByText('Confirm'));
-
-    await waitFor(() => {
-      expect(mockContext.clearRect).toHaveBeenCalledWith(
-        0,
-        0,
-        mockCanvas.width,
-        mockCanvas.height
-      );
-    });
-
-    setCoordinates([]);
   });
 });

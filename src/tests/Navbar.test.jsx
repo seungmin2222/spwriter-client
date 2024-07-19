@@ -22,7 +22,6 @@ describe('Navbar', () => {
       setCoordinates: vi.fn(),
       padding: 10,
       canvasRef: { current: document.createElement('canvas') },
-      setCanvasRef: vi.fn(),
       toast: null,
       setToast: vi.fn(),
     });
@@ -49,7 +48,7 @@ describe('Navbar', () => {
     expect(screen.getByTestId('navbar')).toBeInTheDocument();
     expect(screen.getByText('Open files')).toBeInTheDocument();
     expect(screen.getByText('Padding :')).toBeInTheDocument();
-    expect(screen.getByText('Align-elements :')).toBeInTheDocument();
+    expect(screen.getByText('정렬 옵션 :')).toBeInTheDocument();
   });
 
   it('calls setPadding on padding input change', () => {
@@ -68,7 +67,7 @@ describe('Navbar', () => {
     render(<Navbar />);
 
     const fileNameInput =
-      screen.getByPlaceholderText(/원하시는 파일 이름을 입력해주세요./i);
+      screen.getByPlaceholderText(/파일 이름을 입력해주세요./i);
     fireEvent.change(fileNameInput, { target: { value: 'test-file' } });
 
     expect(fileNameInput.value).toBe('test-file');
@@ -89,7 +88,7 @@ describe('Navbar', () => {
   it('renders Align-elements options correctly', () => {
     render(<Navbar />);
 
-    const selectElement = screen.getByLabelText('Align-elements :');
+    const selectElement = screen.getByLabelText('정렬 옵션 :');
     const options = selectElement.querySelectorAll('option');
 
     expect(options).toHaveLength(3);
@@ -132,7 +131,7 @@ describe('Navbar', () => {
   it('sets the selected option for align-elements', () => {
     render(<Navbar />);
 
-    const selectElement = screen.getByLabelText('Align-elements :');
+    const selectElement = screen.getByLabelText('정렬 옵션 :');
     fireEvent.change(selectElement, { target: { value: 'top-bottom' } });
 
     expect(selectElement.value).toBe('top-bottom');
@@ -153,7 +152,7 @@ describe('Navbar', () => {
     render(<Navbar />);
 
     const fileNameInput =
-      screen.getByPlaceholderText(/원하시는 파일 이름을 입력해주세요./i);
+      screen.getByPlaceholderText(/파일 이름을 입력해주세요./i);
     fireEvent.change(fileNameInput, { target: { value: 'test-file' } });
 
     const downloadButton = screen.getByRole('button', { name: /download/i });
