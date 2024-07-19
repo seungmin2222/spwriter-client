@@ -54,9 +54,8 @@ describe('Modal component', () => {
         handleConfirm={handleConfirm}
       />
     );
-    const modalContent = screen.getByText(
-      'Are you sure you want to delete the image file?'
-    ).parentElement;
+    const modalContent =
+      screen.getByText('이미지 파일을 삭제하시겠습니까?').parentElement;
     fireEvent.click(modalContent);
     expect(handleClose).not.toHaveBeenCalled();
   });

@@ -131,7 +131,6 @@ function SpriteEditor() {
       onClick={handleCanvasClick}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
-      role="button"
       tabIndex={0}
       aria-label="Sprite Editor Canvas"
     >

@@ -20,20 +20,16 @@ function Modal({ showModal, handleClose, handleConfirm }) {
       className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
       data-testid="modal"
       onClick={handleBackgroundClick}
-      role="button"
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
       <div
-        className="bg-white rounded-lg shadow-lg p-6 w-[300px]"
+        className="bg-white rounded-lg shadow-lg p-6 w-[350px] h-[130px]"
         onClick={handleContentClick}
-        role="button"
         tabIndex={0}
         onKeyDown={handleKeyDown}
       >
-        <h2 className="text-xl mb-4">
-          Are you sure you want to delete the image file?
-        </h2>
+        <h2 className="text-xl mb-5">이미지 파일을 삭제하시겠습니까?</h2>
         <div className="flex justify-end space-x-4">
           <button
             className="w-[70px] px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
