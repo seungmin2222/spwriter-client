@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 import Toast from './Toast';
 import useFileStore from '../../store';
-import { handleDropFiles } from '../utils/utils';
+import { handleDropFiles, calculateCoordinates } from '../utils/utils';
 
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
@@ -19,6 +19,18 @@ function ImageList() {
   const setSelectedFiles = useFileStore(state => state.setSelectedFiles);
   const setFiles = useFileStore(state => state.setFiles);
   const padding = useFileStore(state => state.padding);
+
+  useEffect(() => {
+    if (coordinates.length > 0) {
+      const newCoordinates = calculateCoordinates(
+        coordinates.map(coord => coord.img),
+        padding
+      );
+      if (JSON.stringify(newCoordinates) !== JSON.stringify(coordinates)) {
+        setCoordinates(newCoordinates);
+      }
+    }
+  }, [padding, coordinates, setCoordinates]);
 
   useEffect(() => {
     if (isDeleting && indexToDelete !== null) {
