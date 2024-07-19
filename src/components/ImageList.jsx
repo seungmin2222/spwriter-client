@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 import Toast from './Toast';
 import useFileStore from '../../store';
@@ -8,10 +8,27 @@ function ImageList() {
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [indexToDelete, setIndexToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
   const selectedFiles = useFileStore(state => state.selectedFiles);
   const setSelectedFiles = useFileStore(state => state.setSelectedFiles);
+
+  useEffect(() => {
+    if (isDeleting && indexToDelete !== null) {
+      const timer = setTimeout(() => {
+        const updatedCoordinates = coordinates.filter(
+          (_, index) => index !== indexToDelete
+        );
+        setCoordinates(updatedCoordinates);
+        setIsDeleting(false);
+        setIndexToDelete(null);
+        setShowModal(false);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isDeleting, indexToDelete, coordinates, setCoordinates]);
 
   const handleOpenModal = index => {
     setShowModal(true);
@@ -25,12 +42,7 @@ function ImageList() {
 
   const handleConfirm = () => {
     if (indexToDelete !== null) {
-      const updatedCoordinates = coordinates.filter(
-        (_, index) => index !== indexToDelete
-      );
-      setCoordinates(updatedCoordinates);
-      setShowModal(false);
-      setIndexToDelete(null);
+      setIsDeleting(true);
     }
   };
 
@@ -90,12 +102,17 @@ function ImageList() {
 
   const renderImageList = (image, index) => {
     const isSelected = selectedFiles.has(image.img);
+    const deleteClass =
+      isDeleting && index === indexToDelete
+        ? 'animate-fadeOut'
+        : 'animate-fadeIn';
+
     return (
       <article
         key={index}
         className={`flex w-full h-[70px] bg-[#f0f4f8] rounded-md transition-colors duration-300 shadow-sm ${
           !isButtonHovered ? 'hover:bg-[#e2e8f0]' : ''
-        } ${isSelected ? 'border border-[#1f77b4] duration-250' : ''}`}
+        } ${isSelected ? 'border border-[#1f77b4] duration-250' : ''} ${deleteClass}`}
       >
         <button
           className="flex w-[20%] items-center justify-center"
@@ -152,40 +169,46 @@ function ImageList() {
       <header className="flex w-full h-[10%] justify-center items-center text-3xl font-semibold text-[#1f2937]">
         Image List
       </header>
-      <div className="flex w-full h-[5%] items-center mb-3 px-[20px] border-[#e2e8f0] bg-[#f9fafb]">
-        <div className="flex w-full justify-between">
-          <div>
+      {coordinates.length > 0 && (
+        <div
+          className={`flex w-full h-[5%] items-center mb-3 px-[20px] border-[#e2e8f0] bg-[#f9fafb] transition-opacity duration-500 ${coordinates.length > 0 ? 'animate-fadeIn' : 'animate-fadeOut'}`}
+        >
+          <div className="flex w-full justify-between">
+            <div>
+              <button
+                className="p-1 mr-2 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
+                onClick={handleSelectAll}
+              >
+                전체 선택
+              </button>
+              <button
+                className="p-1 border rounded-md shadow-sm hover:bg-[#cbd5e1] transition-colors"
+                onClick={handleDeselectAll}
+              >
+                선택 해제
+              </button>
+            </div>
             <button
-              className="p-1 bg-[#ffffff] mr-2 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
-              onClick={handleSelectAll}
-            >
-              전체 선택
-            </button>
-            <button
-              className="p-1 border rounded-md shadow-sm hover:bg-[#cbd5e1] transition-colors"
+              className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
               onClick={handleDeselectAll}
             >
-              선택 해제
+              좌표 복사
             </button>
           </div>
-          <button
-            className="p-1 border rounded-md shadow-sm hover:bg-[#cbd5e1] transition-colors"
-            onClick={handleDeselectAll}
-          >
-            좌표 복사
-          </button>
         </div>
-      </div>
+      )}
       <section className="flex flex-col w-full h-[80%] px-[20px] pb-[20px] text-lg font-light space-y-3 overflow-y-auto">
         {Array.isArray(coordinates)
           ? coordinates.map((image, index) => renderImageList(image, index))
           : null}
       </section>
-      <Modal
-        showModal={showModal}
-        handleClose={handleCloseModal}
-        handleConfirm={handleConfirm}
-      />
+      {showModal && (
+        <Modal
+          showModal={showModal}
+          handleClose={handleCloseModal}
+          handleConfirm={handleConfirm}
+        />
+      )}
       {toast && (
         <Toast
           key={toast.id}

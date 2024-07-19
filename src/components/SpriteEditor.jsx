@@ -132,7 +132,7 @@ function SpriteEditor() {
     >
       {coordinates.length === 0 ? (
         <div className="flex items-center justify-center h-full">
-          <span className="text-[#6b7280] text-xl border rounded-md p-2">
+          <span className="text-[#6b7280] text-xl border rounded-md p-2 animate-fadeIn">
             Drag & Drop files here
           </span>
         </div>
