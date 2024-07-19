@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Toast from './Toast';
 import useFileStore from '../../store';
 import { handleFiles, trimImage } from '../utils/utils';
+
 import downloadIcon from '../assets/images/download-solid.svg';
 
 function Navbar() {

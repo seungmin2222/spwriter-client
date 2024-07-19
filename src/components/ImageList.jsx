@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 import Toast from './Toast';
 import useFileStore from '../../store';
+import { handleDropFiles } from '../utils/utils';
+
+import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 function ImageList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
@@ -9,10 +12,13 @@ function ImageList() {
   const [toast, setToast] = useState(null);
   const [indexToDelete, setIndexToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
   const selectedFiles = useFileStore(state => state.selectedFiles);
   const setSelectedFiles = useFileStore(state => state.setSelectedFiles);
+  const setFiles = useFileStore(state => state.setFiles);
+  const padding = useFileStore(state => state.padding);
 
   useEffect(() => {
     if (isDeleting && indexToDelete !== null) {
@@ -100,6 +106,16 @@ function ImageList() {
     setSelectedFiles(new Set());
   };
 
+  const handleDrop = event => {
+    event.preventDefault();
+    const droppedFiles = Array.from(event.dataTransfer.files);
+    handleDropFiles(event, setFiles, setCoordinates, coordinates, padding);
+  };
+
+  const handleDragOver = event => {
+    event.preventDefault();
+  };
+
   const renderImageList = (image, index) => {
     const isSelected = selectedFiles.has(image.img);
     const deleteClass =
@@ -163,16 +179,16 @@ function ImageList() {
 
   return (
     <aside
-      className="flex flex-col w-[26%] h-full mr-[2%] bg-[#f9fafb] rounded-md shadow-md"
+      className="flex flex-col w-[26%] h-full mr-[2%] text-gray-700 bg-[#f9fafb] rounded-md shadow-md"
       data-testid="image-list"
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
     >
       <header className="flex w-full h-[10%] justify-center items-center text-3xl font-semibold text-[#1f2937]">
         Image List
       </header>
       {coordinates.length > 0 && (
-        <div
-          className={`flex w-full h-[5%] items-center mb-3 px-[20px] border-[#e2e8f0] bg-[#f9fafb] transition-opacity duration-500 ${coordinates.length > 0 ? 'animate-fadeIn' : 'animate-fadeOut'}`}
-        >
+        <div className="flex w-full h-[5%] items-center mb-3 px-[20px] border-[#e2e8f0] bg-[#f9fafb] transition-opacity duration-500 animate-fadeIn">
           <div className="flex w-full justify-between">
             <div>
               <button
@@ -197,10 +213,21 @@ function ImageList() {
           </div>
         </div>
       )}
-      <section className="flex flex-col w-full h-[80%] px-[20px] pb-[20px] text-lg font-light space-y-3 overflow-y-auto">
-        {Array.isArray(coordinates)
-          ? coordinates.map((image, index) => renderImageList(image, index))
-          : null}
+      <section
+        className={`flex flex-col w-full h-[80%] px-[20px] pb-[20px] text-lg font-light space-y-3 overflow-y-auto ${
+          coordinates.length > 0 ? '' : 'justify-center'
+        }`}
+      >
+        {coordinates.length > 0 ? (
+          coordinates.map((image, index) => renderImageList(image, index))
+        ) : (
+          <div className="flex w-full justify-center border-[#e2e8f0] bg-[#f9fafb] transition-opacity duration-500">
+            <span className="flex items-center text-[#6b7280] text-[15px] border rounded-md p-2 animate-fadeIn">
+              이미지 파일을 드래그하여 놓으세요.
+              <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
+            </span>
+          </div>
+        )}
       </section>
       {showModal && (
         <Modal
