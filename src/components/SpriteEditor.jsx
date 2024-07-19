@@ -8,8 +8,8 @@ function SpriteEditor() {
   const coordinates = useFileStore(state => state.coordinates);
   const padding = useFileStore(state => state.padding);
   const setCoordinates = useFileStore(state => state.setCoordinates);
-  const lastClickedIndex = useFileStore(state => state.lastClickedIndex);
-  const setLastClickedIndex = useFileStore(state => state.setLastClickedIndex);
+  const selectedIndices = useFileStore(state => state.selectedIndices);
+  const setSelectedIndices = useFileStore(state => state.setSelectedIndices);
   const files = useFileStore(state => state.files);
   const setFiles = useFileStore(state => state.setFiles);
 
@@ -53,25 +53,19 @@ function SpriteEditor() {
     const elapsed = Math.min(timestamp - startTime, duration);
     const opacity = elapsed / duration;
 
-    const updatedCoordinates = coordinates.map((coord, index) => {
-      if (!coord.img.complete) {
-        return coord;
-      }
+    coordinates.forEach((coord, index) => {
+      if (!coord.img.complete) return;
+
       ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
 
-      if (index === lastClickedIndex) {
+      if (selectedIndices.has(index)) {
         ctx.strokeStyle = `rgba(0, 0, 255, ${opacity})`;
         ctx.lineWidth = 1;
         ctx.strokeRect(xOffset, padding, coord.width, coord.height);
       }
-      const updatedCoord = { ...coord, x: xOffset, y: padding };
-      xOffset += coord.width + padding;
-      return updatedCoord;
-    });
 
-    if (JSON.stringify(coordinates) !== JSON.stringify(updatedCoordinates)) {
-      setCoordinates(updatedCoordinates);
-    }
+      xOffset += coord.width + padding;
+    });
 
     if (elapsed < duration) {
       requestAnimationFrame(timestamp => drawImages(timestamp, startTime));
@@ -87,6 +81,8 @@ function SpriteEditor() {
     const y = event.clientY - rect.top;
 
     let xOffset = 0;
+    const newSelectedIndices = new Set(selectedIndices);
+
     for (let i = 0; i < coordinates.length; i++) {
       const coord = coordinates[i];
       const startX = xOffset;
@@ -95,7 +91,12 @@ function SpriteEditor() {
       const endY = padding + coord.height;
 
       if (x >= startX && x <= endX && y >= startY && y <= endY) {
-        setLastClickedIndex(i);
+        if (newSelectedIndices.has(i)) {
+          newSelectedIndices.delete(i);
+        } else {
+          newSelectedIndices.add(i);
+        }
+        setSelectedIndices(newSelectedIndices);
         requestAnimationFrame(timestamp => drawImages(timestamp, timestamp));
         break;
       }
@@ -122,7 +123,7 @@ function SpriteEditor() {
     if (canvasRef.current && coordinates.length > 0) {
       requestAnimationFrame(timestamp => drawImages(timestamp, timestamp));
     }
-  }, [coordinates, padding, lastClickedIndex]);
+  }, [coordinates, padding, selectedIndices]);
 
   return (
     <div
