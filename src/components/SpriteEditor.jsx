@@ -59,8 +59,11 @@ function SpriteEditor() {
 
       ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
 
-      if (selectedFiles.has(coord.img)) {
-        ctx.strokeStyle = `rgba(0, 0, 255, ${opacity})`;
+      const isSelected = selectedFiles.has(coord.img);
+      const borderOpacity = isSelected ? opacity : 1 - opacity;
+
+      if (borderOpacity > 0) {
+        ctx.strokeStyle = `rgba(0, 0, 255, ${borderOpacity})`;
         ctx.lineWidth = 1;
         ctx.strokeRect(xOffset, padding, coord.width, coord.height);
       }
