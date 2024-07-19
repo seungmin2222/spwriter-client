@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import useFileStore from '../../store';
-import { handleFiles } from '../utils/utils';
+import { handleFiles, handleDragOverFiles } from '../utils/utils';
+
+import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 function SpriteEditor() {
   const canvasRef = useRef(null);
@@ -110,10 +112,6 @@ function SpriteEditor() {
     handleFiles(droppedFiles, setFiles, setCoordinates, coordinates, padding);
   };
 
-  const handleDragOver = event => {
-    event.preventDefault();
-  };
-
   useEffect(() => {
     if (canvasRef.current && files.length > 0) {
       requestAnimationFrame(timestamp => drawImages(timestamp, timestamp));
@@ -126,14 +124,15 @@ function SpriteEditor() {
       data-testid="sprite-editor"
       onClick={handleCanvasClick}
       onDrop={handleDrop}
-      onDragOver={handleDragOver}
+      onDragOver={handleDragOverFiles}
       tabIndex={0}
       aria-label="Sprite Editor Canvas"
     >
       {coordinates.length === 0 ? (
         <div className="flex items-center justify-center h-full">
-          <span className="text-[#6b7280] text-xl border rounded-md p-2 animate-fadeIn">
-            Drag & Drop files here
+          <span className="flex text-[#6b7280] text-xl border rounded-md p-2 animate-fadeIn">
+            이미지 파일을 드래그하여 놓으세요.
+            <img src={fileImageIcon} alt="파일 아이콘" className=" h-7 ml-2" />
           </span>
         </div>
       ) : (

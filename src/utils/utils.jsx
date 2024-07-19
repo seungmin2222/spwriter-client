@@ -104,3 +104,19 @@ export const handleFiles = (
     reader.readAsDataURL(file);
   });
 };
+
+export const handleDropFiles = (
+  event,
+  setFiles,
+  setCoordinates,
+  coordinates,
+  padding
+) => {
+  event.preventDefault();
+  const droppedFiles = Array.from(event.dataTransfer.files);
+  handleFiles(droppedFiles, setFiles, setCoordinates, coordinates, padding);
+};
+
+export const handleDragOverFiles = event => {
+  event.preventDefault();
+};

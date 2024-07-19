@@ -1,4 +1,5 @@
 import React from 'react';
+
 import rotateIcon from '../assets/images/arrows-spin-solid.svg';
 import inversionIcon from '../assets/images/right-left-solid.svg';
 import cloneIcon from '../assets/images/copy-regular.svg';
