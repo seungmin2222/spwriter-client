@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import downloadIcon from '../assets/images/download-solid.svg';
-import useFileStore from '../../store';
 import Toast from './Toast';
+import useFileStore from '../../store';
 import { handleFiles, trimImage } from '../utils/utils';
+import downloadIcon from '../assets/images/download-solid.svg';
 
 function Navbar() {
   const [option, setOption] = useState('Binary Tree');
@@ -126,7 +126,7 @@ function Navbar() {
         </div>
         <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
           <label htmlFor="align-elements" className="gray-[#374151]">
-            Align-elements :
+            정렬 옵션 :
           </label>
           <select
             id="align-elements"
@@ -145,7 +145,7 @@ function Navbar() {
           <input
             type="text"
             className="flex-grow focus:outline-none h-full p-2 border-b-2 border-gray-400 focus-within:border-gray-600"
-            placeholder="원하시는 파일 이름을 입력해주세요."
+            placeholder="파일 이름을 입력해주세요."
             value={fileName}
             onChange={e => setFileName(e.target.value)}
           />

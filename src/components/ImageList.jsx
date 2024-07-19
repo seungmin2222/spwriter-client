@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
-import useFileStore from '../../store';
 import Toast from './Toast';
+import useFileStore from '../../store';
 
 function ImageList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
