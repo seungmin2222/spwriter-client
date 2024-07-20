@@ -125,7 +125,7 @@ function SpriteEditor() {
     >
       {coordinates.length === 0 ? (
         <div className="flex items-center justify-center h-full">
-          <span className="flex text-[#6b7280] text-xl border rounded-md p-2 animate-fadeIn">
+          <span className="flex text-[#6b7280] text-xl border rounded-md p-2 animate-fadeIn select-none">
             이미지 파일을 드래그하여 놓으세요.
             <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
           </span>

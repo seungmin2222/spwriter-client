@@ -207,30 +207,41 @@ function ImageList() {
             <button
               className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
               onClick={() => {
-                navigator.clipboard
-                  .writeText(
-                    coordinates
-                      .map(coord =>
-                        generateCSS(coord.img, coordinates.indexOf(coord))
-                      )
-                      .join('\n')
-                  )
-                  .then(() =>
-                    setToast({
-                      id: Date.now(),
-                      message: '좌표가 클립보드에 복사되었습니다.',
-                    })
-                  )
-                  .catch(err => {
-                    setToast({
-                      id: Date.now(),
-                      message: '클립보드 복사 실패.',
-                    });
-                    console.error('클립보드 복사 실패:', err);
+                const selectedCoordinates = coordinates.filter(coord =>
+                  selectedFiles.has(coord.img)
+                );
+
+                if (selectedCoordinates.length === 0) {
+                  setToast({
+                    id: Date.now(),
+                    message: '선택된 좌표가 없습니다.',
                   });
+                } else {
+                  navigator.clipboard
+                    .writeText(
+                      selectedCoordinates
+                        .map((coord, index) =>
+                          generateCSS(coord, coordinates.indexOf(coord))
+                        )
+                        .join('\n')
+                    )
+                    .then(() =>
+                      setToast({
+                        id: Date.now(),
+                        message: '선택된 좌표가 클립보드에 복사되었습니다.',
+                      })
+                    )
+                    .catch(err => {
+                      setToast({
+                        id: Date.now(),
+                        message: '클립보드 복사 실패.',
+                      });
+                      console.error('클립보드 복사 실패:', err);
+                    });
+                }
               }}
             >
-              좌표 복사
+              선택된 좌표 복사
             </button>
           </div>
         </div>
@@ -244,7 +255,7 @@ function ImageList() {
           coordinates.map((image, index) => renderImageList(image, index))
         ) : (
           <div className="flex w-full justify-center border-[#e2e8f0] bg-[#f9fafb] transition-opacity duration-500">
-            <span className="flex items-center text-[#6b7280] text-[15px] border rounded-md p-2 animate-fadeIn">
+            <span className="flex items-center text-[#6b7280] text-[15px] border rounded-md p-2 animate-fadeIn select-none">
               이미지 파일을 드래그하여 놓으세요.
               <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
             </span>
