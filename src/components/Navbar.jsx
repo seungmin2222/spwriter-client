@@ -7,7 +7,8 @@ import downloadIcon from '../assets/images/download-solid.svg';
 
 function Navbar() {
   const [option, setOption] = useState('Binary Tree');
-  const [fileName, setFileName] = useState('');
+  const fileName = useFileStore(state => state.fileName);
+  const setFileName = useFileStore(state => state.setFileName);
   const setFiles = useFileStore(state => state.setFiles);
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);

@@ -18,6 +18,7 @@ function ImageList() {
   const setSelectedFiles = useFileStore(state => state.setSelectedFiles);
   const setFiles = useFileStore(state => state.setFiles);
   const padding = useFileStore(state => state.padding);
+  const fileName = useFileStore(state => state.fileName);
 
   useEffect(() => {
     if (coordinates.length > 0) {
@@ -66,7 +67,9 @@ function ImageList() {
     .sprite-${index} {
       width: ${image.width}px;
       height: ${image.height}px;
-      background: url('css_sprites.png') -${image.x}px -${image.y}px;
+      background: url('${
+        fileName ? `${fileName}.png` : 'css_sprites.png'
+      }') -${image.x}px -${image.y}px;
     }
   `;
 
