@@ -70,6 +70,23 @@ function ImageList() {
     }
   `;
 
+  const generateToast = message => {
+    setToast({
+      id: Date.now(),
+      message,
+    });
+  };
+
+  const copyToClipboard = text => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => generateToast('좌표값이 클립보드에 복사되었습니다.'))
+      .catch(err => {
+        generateToast('클립보드 복사 실패.');
+        console.error('클립보드 복사 실패:', err);
+      });
+  };
+
   const handleImageClick = (image, index) => {
     const newSelectedFiles = new Set(selectedFiles);
     newSelectedFiles.has(image.img)
@@ -78,19 +95,7 @@ function ImageList() {
     setSelectedFiles(newSelectedFiles);
 
     const cssText = generateCSS(image, index);
-
-    navigator.clipboard
-      .writeText(cssText)
-      .then(() => {
-        setToast({
-          id: Date.now(),
-          message: 'CSS 정보가 클립보드에 복사되었습니다.',
-        });
-      })
-      .catch(err => {
-        setToast({ id: Date.now(), message: '클립보드 복사 실패.' });
-        console.error('클립보드 복사 실패:', err);
-      });
+    copyToClipboard(cssText);
   };
 
   const handleToastClose = id => {
@@ -114,6 +119,21 @@ function ImageList() {
 
   const handleDragOver = event => {
     event.preventDefault();
+  };
+
+  const copySelectedCoordinates = () => {
+    const selectedCoordinates = coordinates.filter(coord =>
+      selectedFiles.has(coord.img)
+    );
+
+    if (selectedCoordinates.length === 0) {
+      generateToast('선택된 리스트가 없습니다.');
+    } else {
+      const cssText = selectedCoordinates
+        .map((coord, index) => generateCSS(coord, coordinates.indexOf(coord)))
+        .join('\n');
+      copyToClipboard(cssText);
+    }
   };
 
   const renderImageList = (image, index) => {
@@ -184,11 +204,11 @@ function ImageList() {
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
-      <header className="flex w-full h-[10%] justify-center items-center text-3xl font-semibold text-[#1f2937]">
+      <header className="flex w-full h-[10%] justify-center items-center text-3xl font-semibold text-[#1f2937] select-none">
         Image List
       </header>
       {coordinates.length > 0 && (
-        <div className="flex w-full h-[5%] items-center mb-3 px-[20px] border-[#e2e8f0] bg-[#f9fafb] transition-opacity duration-500 animate-fadeIn">
+        <div className="flex w-full h-[5%] items-center mb-3 px-[20px] border-[#e2e8f0] bg-[#f9fafb] transition-opacity duration-500 animate-fadeIn select-none">
           <div className="flex w-full justify-between">
             <div>
               <button
@@ -206,42 +226,9 @@ function ImageList() {
             </div>
             <button
               className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
-              onClick={() => {
-                const selectedCoordinates = coordinates.filter(coord =>
-                  selectedFiles.has(coord.img)
-                );
-
-                if (selectedCoordinates.length === 0) {
-                  setToast({
-                    id: Date.now(),
-                    message: '선택된 좌표가 없습니다.',
-                  });
-                } else {
-                  navigator.clipboard
-                    .writeText(
-                      selectedCoordinates
-                        .map((coord, index) =>
-                          generateCSS(coord, coordinates.indexOf(coord))
-                        )
-                        .join('\n')
-                    )
-                    .then(() =>
-                      setToast({
-                        id: Date.now(),
-                        message: '선택된 좌표가 클립보드에 복사되었습니다.',
-                      })
-                    )
-                    .catch(err => {
-                      setToast({
-                        id: Date.now(),
-                        message: '클립보드 복사 실패.',
-                      });
-                      console.error('클립보드 복사 실패:', err);
-                    });
-                }
-              }}
+              onClick={copySelectedCoordinates}
             >
-              선택된 좌표 복사
+              선택한 좌표 복사
             </button>
           </div>
         </div>
