@@ -27,7 +27,7 @@ function SpriteEditor() {
     return patternCanvas;
   };
 
-  const drawImages = (timestamp, startTime) => {
+  const drawImages = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -59,7 +59,7 @@ function SpriteEditor() {
       const isSelected = selectedFiles.has(coord.img);
 
       if (isSelected) {
-        ctx.strokeStyle = `#1a5a91`;
+        ctx.strokeStyle = '#1a5a91';
         ctx.lineWidth = 1;
         ctx.strokeRect(xOffset, padding, coord.width, coord.height);
       }
@@ -93,7 +93,7 @@ function SpriteEditor() {
         }
 
         setSelectedFiles(newSelectedFiles);
-        requestAnimationFrame(timestamp => drawImages(timestamp, timestamp));
+        drawImages();
         break;
       }
 
@@ -109,7 +109,7 @@ function SpriteEditor() {
 
   useEffect(() => {
     if (canvasRef.current && files.length > 0) {
-      requestAnimationFrame(timestamp => drawImages(timestamp, timestamp));
+      drawImages();
     }
   }, [coordinates, padding, selectedFiles, files]);
 
@@ -125,7 +125,7 @@ function SpriteEditor() {
     >
       {coordinates.length === 0 ? (
         <div className="flex items-center justify-center h-full">
-          <span className="flex text-[#6b7280] text-xl border rounded-md p-2">
+          <span className="flex text-[#6b7280] text-xl border rounded-md p-2 animate-fadeIn">
             이미지 파일을 드래그하여 놓으세요.
             <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
           </span>
