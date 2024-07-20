@@ -27,6 +27,9 @@ const useFileStore = create(set => ({
       }
       return { selectedFiles: newSelectedFiles };
     }),
+
+  fileName: '',
+  setFileName: fileName => set({ fileName }),
 }));
 
 export default useFileStore;
