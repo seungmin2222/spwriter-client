@@ -1,4 +1,6 @@
 import React from 'react';
+import useFileStore from '../../store';
+import { cloneSelectedImages } from '../utils/utils';
 
 import rotateIcon from '../assets/images/arrows-spin-solid.svg';
 import inversionIcon from '../assets/images/right-left-solid.svg';
@@ -7,8 +9,16 @@ import leftIcon from '../assets/images/angles-left-solid.svg';
 import rightIcon from '../assets/images/angles-right-solid.svg';
 
 function Footer() {
+  const coordinates = useFileStore(state => state.coordinates);
+  const setCoordinates = useFileStore(state => state.setCoordinates);
+  const selectedFiles = useFileStore(state => state.selectedFiles);
+
   const buttonStyle =
     'p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300';
+
+  const handleCloneSelectedImages = () => {
+    cloneSelectedImages(coordinates, selectedFiles, setCoordinates);
+  };
 
   return (
     <footer
@@ -22,7 +32,7 @@ function Footer() {
         <button className={buttonStyle}>
           <img src={inversionIcon} alt="Inversion Icon" className="h-6 w-6" />
         </button>
-        <button className={buttonStyle}>
+        <button className={buttonStyle} onClick={handleCloneSelectedImages}>
           <img src={cloneIcon} alt="Clone Icon" className="h-6 w-6" />
         </button>
       </div>

@@ -21,53 +21,54 @@ export const sortAndSetCoordinates = (newCoords, setCoordinates) => {
   setCoordinates(sortedCoordinates);
 };
 
-export const trimImage = img => {
-  return new Promise(resolve => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0);
+export const trimImage = async img => {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = img.width;
+  canvas.height = img.height;
+  ctx.drawImage(img, 0, 0);
 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imageData.data;
-    let left = canvas.width;
-    let right = 0;
-    let top = canvas.height;
-    let bottom = 0;
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const pixels = imageData.data;
+  let left = canvas.width;
+  let right = 0;
+  let top = canvas.height;
+  let bottom = 0;
 
-    for (let y = 0; y < canvas.height; y++) {
-      for (let x = 0; x < canvas.width; x++) {
-        const index = (y * canvas.width + x) * 4;
-        if (pixels[index + 3] > 0) {
-          if (x < left) left = x;
-          if (x > right) right = x;
-          if (y < top) top = y;
-          if (y > bottom) bottom = y;
-        }
+  for (let y = 0; y < canvas.height; y++) {
+    for (let x = 0; x < canvas.width; x++) {
+      const index = (y * canvas.width + x) * 4;
+      if (pixels[index + 3] > 0) {
+        if (x < left) left = x;
+        if (x > right) right = x;
+        if (y < top) top = y;
+        if (y > bottom) bottom = y;
       }
     }
+  }
 
-    const trimmedWidth = right - left + 1;
-    const trimmedHeight = bottom - top + 1;
-    const trimmedCanvas = document.createElement('canvas');
-    const trimmedCtx = trimmedCanvas.getContext('2d');
-    trimmedCanvas.width = trimmedWidth;
-    trimmedCanvas.height = trimmedHeight;
-    trimmedCtx.drawImage(
-      canvas,
-      left,
-      top,
-      trimmedWidth,
-      trimmedHeight,
-      0,
-      0,
-      trimmedWidth,
-      trimmedHeight
-    );
+  const trimmedWidth = right - left + 1;
+  const trimmedHeight = bottom - top + 1;
+  const trimmedCanvas = document.createElement('canvas');
+  const trimmedCtx = trimmedCanvas.getContext('2d');
+  trimmedCanvas.width = trimmedWidth;
+  trimmedCanvas.height = trimmedHeight;
+  trimmedCtx.drawImage(
+    canvas,
+    left,
+    top,
+    trimmedWidth,
+    trimmedHeight,
+    0,
+    0,
+    trimmedWidth,
+    trimmedHeight
+  );
 
-    const trimmedImg = new Image();
-    trimmedImg.src = trimmedCanvas.toDataURL();
+  const trimmedImg = new Image();
+  trimmedImg.src = trimmedCanvas.toDataURL();
+
+  return new Promise(resolve => {
     trimmedImg.onload = () => resolve(trimmedImg);
   });
 };
@@ -121,4 +122,36 @@ export const handleDropFiles = (
 
 export const handleDragOverFiles = event => {
   event.preventDefault();
+};
+export const cloneSelectedImages = (
+  coordinates,
+  selectedFiles,
+  setCoordinates
+) => {
+  const newCoordinates = [...coordinates];
+
+  selectedFiles.forEach(img => {
+    const index = coordinates.findIndex(coord => coord.img === img);
+    if (index !== -1) {
+      const coord = coordinates[index];
+      const newImg = new Image();
+      newImg.src = coord.img.src;
+
+      const imageLoaded = new Promise(resolve => {
+        newImg.onload = () => resolve();
+      });
+
+      imageLoaded.then(() => {
+        newCoordinates.push({
+          img: newImg,
+          x: coord.x,
+          y: coord.y,
+          width: coord.width,
+          height: coord.height,
+        });
+
+        sortAndSetCoordinates(newCoordinates, setCoordinates);
+      });
+    }
+  });
 };
