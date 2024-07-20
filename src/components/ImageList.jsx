@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Modal from './Modal';
 import Toast from './Toast';
 import useFileStore from '../../store';
@@ -20,17 +20,32 @@ function ImageList() {
   const padding = useFileStore(state => state.padding);
   const fileName = useFileStore(state => state.fileName);
 
+  const prevCoordinatesRef = useRef(coordinates);
+
   useEffect(() => {
     if (coordinates.length > 0) {
       const newCoordinates = calculateCoordinates(
         coordinates.map(coord => coord.img),
         padding
       );
-      if (JSON.stringify(newCoordinates) !== JSON.stringify(coordinates)) {
+
+      const prevCoordinates = prevCoordinatesRef.current;
+      const coordinatesChanged =
+        newCoordinates.length !== prevCoordinates.length ||
+        newCoordinates.some(
+          (coord, index) =>
+            coord.img !== prevCoordinates[index]?.img ||
+            coord.x !== prevCoordinates[index]?.x ||
+            coord.y !== prevCoordinates[index]?.y
+        );
+
+      if (coordinatesChanged) {
         setCoordinates(newCoordinates);
       }
+
+      prevCoordinatesRef.current = coordinates;
     }
-  }, [padding, setCoordinates]);
+  }, [padding, coordinates]);
 
   useEffect(() => {
     if (isDeleting && indexToDelete !== null) {
