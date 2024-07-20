@@ -3,7 +3,6 @@ import Modal from './Modal';
 import Toast from './Toast';
 import useFileStore from '../../store';
 import { handleDropFiles, calculateCoordinates } from '../utils/utils';
-
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 function ImageList() {
@@ -30,7 +29,7 @@ function ImageList() {
         setCoordinates(newCoordinates);
       }
     }
-  }, [padding, coordinates, setCoordinates]);
+  }, [padding, setCoordinates]);
 
   useEffect(() => {
     if (isDeleting && indexToDelete !== null) {
@@ -43,7 +42,6 @@ function ImageList() {
         setIndexToDelete(null);
         setShowModal(false);
       }, 300);
-
       return () => clearTimeout(timer);
     }
   }, [isDeleting, indexToDelete, coordinates, setCoordinates]);
@@ -64,25 +62,19 @@ function ImageList() {
     }
   };
 
-  const generateCSS = (image, index) => {
-    return `
-      .sprite-${index} {
-        width: ${image.width}px;
-        height: ${image.height}px;
-        background: url('css_sprites.png') -${image.x}px -${image.y}px;
-      }
-    `;
-  };
+  const generateCSS = (image, index) => `
+    .sprite-${index} {
+      width: ${image.width}px;
+      height: ${image.height}px;
+      background: url('css_sprites.png') -${image.x}px -${image.y}px;
+    }
+  `;
 
   const handleImageClick = (image, index) => {
     const newSelectedFiles = new Set(selectedFiles);
-
-    if (newSelectedFiles.has(image.img)) {
-      newSelectedFiles.delete(image.img);
-    } else {
-      newSelectedFiles.add(image.img);
-    }
-
+    newSelectedFiles.has(image.img)
+      ? newSelectedFiles.delete(image.img)
+      : newSelectedFiles.add(image.img);
     setSelectedFiles(newSelectedFiles);
 
     const cssText = generateCSS(image, index);
@@ -90,28 +82,25 @@ function ImageList() {
     navigator.clipboard
       .writeText(cssText)
       .then(() => {
-        const newToast = {
+        setToast({
           id: Date.now(),
           message: 'CSS 정보가 클립보드에 복사되었습니다.',
-        };
-        setToast(newToast);
+        });
       })
       .catch(err => {
-        const newToast = { id: Date.now(), message: '클립보드 복사 실패.' };
-        setToast(newToast);
+        setToast({ id: Date.now(), message: '클립보드 복사 실패.' });
         console.error('클립보드 복사 실패:', err);
       });
   };
 
   const handleToastClose = id => {
-    if (toast && toast.id === id) {
+    if (toast?.id === id) {
       setToast(null);
     }
   };
 
   const handleSelectAll = () => {
-    const newSelectedFiles = new Set(coordinates.map(coord => coord.img));
-    setSelectedFiles(newSelectedFiles);
+    setSelectedFiles(new Set(coordinates.map(coord => coord.img)));
   };
 
   const handleDeselectAll = () => {
@@ -120,7 +109,6 @@ function ImageList() {
 
   const handleDrop = event => {
     event.preventDefault();
-    const droppedFiles = Array.from(event.dataTransfer.files);
     handleDropFiles(event, setFiles, setCoordinates, coordinates, padding);
   };
 
@@ -213,12 +201,34 @@ function ImageList() {
                 className="p-1 border rounded-md shadow-sm hover:bg-[#cbd5e1] transition-colors"
                 onClick={handleDeselectAll}
               >
-                선택 해제
+                전체 해제
               </button>
             </div>
             <button
               className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
-              onClick={handleDeselectAll}
+              onClick={() => {
+                navigator.clipboard
+                  .writeText(
+                    coordinates
+                      .map(coord =>
+                        generateCSS(coord.img, coordinates.indexOf(coord))
+                      )
+                      .join('\n')
+                  )
+                  .then(() =>
+                    setToast({
+                      id: Date.now(),
+                      message: '좌표가 클립보드에 복사되었습니다.',
+                    })
+                  )
+                  .catch(err => {
+                    setToast({
+                      id: Date.now(),
+                      message: '클립보드 복사 실패.',
+                    });
+                    console.error('클립보드 복사 실패:', err);
+                  });
+              }}
             >
               좌표 복사
             </button>

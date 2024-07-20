@@ -92,10 +92,12 @@ export const handleFiles = (
           newImages.push(trimmedImg);
           if (newImages.length === filesArray.length) {
             const newCoordinates = calculateCoordinates(newImages, padding);
-            sortAndSetCoordinates(
-              [...coordinates, ...newCoordinates],
-              setCoordinates
-            );
+            const updatedCoordinates = [...coordinates, ...newCoordinates];
+            if (
+              JSON.stringify(updatedCoordinates) !== JSON.stringify(coordinates)
+            ) {
+              sortAndSetCoordinates(updatedCoordinates, setCoordinates);
+            }
           }
         });
       };
