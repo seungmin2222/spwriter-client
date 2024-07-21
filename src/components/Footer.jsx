@@ -1,6 +1,6 @@
 import React from 'react';
 import useFileStore from '../../store';
-import { cloneSelectedImages } from '../utils/utils';
+import { cloneSelectedImages, inversionSelectedImages } from '../utils/utils';
 
 import rotateIcon from '../assets/images/arrows-spin-solid.svg';
 import inversionIcon from '../assets/images/right-left-solid.svg';
@@ -20,6 +20,10 @@ function Footer() {
     cloneSelectedImages(coordinates, selectedFiles, setCoordinates);
   };
 
+  const handleInversionSelectedImages = () => {
+    inversionSelectedImages(coordinates, selectedFiles, setCoordinates);
+  };
+
   return (
     <footer
       className="flex justify-between items-center w-full h-[10%] p-[3%] select-none"
@@ -29,7 +33,7 @@ function Footer() {
         <button className={buttonStyle}>
           <img src={rotateIcon} alt="Rotate Icon" className="h-6 w-6" />
         </button>
-        <button className={buttonStyle}>
+        <button className={buttonStyle} onClick={handleInversionSelectedImages}>
           <img src={inversionIcon} alt="Inversion Icon" className="h-6 w-6" />
         </button>
         <button className={buttonStyle} onClick={handleCloneSelectedImages}>

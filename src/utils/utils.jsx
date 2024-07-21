@@ -155,3 +155,40 @@ export const cloneSelectedImages = (
     }
   });
 };
+export const inversionSelectedImages = (
+  coordinates,
+  selectedFiles,
+  setCoordinates
+) => {
+  const updatedCoordinatesPromises = coordinates.map(async coord => {
+    if (selectedFiles.has(coord.img)) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = coord.img.width;
+      canvas.height = coord.img.height;
+
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(coord.img, 0, 0);
+
+      const flippedImg = new Image();
+      flippedImg.src = canvas.toDataURL();
+
+      await new Promise(resolve => {
+        flippedImg.onload = () => resolve();
+      });
+
+      const newX = coord.x + coord.width - flippedImg.width;
+      return {
+        ...coord,
+        img: flippedImg,
+        x: newX,
+      };
+    }
+    return coord;
+  });
+
+  Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
+    setCoordinates(newCoordinates);
+  });
+};
