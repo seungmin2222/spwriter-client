@@ -12,15 +12,24 @@ function Footer() {
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
   const selectedFiles = useFileStore(state => state.selectedFiles);
+  const addToast = useFileStore(state => state.addToast);
 
   const buttonStyle =
     'p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300';
 
   const handleCloneSelectedImages = () => {
+    if (selectedFiles.size === 0) {
+      addToast('선택된 이미지파일이 없습니다.');
+      return;
+    }
     cloneSelectedImages(coordinates, selectedFiles, setCoordinates);
   };
 
   const handleInversionSelectedImages = () => {
+    if (selectedFiles.size === 0) {
+      addToast('선택된 이미지파일이 없습니다.');
+      return;
+    }
     inversionSelectedImages(coordinates, selectedFiles, setCoordinates);
   };
 
