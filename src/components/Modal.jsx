@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Modal({ showModal, handleClose, handleConfirm }) {
+function Modal({ showModal, handleClose, handleConfirm, message }) {
   if (!showModal) return null;
 
   const handleBackgroundClick = () => {
@@ -29,7 +29,7 @@ function Modal({ showModal, handleClose, handleConfirm }) {
         tabIndex={0}
         onKeyDown={handleKeyDown}
       >
-        <h2 className="text-xl mb-5">이미지 파일을 삭제하시겠습니까?</h2>
+        <h2 className="text-xl mb-5">{message}</h2>
         <div className="flex justify-end space-x-4">
           <button
             className="w-[70px] px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
