@@ -155,6 +155,7 @@ export const cloneSelectedImages = (
     }
   });
 };
+
 export const inversionSelectedImages = (
   coordinates,
   selectedFiles,
@@ -179,11 +180,14 @@ export const inversionSelectedImages = (
       });
 
       const newX = coord.x + coord.width - flippedImg.width;
-      return {
+      const updatedCoord = {
         ...coord,
         img: flippedImg,
         x: newX,
       };
+
+      selectedFiles.add(flippedImg);
+      return updatedCoord;
     }
     return coord;
   });
