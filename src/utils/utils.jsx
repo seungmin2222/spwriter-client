@@ -123,6 +123,23 @@ export const handleDropFiles = (
 export const handleDragOverFiles = event => {
   event.preventDefault();
 };
+
+const processImage = async (coord, transformCallback) => {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = coord.img.width;
+  canvas.height = coord.img.height;
+
+  await transformCallback(ctx, canvas, coord.img);
+
+  const processedImg = new Image();
+  processedImg.src = canvas.toDataURL();
+
+  return new Promise(resolve => {
+    processedImg.onload = () => resolve(processedImg);
+  });
+};
+
 export const cloneSelectedImages = (
   coordinates,
   selectedFiles,
@@ -163,20 +180,10 @@ export const inversionSelectedImages = (
 ) => {
   const updatedCoordinatesPromises = coordinates.map(async coord => {
     if (selectedFiles.has(coord.img)) {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = coord.img.width;
-      canvas.height = coord.img.height;
-
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(coord.img, 0, 0);
-
-      const flippedImg = new Image();
-      flippedImg.src = canvas.toDataURL();
-
-      await new Promise(resolve => {
-        flippedImg.onload = () => resolve();
+      const flippedImg = await processImage(coord, (ctx, canvas) => {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(coord.img, 0, 0);
       });
 
       const newX = coord.x + coord.width - flippedImg.width;
@@ -204,31 +211,21 @@ export const rotateSelectedImages = (
 ) => {
   const updatedCoordinatesPromises = coordinates.map(async coord => {
     if (selectedFiles.has(coord.img)) {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = coord.img.height;
-      canvas.height = coord.img.width;
-
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate((90 * Math.PI) / 180);
-      ctx.drawImage(coord.img, -coord.img.width / 2, -coord.img.height / 2);
-
-      const rotatedImg = new Image();
-      rotatedImg.src = canvas.toDataURL();
-
-      await new Promise(resolve => {
-        rotatedImg.onload = () => resolve();
+      const rotatedImg = await processImage(coord, (ctx, canvas) => {
+        canvas.width = coord.img.height;
+        canvas.height = coord.img.width;
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((90 * Math.PI) / 180);
+        ctx.drawImage(coord.img, -coord.img.width / 2, -coord.img.height / 2);
       });
 
-      const newX = coord.x;
-      const newY = coord.y;
       const updatedCoord = {
         ...coord,
         img: rotatedImg,
         width: coord.img.height,
         height: coord.img.width,
-        x: newX,
-        y: newY,
+        x: coord.x,
+        y: coord.y,
       };
 
       selectedFiles.add(rotatedImg);
