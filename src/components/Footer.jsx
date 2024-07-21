@@ -1,6 +1,10 @@
 import React from 'react';
 import useFileStore from '../../store';
-import { cloneSelectedImages, inversionSelectedImages } from '../utils/utils';
+import {
+  cloneSelectedImages,
+  inversionSelectedImages,
+  rotateSelectedImages,
+} from '../utils/utils';
 
 import rotateIcon from '../assets/images/arrows-spin-solid.svg';
 import inversionIcon from '../assets/images/right-left-solid.svg';
@@ -17,20 +21,31 @@ function Footer() {
   const buttonStyle =
     'p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300';
 
-  const handleCloneSelectedImages = () => {
+  const handleActionIfNoSelection = action => {
     if (selectedFiles.size === 0) {
-      addToast('선택된 이미지파일이 없습니다.');
-      return;
+      addToast('선택된 이미지가 없습니다');
+      return false;
     }
-    cloneSelectedImages(coordinates, selectedFiles, setCoordinates);
+    action();
+    return true;
+  };
+
+  const handleCloneSelectedImages = () => {
+    handleActionIfNoSelection(() =>
+      cloneSelectedImages(coordinates, selectedFiles, setCoordinates)
+    );
   };
 
   const handleInversionSelectedImages = () => {
-    if (selectedFiles.size === 0) {
-      addToast('선택된 이미지파일이 없습니다.');
-      return;
-    }
-    inversionSelectedImages(coordinates, selectedFiles, setCoordinates);
+    handleActionIfNoSelection(() =>
+      inversionSelectedImages(coordinates, selectedFiles, setCoordinates)
+    );
+  };
+
+  const handleRotateSelectedImages = () => {
+    handleActionIfNoSelection(() =>
+      rotateSelectedImages(coordinates, selectedFiles, setCoordinates)
+    );
   };
 
   return (
@@ -39,7 +54,7 @@ function Footer() {
       data-testid="footer"
     >
       <div className="flex space-x-4">
-        <button className={buttonStyle}>
+        <button className={buttonStyle} onClick={handleRotateSelectedImages}>
           <img src={rotateIcon} alt="Rotate Icon" className="h-6 w-6" />
         </button>
         <button className={buttonStyle} onClick={handleInversionSelectedImages}>

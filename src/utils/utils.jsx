@@ -196,3 +196,48 @@ export const inversionSelectedImages = (
     setCoordinates(newCoordinates);
   });
 };
+
+export const rotateSelectedImages = (
+  coordinates,
+  selectedFiles,
+  setCoordinates
+) => {
+  const updatedCoordinatesPromises = coordinates.map(async coord => {
+    if (selectedFiles.has(coord.img)) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = coord.img.height;
+      canvas.height = coord.img.width;
+
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate((90 * Math.PI) / 180);
+      ctx.drawImage(coord.img, -coord.img.width / 2, -coord.img.height / 2);
+
+      const rotatedImg = new Image();
+      rotatedImg.src = canvas.toDataURL();
+
+      await new Promise(resolve => {
+        rotatedImg.onload = () => resolve();
+      });
+
+      const newX = coord.x;
+      const newY = coord.y;
+      const updatedCoord = {
+        ...coord,
+        img: rotatedImg,
+        width: coord.img.height,
+        height: coord.img.width,
+        x: newX,
+        y: newY,
+      };
+
+      selectedFiles.add(rotatedImg);
+      return updatedCoord;
+    }
+    return coord;
+  });
+
+  Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
+    setCoordinates(newCoordinates);
+  });
+};

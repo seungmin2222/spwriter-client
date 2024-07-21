@@ -240,7 +240,7 @@ function ImageList() {
 
   return (
     <aside
-      className="flex flex-col w-[26%] h-full min-w-[435px] mr-[2%] text-gray-700 bg-[#f9fafb] rounded-md shadow-md"
+      className="flex flex-col w-[26%] h-full min-w-[380px] mr-[2%] text-gray-700 bg-[#f9fafb] rounded-md shadow-md"
       data-testid="image-list"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
