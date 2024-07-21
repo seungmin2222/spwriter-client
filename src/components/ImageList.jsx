@@ -9,8 +9,9 @@ function ImageList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState(null);
-  const [indexToDelete, setIndexToDelete] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteConfirmationType, setDeleteConfirmationType] = useState(null);
+  const [currentImage, setCurrentImage] = useState(null);
+  const [deletingImages, setDeletingImages] = useState(new Set());
 
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
@@ -45,37 +46,30 @@ function ImageList() {
 
       prevCoordinatesRef.current = coordinates;
     }
-  }, [padding, coordinates]);
+  }, [padding, coordinates, setCoordinates]);
 
-  useEffect(() => {
-    if (isDeleting && indexToDelete !== null) {
-      const timer = setTimeout(() => {
-        const updatedCoordinates = coordinates.filter(
-          (_, index) => index !== indexToDelete
-        );
-        setCoordinates(updatedCoordinates);
-        setIsDeleting(false);
-        setIndexToDelete(null);
-        setShowModal(false);
-      }, 300);
-      return () => clearTimeout(timer);
+  const handleOpenModal = () => {
+    if (selectedFiles.size === 0) {
+      generateToast('선택된 리스트가 없습니다.');
+      return;
     }
-  }, [isDeleting, indexToDelete, coordinates, setCoordinates]);
-
-  const handleOpenModal = index => {
     setShowModal(true);
-    setIndexToDelete(index);
+    setDeleteConfirmationType('batch');
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setIndexToDelete(null);
+    setDeleteConfirmationType(null);
+    setCurrentImage(null);
   };
 
   const handleConfirm = () => {
-    if (indexToDelete !== null) {
-      setIsDeleting(true);
+    if (deleteConfirmationType === 'batch') {
+      deleteSelectedImages();
+    } else if (deleteConfirmationType === 'single' && currentImage) {
+      deleteImage(currentImage);
     }
+    setShowModal(false);
   };
 
   const generateCSS = (image, index) => `
@@ -130,6 +124,35 @@ function ImageList() {
     setSelectedFiles(new Set());
   };
 
+  const deleteSelectedImages = () => {
+    setDeletingImages(new Set(selectedFiles));
+
+    setTimeout(() => {
+      const updatedCoordinates = coordinates.filter(
+        coord => !selectedFiles.has(coord.img)
+      );
+
+      setCoordinates(updatedCoordinates);
+      setSelectedFiles(new Set());
+      setDeletingImages(new Set());
+      generateToast('선택된 이미지가 삭제되었습니다.');
+    }, 400);
+  };
+
+  const deleteImage = imgSrc => {
+    setDeletingImages(new Set([imgSrc]));
+
+    setTimeout(() => {
+      const updatedCoordinates = coordinates.filter(
+        coord => coord.img !== imgSrc
+      );
+
+      setCoordinates(updatedCoordinates);
+      setDeletingImages(new Set());
+      generateToast('이미지가 삭제되었습니다.');
+    }, 400);
+  };
+
   const handleDrop = event => {
     event.preventDefault();
     handleDropFiles(event, setFiles, setCoordinates, coordinates, padding);
@@ -156,17 +179,16 @@ function ImageList() {
 
   const renderImageList = (image, index) => {
     const isSelected = selectedFiles.has(image.img);
-    const deleteClass =
-      isDeleting && index === indexToDelete
-        ? 'animate-fadeOut'
-        : 'animate-fadeIn';
+    const isDeleting = deletingImages.has(image.img);
 
     return (
       <article
         key={index}
         className={`flex w-full h-[70px] bg-[#f0f4f8] rounded-md transition-colors duration-300 shadow-sm border transition-border duration-250 ${
           !isButtonHovered ? 'hover:bg-[#e2e8f0]' : ''
-        } ${isSelected ? 'border border-[#1f77b4]' : ''} ${deleteClass}`}
+        } ${isSelected ? 'border border-[#1f77b4]' : ''} ${
+          isDeleting ? 'animate-fadeOut' : 'animate-fadeIn'
+        }`}
       >
         <button
           className="flex w-[20%] items-center justify-center"
@@ -197,13 +219,14 @@ function ImageList() {
           onMouseLeave={() => setIsButtonHovered(false)}
           onClick={e => {
             e.stopPropagation();
-            handleOpenModal(index);
+            setCurrentImage(image.img);
+            setDeleteConfirmationType('single');
+            setShowModal(true);
           }}
           aria-label="cross"
         >
           <svg
-            className="h-6 w-6 bg-[#1f77b4] transition-colors duration-300 group-hover:fill-current group-hover:text-white group-hover:bg-[#07427e] rounded-full"
-            aria-label="cross"
+            className="h-6 w-6 bg-[#1f77b4] transition-colors duration-300 group-hover:fill-current group-hover:text-white group-hover:bg-[#c53030] rounded-full"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="#ffffff"
@@ -217,7 +240,7 @@ function ImageList() {
 
   return (
     <aside
-      className="flex flex-col w-[26%] h-full mr-[2%] text-gray-700 bg-[#f9fafb] rounded-md shadow-md"
+      className="flex flex-col w-[26%] h-full min-w-[435px] mr-[2%] text-gray-700 bg-[#f9fafb] rounded-md shadow-md"
       data-testid="image-list"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -230,23 +253,29 @@ function ImageList() {
           <div className="flex w-full justify-between">
             <div>
               <button
-                className="p-1 mr-2 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
+                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
                 onClick={handleSelectAll}
               >
                 전체 선택
               </button>
               <button
-                className="p-1 border rounded-md shadow-sm hover:bg-[#cbd5e1] transition-colors"
+                className="p-1 border mr-2 rounded-md shadow-sm hover:bg-[#cbd5e1] transition-colors"
                 onClick={handleDeselectAll}
               >
                 전체 해제
               </button>
+              <button
+                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
+                onClick={copySelectedCoordinates}
+              >
+                선택좌표 복사
+              </button>
             </div>
             <button
-              className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
-              onClick={copySelectedCoordinates}
+              className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#e53e3e] transition-colors"
+              onClick={handleOpenModal}
             >
-              선택한 좌표 복사
+              선택삭제
             </button>
           </div>
         </div>
@@ -272,6 +301,11 @@ function ImageList() {
           showModal={showModal}
           handleClose={handleCloseModal}
           handleConfirm={handleConfirm}
+          message={
+            deleteConfirmationType === 'single'
+              ? '이 이미지를 삭제하시겠습니까?'
+              : '선택된 이미지를 삭제하시겠습니까?'
+          }
         />
       )}
       {toast && (
