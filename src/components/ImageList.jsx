@@ -79,8 +79,7 @@ function ImageList() {
       background: url('${
         fileName ? `${fileName}.png` : 'css_sprites.png'
       }') -${image.x}px -${image.y}px;
-    }
-  `;
+    }`;
 
   const generateToast = message => {
     setToast({
