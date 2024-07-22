@@ -40,7 +40,7 @@ const useFileStore = create(set => ({
       }
       return { history, redoHistory: state.redoHistory };
     }),
-  redo: () =>
+  pushHistory: () =>
     set(state => {
       const redoHistory = [...state.redoHistory];
       const nextState = redoHistory.shift();

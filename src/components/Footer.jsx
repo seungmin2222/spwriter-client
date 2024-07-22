@@ -17,9 +17,11 @@ function Footer() {
   const setCoordinates = useFileStore(state => state.setCoordinates);
   const addHistory = useFileStore(state => state.addHistory);
   const popHistory = useFileStore(state => state.popHistory);
-  const redoHistory = useFileStore(state => state.redo);
+  const pushHistory = useFileStore(state => state.pushHistory);
   const selectedFiles = useFileStore(state => state.selectedFiles);
   const addToast = useFileStore(state => state.addToast);
+  const history = useFileStore(state => state.history);
+  const redoHistory = useFileStore(state => state.redoHistory);
 
   const buttonStyle =
     'p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300';
@@ -27,10 +29,9 @@ function Footer() {
   const handleActionIfNoSelection = action => {
     if (selectedFiles.size === 0) {
       addToast('선택된 이미지가 없습니다');
-      return false;
+    } else {
+      action();
     }
-    action();
-    return true;
   };
 
   const handleCloneSelectedImages = () => {
@@ -55,11 +56,19 @@ function Footer() {
   };
 
   const handleUndo = () => {
-    popHistory();
+    if (history.length) {
+      popHistory();
+    } else {
+      addToast('뒤로 갈 기록이 없습니다');
+    }
   };
 
   const handleRedo = () => {
-    redoHistory();
+    if (redoHistory.length) {
+      pushHistory();
+    } else {
+      addToast('앞으로 갈 기록이 없습니다');
+    }
   };
 
   return (
