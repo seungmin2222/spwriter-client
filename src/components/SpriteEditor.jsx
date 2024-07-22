@@ -5,7 +5,6 @@ import {
   handleDragOverFiles,
   resizeSelectedImages,
 } from '../utils/utils';
-
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 function SpriteEditor() {
@@ -18,6 +17,7 @@ function SpriteEditor() {
   const files = useFileStore(state => state.files);
   const setFiles = useFileStore(state => state.setFiles);
   const addHistory = useFileStore(state => state.addHistory);
+  const alignElement = useFileStore(state => state.alignElement);
 
   const [isResizing, setIsResizing] = useState(false);
   const [resizing, setResizing] = useState(null);
@@ -46,59 +46,116 @@ function SpriteEditor() {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const totalWidth = coordinates.reduce(
-      (acc, coord) => acc + coord.width + padding,
-      -padding
-    );
-    const maxHeight =
-      Math.max(...coordinates.map(coord => coord.height)) + padding * 2;
-    canvas.width = totalWidth;
-    canvas.height = maxHeight;
+    if (alignElement === 'left-right') {
+      const totalWidth = coordinates.reduce(
+        (acc, coord) => acc + coord.width + padding,
+        -padding
+      );
+      const maxHeight =
+        Math.max(...coordinates.map(coord => coord.height)) + padding * 2;
+      canvas.width = totalWidth;
+      canvas.height = maxHeight;
 
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    let xOffset = 0;
+      let xOffset = 0;
 
-    coordinates.forEach(coord => {
-      if (!coord.img.complete) return;
+      coordinates.forEach(coord => {
+        if (!coord.img.complete) return;
 
-      ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
+        ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
 
-      const isSelected = selectedFiles.has(coord.img);
+        const isSelected = selectedFiles.has(coord.img);
 
-      if (isSelected) {
-        ctx.strokeStyle = '#1a5a91';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(xOffset, padding, coord.width, coord.height);
+        if (isSelected) {
+          ctx.strokeStyle = '#1a5a91';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(xOffset, padding, coord.width, coord.height);
 
-        const circleRadius = 8;
-        const circleOffset = -10;
-        ctx.beginPath();
-        ctx.arc(
-          xOffset + coord.width + circleOffset,
-          padding + coord.height + circleOffset,
-          circleRadius,
-          0,
-          2 * Math.PI
-        );
-        ctx.fillStyle = '#1a5a91';
-        ctx.fill();
+          const circleRadius = 8;
+          const circleOffset = -10;
+          ctx.beginPath();
+          ctx.arc(
+            xOffset + coord.width + circleOffset,
+            padding + coord.height + circleOffset,
+            circleRadius,
+            0,
+            2 * Math.PI
+          );
+          ctx.fillStyle = '#1a5a91';
+          ctx.fill();
 
-        coord.circle = {
-          x: xOffset + coord.width + circleOffset,
-          y: padding + coord.height + circleOffset,
-          radius: circleRadius,
-        };
-      } else {
-        coord.circle = null;
-      }
+          coord.circle = {
+            x: xOffset + coord.width + circleOffset,
+            y: padding + coord.height + circleOffset,
+            radius: circleRadius,
+          };
+        } else {
+          coord.circle = null;
+        }
 
-      xOffset += coord.width + padding;
-    });
+        xOffset += coord.width + padding;
+      });
+    } else if (alignElement === 'top-bottom') {
+      const maxWidth =
+        Math.max(...coordinates.map(coord => coord.width)) + padding;
+      const totalHeight = coordinates.reduce(
+        (acc, coord) => acc + coord.height + padding,
+        0
+      );
+      canvas.width = maxWidth;
+      canvas.height = totalHeight;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      let yOffset = 0;
+
+      coordinates.forEach(coord => {
+        if (!coord.img.complete) return;
+
+        const xOffset = padding;
+        ctx.drawImage(coord.img, xOffset, yOffset, coord.width, coord.height);
+
+        const isSelected = selectedFiles.has(coord.img);
+
+        if (isSelected) {
+          ctx.strokeStyle = '#1a5a91';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(xOffset, yOffset, coord.width, coord.height);
+
+          const circleRadius = 8;
+          const circleOffset = -10;
+          ctx.beginPath();
+          ctx.arc(
+            xOffset + coord.width + circleOffset,
+            yOffset + coord.height + circleOffset,
+            circleRadius,
+            0,
+            2 * Math.PI
+          );
+          ctx.fillStyle = '#1a5a91';
+          ctx.fill();
+
+          coord.circle = {
+            x: xOffset + coord.width + circleOffset,
+            y: yOffset + coord.height + circleOffset,
+            radius: circleRadius,
+          };
+        } else {
+          coord.circle = null;
+        }
+
+        yOffset += coord.height + padding;
+      });
+    }
   };
 
   const handleCanvasMouseDown = event => {
@@ -111,24 +168,46 @@ function SpriteEditor() {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
-    let xOffset = 0;
+    if (alignElement === 'left-right') {
+      let xOffset = 0;
 
-    for (const coord of coordinates) {
-      if (coord.circle) {
-        const dist = Math.sqrt(
-          Math.pow(x - coord.circle.x, 2) + Math.pow(y - coord.circle.y, 2)
-        );
+      for (const coord of coordinates) {
+        if (coord.circle) {
+          const dist = Math.sqrt(
+            Math.pow(x - coord.circle.x, 2) + Math.pow(y - coord.circle.y, 2)
+          );
 
-        if (dist <= coord.circle.radius) {
-          setResizing(coord);
-          setStartPos({ x, y });
-          setOriginalSize({ width: coord.width, height: coord.height });
-          setIsResizing(true);
-          return;
+          if (dist <= coord.circle.radius) {
+            setResizing(coord);
+            setStartPos({ x, y });
+            setOriginalSize({ width: coord.width, height: coord.height });
+            setIsResizing(true);
+            return;
+          }
         }
-      }
 
-      xOffset += coord.width + padding;
+        xOffset += coord.width + padding;
+      }
+    } else if (alignElement === 'top-bottom') {
+      let yOffset = 0;
+
+      for (const coord of coordinates) {
+        if (coord.circle) {
+          const dist = Math.sqrt(
+            Math.pow(x - coord.circle.x, 2) + Math.pow(y - coord.circle.y, 2)
+          );
+
+          if (dist <= coord.circle.radius) {
+            setResizing(coord);
+            setStartPos({ x, y });
+            setOriginalSize({ width: coord.width, height: coord.height });
+            setIsResizing(true);
+            return;
+          }
+        }
+
+        yOffset += coord.height + padding;
+      }
     }
   };
 
@@ -183,28 +262,55 @@ function SpriteEditor() {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
-    let xOffset = 0;
-    const newSelectedFiles = new Set(selectedFiles);
+    if (alignElement === 'left-right') {
+      let xOffset = 0;
+      const newSelectedFiles = new Set(selectedFiles);
 
-    for (const coord of coordinates) {
-      const startX = xOffset;
-      const endX = xOffset + coord.width;
-      const startY = padding;
-      const endY = padding + coord.height;
+      for (const coord of coordinates) {
+        const startX = xOffset;
+        const endX = xOffset + coord.width;
+        const startY = padding;
+        const endY = padding + coord.height;
 
-      if (x >= startX && x <= endX && y >= startY && y <= endY) {
-        if (newSelectedFiles.has(coord.img)) {
-          newSelectedFiles.delete(coord.img);
-        } else {
-          newSelectedFiles.add(coord.img);
+        if (x >= startX && x <= endX && y >= startY && y <= endY) {
+          if (newSelectedFiles.has(coord.img)) {
+            newSelectedFiles.delete(coord.img);
+          } else {
+            newSelectedFiles.add(coord.img);
+          }
+
+          setSelectedFiles(newSelectedFiles);
+          drawImages();
+          break;
         }
 
-        setSelectedFiles(newSelectedFiles);
-        drawImages();
-        break;
+        xOffset += coord.width + padding;
       }
+    } else if (alignElement === 'top-bottom') {
+      let yOffset = 0;
+      const newSelectedFiles = new Set(selectedFiles);
 
-      xOffset += coord.width + padding;
+      for (const coord of coordinates) {
+        const xOffset = padding;
+        const startX = xOffset;
+        const endX = xOffset + coord.width;
+        const startY = yOffset;
+        const endY = yOffset + coord.height;
+
+        if (x >= startX && x <= endX && y >= startY && y <= endY) {
+          if (newSelectedFiles.has(coord.img)) {
+            newSelectedFiles.delete(coord.img);
+          } else {
+            newSelectedFiles.add(coord.img);
+          }
+
+          setSelectedFiles(newSelectedFiles);
+          drawImages();
+          break;
+        }
+
+        yOffset += coord.height + padding;
+      }
     }
   };
 
@@ -218,7 +324,7 @@ function SpriteEditor() {
     if (canvasRef.current && files.length > 0) {
       drawImages();
     }
-  }, [coordinates, padding, selectedFiles, files]);
+  }, [coordinates, padding, selectedFiles, files, alignElement]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

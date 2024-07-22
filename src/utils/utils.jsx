@@ -1,15 +1,23 @@
-export const calculateCoordinates = (images, padding) => {
-  let xOffset = 0;
+export const calculateCoordinates = (images, padding, alignElement) => {
+  let xOffset = padding;
+  let yOffset = padding;
+
   return images.map((img, index) => {
     const coord = {
       index: Date.now() + index,
-      x: xOffset,
-      y: padding,
+      x: alignElement === 'top-bottom' ? padding : xOffset,
+      y: alignElement === 'left-right' ? padding : yOffset,
       width: img.width,
       height: img.height,
       img,
     };
-    xOffset += img.width + padding;
+
+    if (alignElement === 'top-bottom') {
+      yOffset += img.height + padding;
+    } else if (alignElement === 'left-right') {
+      xOffset += img.width + padding;
+    }
+
     return coord;
   });
 };
@@ -78,7 +86,8 @@ export const handleFiles = (
   setFiles,
   setCoordinates,
   coordinates,
-  padding
+  padding,
+  alignElement
 ) => {
   const filesArray = Array.from(files);
   setFiles(prevFiles => [...prevFiles, ...filesArray]);
@@ -92,7 +101,11 @@ export const handleFiles = (
         trimImage(img).then(trimmedImg => {
           newImages.push(trimmedImg);
           if (newImages.length === filesArray.length) {
-            const newCoordinates = calculateCoordinates(newImages, padding);
+            const newCoordinates = calculateCoordinates(
+              newImages,
+              padding,
+              alignElement
+            );
             const updatedCoordinates = [...coordinates, ...newCoordinates];
             if (
               JSON.stringify(updatedCoordinates) !== JSON.stringify(coordinates)
@@ -113,11 +126,19 @@ export const handleDropFiles = (
   setFiles,
   setCoordinates,
   coordinates,
-  padding
+  padding,
+  alignElement
 ) => {
   event.preventDefault();
   const droppedFiles = Array.from(event.dataTransfer.files);
-  handleFiles(droppedFiles, setFiles, setCoordinates, coordinates, padding);
+  handleFiles(
+    droppedFiles,
+    setFiles,
+    setCoordinates,
+    coordinates,
+    padding,
+    alignElement
+  );
 };
 
 export const handleDragOverFiles = event => {

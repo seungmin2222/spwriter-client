@@ -15,12 +15,13 @@ function ImageList() {
 
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
-  const selectedFiles = useFileStore(state => state.selectedFiles);
+  const selectedFiles = useFileStore(state => state.selectedFiles) || new Set();
   const setSelectedFiles = useFileStore(state => state.setSelectedFiles);
   const setFiles = useFileStore(state => state.setFiles);
   const padding = useFileStore(state => state.padding);
   const fileName = useFileStore(state => state.fileName);
   const addHistory = useFileStore(state => state.addHistory);
+  const alignElement = useFileStore(state => state.alignElement);
 
   const prevCoordinatesRef = useRef(coordinates);
 
@@ -28,7 +29,8 @@ function ImageList() {
     if (coordinates.length > 0) {
       const newCoordinates = calculateCoordinates(
         coordinates.map(coord => coord.img),
-        padding
+        padding,
+        alignElement
       );
 
       const prevCoordinates = prevCoordinatesRef.current;
@@ -45,9 +47,9 @@ function ImageList() {
         setCoordinates(newCoordinates);
       }
 
-      prevCoordinatesRef.current = coordinates;
+      prevCoordinatesRef.current = newCoordinates;
     }
-  }, [padding, coordinates, setCoordinates]);
+  }, [padding, coordinates, setCoordinates, alignElement]);
 
   const handleOpenModal = () => {
     if (selectedFiles.size === 0) {
