@@ -15,6 +15,9 @@ import rightIcon from '../assets/images/angles-right-solid.svg';
 function Footer() {
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
+  const addHistory = useFileStore(state => state.addHistory);
+  const popHistory = useFileStore(state => state.popHistory);
+  const redoHistory = useFileStore(state => state.redo);
   const selectedFiles = useFileStore(state => state.selectedFiles);
   const addToast = useFileStore(state => state.addToast);
 
@@ -31,21 +34,32 @@ function Footer() {
   };
 
   const handleCloneSelectedImages = () => {
-    handleActionIfNoSelection(() =>
-      cloneSelectedImages(coordinates, selectedFiles, setCoordinates)
-    );
+    handleActionIfNoSelection(() => {
+      addHistory(coordinates);
+      cloneSelectedImages(coordinates, selectedFiles, setCoordinates);
+    });
   };
 
   const handleInversionSelectedImages = () => {
-    handleActionIfNoSelection(() =>
-      inversionSelectedImages(coordinates, selectedFiles, setCoordinates)
-    );
+    handleActionIfNoSelection(() => {
+      addHistory(coordinates);
+      inversionSelectedImages(coordinates, selectedFiles, setCoordinates);
+    });
   };
 
   const handleRotateSelectedImages = () => {
-    handleActionIfNoSelection(() =>
-      rotateSelectedImages(coordinates, selectedFiles, setCoordinates)
-    );
+    handleActionIfNoSelection(() => {
+      addHistory(coordinates);
+      rotateSelectedImages(coordinates, selectedFiles, setCoordinates);
+    });
+  };
+
+  const handleUndo = () => {
+    popHistory();
+  };
+
+  const handleRedo = () => {
+    redoHistory();
   };
 
   return (
@@ -65,11 +79,11 @@ function Footer() {
         </button>
       </div>
       <div className="flex space-x-4">
-        <button className={buttonStyle}>
+        <button className={buttonStyle} onClick={handleUndo}>
           <img src={leftIcon} alt="Left Icon" className="h-6 w-6" />
         </button>
-        <button className={buttonStyle}>
-          <img src={rightIcon} alt="Right Icon" className="h-6 w-6" />
+        <button className={buttonStyle} onClick={handleRedo}>
+          <img src={rightIcon} alt="Redo Icon" className="h-6 w-6" />{' '}
         </button>
       </div>
     </footer>
