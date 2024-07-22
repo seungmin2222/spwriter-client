@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Toast from './Toast';
 import useFileStore from '../../store';
 import { handleFiles, trimImage } from '../utils/utils';
-
 import downloadIcon from '../assets/images/download-solid.svg';
 
 function Navbar() {
@@ -27,9 +26,9 @@ function Navbar() {
     }
   };
 
-  const drawImagesWithoutBackground = async (ctx, coordinate, padding) => {
+  const drawImagesWithoutBackground = async (ctx, coordinates, padding) => {
     let xOffset = 0;
-    const promises = coordinate.map(async coord => {
+    const promises = coordinates.map(async coord => {
       const trimmedImg = await trimImage(coord.img);
       ctx.drawImage(
         trimmedImg,
@@ -123,13 +122,11 @@ function Navbar() {
               onChange={handlePaddingChange}
               className="w-16 p-1 border rounded-md text-center"
             />
-            <span className="gray-[#374151]">px</span>
+            <span>px</span>
           </div>
         </div>
         <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
-          <label htmlFor="align-elements" className="gray-[#374151]">
-            정렬 옵션 :
-          </label>
+          <label htmlFor="align-elements">정렬 옵션 :</label>
           <select
             id="align-elements"
             value={option}
@@ -137,8 +134,8 @@ function Navbar() {
             className="w-40 p-1 border rounded-md"
           >
             <option value="Binary Tree">Binary Tree</option>
-            <option value="left-right">left-right</option>
-            <option value="top-bottom">top-bottom</option>
+            <option value="left-right">Left-Right</option>
+            <option value="top-bottom">Top-Bottom</option>
           </select>
         </div>
       </div>
