@@ -5,7 +5,6 @@ import { handleFiles, trimImage } from '../utils/utils';
 import downloadIcon from '../assets/images/download-solid.svg';
 
 function Navbar() {
-  const [option, setOption] = useState('Binary Tree');
   const fileName = useFileStore(state => state.fileName);
   const setFileName = useFileStore(state => state.setFileName);
   const setFiles = useFileStore(state => state.setFiles);
@@ -16,30 +15,52 @@ function Navbar() {
   const addToast = useFileStore(state => state.addToast);
   const toast = useFileStore(state => state.toast);
   const setToast = useFileStore(state => state.setToast);
+  const alignElement = useFileStore(state => state.alignElement);
+  const setAlignElement = useFileStore(state => state.setAlignElement);
 
   const handlePaddingChange = event => {
     const value = Number(event.target.value);
     if (value <= 0) {
-      addToast('1 보다 작게 설정 할 수 없습니다.');
+      addToast('1 보다 작게 설정할 수 없습니다.');
     } else {
       setPadding(value);
     }
   };
 
-  const drawImagesWithoutBackground = async (ctx, coordinates, padding) => {
-    let xOffset = 0;
-    const promises = coordinates.map(async coord => {
-      const trimmedImg = await trimImage(coord.img);
-      ctx.drawImage(
-        trimmedImg,
-        xOffset,
-        padding,
-        trimmedImg.width,
-        trimmedImg.height
-      );
-      xOffset += trimmedImg.width + padding;
-    });
-    await Promise.all(promises);
+  const drawImagesWithoutBackground = async (
+    ctx,
+    coordinates,
+    padding,
+    alignElement
+  ) => {
+    let xOffset = padding;
+    let yOffset = padding;
+
+    if (alignElement === 'left-right') {
+      for (const coord of coordinates) {
+        const trimmedImg = await trimImage(coord.img);
+        ctx.drawImage(
+          trimmedImg,
+          xOffset,
+          padding,
+          trimmedImg.width,
+          trimmedImg.height
+        );
+        xOffset += trimmedImg.width + padding;
+      }
+    } else if (alignElement === 'top-bottom') {
+      for (const coord of coordinates) {
+        const trimmedImg = await trimImage(coord.img);
+        ctx.drawImage(
+          trimmedImg,
+          padding,
+          yOffset,
+          trimmedImg.width,
+          trimmedImg.height
+        );
+        yOffset += trimmedImg.height + padding;
+      }
+    }
   };
 
   const handleDownload = async () => {
@@ -56,18 +77,34 @@ function Navbar() {
       return;
     }
 
-    const totalWidth = coordinates.reduce(
-      (acc, coord) => acc + coord.width + paddingValue,
-      -paddingValue
-    );
-    const maxHeight =
-      Math.max(...coordinates.map(coord => coord.height)) + paddingValue * 2;
+    let totalWidth, maxHeight;
+    if (alignElement === 'left-right') {
+      totalWidth = coordinates.reduce(
+        (acc, coord) => acc + coord.width + paddingValue,
+        paddingValue
+      );
+      maxHeight =
+        Math.max(...coordinates.map(coord => coord.height)) + paddingValue * 2;
+    } else if (alignElement === 'top-bottom') {
+      totalWidth =
+        Math.max(...coordinates.map(coord => coord.width)) + paddingValue * 2;
+      maxHeight = coordinates.reduce(
+        (acc, coord) => acc + coord.height + paddingValue,
+        paddingValue
+      );
+    }
+
     downloadCanvas.width = totalWidth;
     downloadCanvas.height = maxHeight;
 
     downloadCtx.clearRect(0, 0, downloadCanvas.width, downloadCanvas.height);
 
-    await drawImagesWithoutBackground(downloadCtx, coordinates, paddingValue);
+    await drawImagesWithoutBackground(
+      downloadCtx,
+      coordinates,
+      paddingValue,
+      alignElement
+    );
 
     const link = document.createElement('a');
     link.href = downloadCanvas.toDataURL('image/png');
@@ -83,7 +120,7 @@ function Navbar() {
 
   return (
     <nav
-      className="flex w-full h-[10%] h-min-[50px] px-[1rem] py-[10px] bg-white rounded-t-md items-center justify-between shadow-md select-none"
+      className="flex w-full h-[10%] min-h-[50px] px-[1rem] py-[10px] bg-white rounded-t-md items-center justify-between shadow-md select-none"
       data-testid="navbar"
     >
       <div className="flex gap-4">
@@ -121,6 +158,7 @@ function Navbar() {
               value={paddingValue}
               onChange={handlePaddingChange}
               className="w-16 p-1 border rounded-md text-center"
+              min="1"
             />
             <span>px</span>
           </div>
@@ -129,8 +167,8 @@ function Navbar() {
           <label htmlFor="align-elements">정렬 옵션 :</label>
           <select
             id="align-elements"
-            value={option}
-            onChange={e => setOption(e.target.value)}
+            value={alignElement}
+            onChange={e => setAlignElement(e.target.value)}
             className="w-40 p-1 border rounded-md"
           >
             <option value="Binary Tree">Binary Tree</option>
