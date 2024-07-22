@@ -200,6 +200,7 @@ export const inversionSelectedImages = (
   });
 
   Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
+    sortAndSetCoordinates(newCoordinates, setCoordinates);
     setCoordinates(newCoordinates);
   });
 };
@@ -229,6 +230,40 @@ export const rotateSelectedImages = (
       };
 
       selectedFiles.add(rotatedImg);
+      return updatedCoord;
+    }
+    return coord;
+  });
+
+  Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
+    sortAndSetCoordinates(newCoordinates, setCoordinates);
+    setCoordinates(newCoordinates);
+  });
+};
+
+export const resizeSelectedImages = (
+  coordinates,
+  selectedFiles,
+  setCoordinates
+) => {
+  const updatedCoordinatesPromises = coordinates.map(async coord => {
+    if (selectedFiles.has(coord.img)) {
+      const resizedImg = await processImage(coord, (ctx, canvas) => {
+        canvas.width = coord.width;
+        canvas.height = coord.height;
+        ctx.drawImage(coord.img, 0, 0, coord.width, coord.height);
+      });
+
+      const updatedCoord = {
+        ...coord,
+        img: resizedImg,
+        width: coord.width,
+        height: coord.height,
+        x: coord.x,
+        y: coord.y,
+      };
+
+      selectedFiles.add(resizedImg);
       return updatedCoord;
     }
     return coord;

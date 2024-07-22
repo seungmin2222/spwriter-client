@@ -1,6 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import useFileStore from '../../store';
-import { handleFiles, handleDragOverFiles } from '../utils/utils';
+import {
+  handleFiles,
+  handleDragOverFiles,
+  resizeSelectedImages,
+} from '../utils/utils';
 
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
@@ -13,6 +17,11 @@ function SpriteEditor() {
   const setSelectedFiles = useFileStore(state => state.setSelectedFiles);
   const files = useFileStore(state => state.files);
   const setFiles = useFileStore(state => state.setFiles);
+
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizing, setResizing] = useState(null);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
 
   const createCheckerboardPattern = () => {
     const patternCanvas = document.createElement('canvas');
@@ -81,10 +90,84 @@ function SpriteEditor() {
           y: padding + coord.height + circleOffset,
           radius: circleRadius,
         };
+      } else {
+        coord.circle = null;
       }
 
       xOffset += coord.width + padding;
     });
+  };
+
+  const handleCanvasMouseDown = event => {
+    setIsResizing(true);
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    let xOffset = 0;
+
+    for (const coord of coordinates) {
+      if (coord.circle) {
+        const dist = Math.sqrt(
+          Math.pow(x - coord.circle.x, 2) + Math.pow(y - coord.circle.y, 2)
+        );
+
+        if (dist <= coord.circle.radius) {
+          setResizing(coord);
+          setStartPos({ x, y });
+          setOriginalSize({ width: coord.width, height: coord.height });
+          setIsResizing(true);
+          return;
+        }
+      }
+
+      xOffset += coord.width + padding;
+    }
+  };
+
+  const handleCanvasMouseMove = event => {
+    if (!isResizing || !resizing) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const deltaX = x - startPos.x;
+    const deltaY = y - startPos.y;
+
+    const newWidth = Math.max(originalSize.width + deltaX, 10);
+    const newHeight = Math.max(originalSize.height + deltaY, 10);
+
+    const updatedCoordinates = coordinates.map(coord => {
+      if (coord === resizing) {
+        return {
+          ...coord,
+          width: newWidth,
+          height: newHeight,
+        };
+      }
+      return coord;
+    });
+
+    setCoordinates(updatedCoordinates);
+
+    resizeSelectedImages(updatedCoordinates, selectedFiles, setCoordinates);
+
+    drawImages();
+  };
+
+  const handleCanvasMouseUp = () => {
+    if (isResizing) {
+      setIsResizing(false);
+      setResizing(null);
+    }
   };
 
   const handleCanvasClick = event => {
@@ -132,6 +215,24 @@ function SpriteEditor() {
     }
   }, [coordinates, padding, selectedFiles, files]);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+
+    if (canvas) {
+      canvas.addEventListener('mousemove', handleCanvasMouseMove);
+      canvas.addEventListener('mouseup', handleCanvasMouseUp);
+      canvas.addEventListener('mousedown', handleCanvasMouseDown);
+    }
+
+    return () => {
+      if (canvas) {
+        canvas.removeEventListener('mousemove', handleCanvasMouseMove);
+        canvas.removeEventListener('mouseup', handleCanvasMouseUp);
+        canvas.removeEventListener('mousedown', handleCanvasMouseDown);
+      }
+    };
+  }, [isResizing, resizing, startPos]);
+
   return (
     <div
       className="relative w-full h-[80%] overflow-auto bg-[#f0f4f8]"
@@ -139,6 +240,8 @@ function SpriteEditor() {
       onClick={handleCanvasClick}
       onDrop={handleDrop}
       onDragOver={handleDragOverFiles}
+      onMouseDown={handleCanvasMouseDown}
+      onMouseUp={handleCanvasMouseUp}
       tabIndex={0}
       aria-label="Sprite Editor Canvas"
     >
