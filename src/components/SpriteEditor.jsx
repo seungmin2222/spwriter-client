@@ -17,6 +17,7 @@ function SpriteEditor() {
   const setSelectedFiles = useFileStore(state => state.setSelectedFiles);
   const files = useFileStore(state => state.files);
   const setFiles = useFileStore(state => state.setFiles);
+  const addHistory = useFileStore(state => state.addHistory);
 
   const [isResizing, setIsResizing] = useState(false);
   const [resizing, setResizing] = useState(null);
@@ -165,6 +166,7 @@ function SpriteEditor() {
 
   const handleCanvasMouseUp = () => {
     if (isResizing) {
+      addHistory(coordinates);
       setIsResizing(false);
       setResizing(null);
       if (changeCoordinates) {

@@ -19,6 +19,40 @@ const useFileStore = create(set => ({
 
   fileName: '',
   setFileName: fileName => set({ fileName }),
+
+  history: [],
+  redoHistory: [],
+  addHistory: prevCoordinates =>
+    set(state => ({
+      history: [...state.history, prevCoordinates],
+      redoHistory: [],
+    })),
+  popHistory: () =>
+    set(state => {
+      const history = [...state.history];
+      const lastState = history.pop();
+      if (lastState) {
+        return {
+          history,
+          coordinates: lastState,
+          redoHistory: [state.coordinates, ...state.redoHistory],
+        };
+      }
+      return { history, redoHistory: state.redoHistory };
+    }),
+  redo: () =>
+    set(state => {
+      const redoHistory = [...state.redoHistory];
+      const nextState = redoHistory.shift();
+      if (nextState) {
+        return {
+          coordinates: nextState,
+          redoHistory,
+          history: [...state.history, state.coordinates],
+        };
+      }
+      return { redoHistory, history: state.history };
+    }),
 }));
 
 export default useFileStore;
