@@ -95,7 +95,6 @@ function ImageList() {
       .then(() => generateToast('좌표값이 클립보드에 복사되었습니다.'))
       .catch(err => {
         generateToast('클립보드 복사 실패.');
-        console.error('클립보드 복사 실패:', err);
       });
   };
 
