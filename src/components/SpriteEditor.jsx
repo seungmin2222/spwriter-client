@@ -166,10 +166,10 @@ function SpriteEditor() {
 
   const handleCanvasMouseUp = () => {
     if (isResizing) {
-      addHistory(coordinates);
       setIsResizing(false);
       setResizing(null);
       if (changeCoordinates) {
+        addHistory(coordinates);
         resizeSelectedImages(changeCoordinates, selectedFiles, setCoordinates);
       }
     }

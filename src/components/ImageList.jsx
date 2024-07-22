@@ -20,6 +20,7 @@ function ImageList() {
   const setFiles = useFileStore(state => state.setFiles);
   const padding = useFileStore(state => state.padding);
   const fileName = useFileStore(state => state.fileName);
+  const addHistory = useFileStore(state => state.addHistory);
 
   const prevCoordinatesRef = useRef(coordinates);
 
@@ -123,6 +124,7 @@ function ImageList() {
   };
 
   const deleteSelectedImages = () => {
+    addHistory(coordinates);
     setDeletingImages(new Set(selectedFiles));
 
     setTimeout(() => {
@@ -138,6 +140,7 @@ function ImageList() {
   };
 
   const deleteImage = imgSrc => {
+    addHistory(coordinates);
     setDeletingImages(new Set([imgSrc]));
 
     setTimeout(() => {
