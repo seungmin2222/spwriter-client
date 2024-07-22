@@ -201,7 +201,6 @@ export const inversionSelectedImages = (
 
   Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
     sortAndSetCoordinates(newCoordinates, setCoordinates);
-    setCoordinates(newCoordinates);
   });
 };
 
@@ -237,7 +236,6 @@ export const rotateSelectedImages = (
 
   Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
     sortAndSetCoordinates(newCoordinates, setCoordinates);
-    setCoordinates(newCoordinates);
   });
 };
 
@@ -263,13 +261,12 @@ export const resizeSelectedImages = (
         y: coord.y,
       };
 
-      selectedFiles.add(resizedImg);
       return updatedCoord;
     }
     return coord;
   });
 
   Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
-    setCoordinates(newCoordinates);
+    sortAndSetCoordinates(newCoordinates, setCoordinates);
   });
 };

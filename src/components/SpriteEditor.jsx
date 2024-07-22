@@ -11,8 +11,8 @@ import fileImageIcon from '../assets/images/file-image-regular.svg';
 function SpriteEditor() {
   const canvasRef = useRef(null);
   const coordinates = useFileStore(state => state.coordinates);
-  const padding = useFileStore(state => state.padding);
   const setCoordinates = useFileStore(state => state.setCoordinates);
+  const padding = useFileStore(state => state.padding);
   const selectedFiles = useFileStore(state => state.selectedFiles) || new Set();
   const setSelectedFiles = useFileStore(state => state.setSelectedFiles);
   const files = useFileStore(state => state.files);
