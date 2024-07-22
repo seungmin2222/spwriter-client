@@ -62,6 +62,25 @@ function SpriteEditor() {
         ctx.strokeStyle = '#1a5a91';
         ctx.lineWidth = 1;
         ctx.strokeRect(xOffset, padding, coord.width, coord.height);
+
+        const circleRadius = 8;
+        const circleOffset = 10;
+        ctx.beginPath();
+        ctx.arc(
+          xOffset + coord.width + circleOffset,
+          padding + coord.height + circleOffset,
+          circleRadius,
+          0,
+          2 * Math.PI
+        );
+        ctx.fillStyle = '#1a5a91';
+        ctx.fill();
+
+        coord.circle = {
+          x: xOffset + coord.width + circleOffset,
+          y: padding + coord.height + circleOffset,
+          radius: circleRadius,
+        };
       }
 
       xOffset += coord.width + padding;
