@@ -23,6 +23,8 @@ function SpriteEditor() {
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
 
+  let changeCoordinates = null;
+
   const createCheckerboardPattern = () => {
     const patternCanvas = document.createElement('canvas');
     patternCanvas.width = 20;
@@ -73,7 +75,7 @@ function SpriteEditor() {
         ctx.strokeRect(xOffset, padding, coord.width, coord.height);
 
         const circleRadius = 8;
-        const circleOffset = 10;
+        const circleOffset = -10;
         ctx.beginPath();
         ctx.arc(
           xOffset + coord.width + circleOffset,
@@ -155,10 +157,8 @@ function SpriteEditor() {
       }
       return coord;
     });
-
+    changeCoordinates = updatedCoordinates;
     setCoordinates(updatedCoordinates);
-
-    resizeSelectedImages(updatedCoordinates, selectedFiles, setCoordinates);
 
     drawImages();
   };
@@ -167,6 +167,9 @@ function SpriteEditor() {
     if (isResizing) {
       setIsResizing(false);
       setResizing(null);
+      if (changeCoordinates) {
+        resizeSelectedImages(changeCoordinates, selectedFiles, setCoordinates);
+      }
     }
   };
 
