@@ -27,12 +27,7 @@ function Navbar() {
     }
   };
 
-  const drawImagesWithoutBackground = async (
-    ctx,
-    coordinates,
-    padding,
-    alignElement
-  ) => {
+  const drawImages = async (ctx, coordinates, padding, alignElement) => {
     let xOffset = padding;
     let yOffset = padding;
 
@@ -78,6 +73,7 @@ function Navbar() {
     }
 
     let totalWidth, maxHeight;
+
     if (alignElement === 'left-right') {
       totalWidth = coordinates.reduce(
         (acc, coord) => acc + coord.width + paddingValue,
@@ -99,16 +95,11 @@ function Navbar() {
 
     downloadCtx.clearRect(0, 0, downloadCanvas.width, downloadCanvas.height);
 
-    await drawImagesWithoutBackground(
-      downloadCtx,
-      coordinates,
-      paddingValue,
-      alignElement
-    );
+    await drawImages(downloadCtx, coordinates, paddingValue, alignElement);
 
     const link = document.createElement('a');
     link.href = downloadCanvas.toDataURL('image/png');
-    link.download = fileName ? `${fileName}.png` : 'css_sprites.png';
+    link.download = fileName ? `${fileName}.png` : 'sprites.png';
     link.click();
   };
 
@@ -136,7 +127,8 @@ function Navbar() {
                 setFiles,
                 setCoordinates,
                 coordinates,
-                paddingValue
+                paddingValue,
+                alignElement
               )
             }
           />
@@ -171,7 +163,7 @@ function Navbar() {
             onChange={e => setAlignElement(e.target.value)}
             className="w-40 p-1 border rounded-md"
           >
-            <option value="Binary Tree">Binary Tree</option>
+            <option value="Best-fit">Best fit</option>
             <option value="left-right">Left-Right</option>
             <option value="top-bottom">Top-Bottom</option>
           </select>
