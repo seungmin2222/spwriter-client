@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 function Modal({ showModal, handleClose, handleConfirm, message }) {
+  const modalContentRef = useRef(null);
+
+  useEffect(() => {
+    if (showModal) {
+      modalContentRef.current.focus();
+    }
+  }, [showModal]);
+
   if (!showModal) return null;
 
   const handleBackgroundClick = () => {
@@ -20,13 +28,13 @@ function Modal({ showModal, handleClose, handleConfirm, message }) {
       className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
       data-testid="modal"
       onClick={handleBackgroundClick}
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
+      tabIndex={-1}
     >
       <div
         className="bg-white rounded-lg shadow-lg p-6 w-[350px] h-[130px]"
         onClick={handleContentClick}
         tabIndex={0}
+        ref={modalContentRef}
         onKeyDown={handleKeyDown}
       >
         <h2 className="text-xl mb-5">{message}</h2>
