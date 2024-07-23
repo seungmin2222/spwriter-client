@@ -29,55 +29,6 @@ export const calculateCoordinates = (images, padding, alignElement) => {
       yOffset += img.height + padding;
       return coord;
     });
-  } else if (alignElement === 'best-fit') {
-    const sortedImages = images.sort(
-      (a, b) => b.width * b.height - a.width * a.height
-    );
-
-    const coordinates = [];
-    const bins = [{ x: padding, y: padding, width: 0, height: 0 }];
-
-    sortedImages.forEach(img => {
-      let placed = false;
-
-      for (const bin of bins) {
-        if (
-          bin.x + img.width + padding <= canvas.width &&
-          bin.y + img.height + padding <= canvas.height
-        ) {
-          coordinates.push({
-            x: bin.x,
-            y: bin.y,
-            width: img.width,
-            height: img.height,
-            img,
-          });
-          bin.x += img.width + padding;
-          bin.height = Math.max(bin.height, img.height);
-          placed = true;
-          break;
-        }
-      }
-
-      if (!placed) {
-        const lastBin = bins[bins.length - 1];
-        bins.push({
-          x: padding,
-          y: lastBin.y + lastBin.height + padding,
-          width: img.width,
-          height: img.height,
-        });
-        coordinates.push({
-          x: padding,
-          y: lastBin.y + lastBin.height + padding,
-          width: img.width,
-          height: img.height,
-          img,
-        });
-      }
-    });
-
-    return coordinates;
   }
 };
 
