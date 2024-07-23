@@ -1,7 +1,43 @@
 export const calculateCoordinates = (images, padding, alignElement) => {
-  if (alignElement === 'left-right') {
+  if (alignElement === 'best-fit-decreasing') {
+    const sortedImages = [...images].sort(
+      (a, b) => b.width * b.height - a.width * a.height
+    );
+
+    let canvasWidth =
+      Math.max(...sortedImages.map(img => img.width)) + padding * 2;
+    let canvasHeight = Math.max(...sortedImages.map(img => img.height)) * 3;
+
+    const coordinates = [];
     let xOffset = padding;
     let yOffset = padding;
+    let rowHeight = 0;
+
+    sortedImages.forEach(img => {
+      if (xOffset + img.width > canvasWidth) {
+        xOffset = padding;
+        yOffset += rowHeight + padding;
+        rowHeight = 0;
+      }
+
+      coordinates.push({
+        x: xOffset,
+        y: yOffset,
+        width: img.width,
+        height: img.height,
+        img: img,
+      });
+
+      xOffset += img.width + padding;
+      rowHeight = Math.max(rowHeight, img.height);
+
+      canvasHeight = Math.max(canvasHeight, yOffset + rowHeight + padding);
+    });
+
+    return coordinates;
+  } else if (alignElement === 'left-right') {
+    let xOffset = padding;
+    const yOffset = padding;
 
     return images.map(img => {
       const coord = {
@@ -15,7 +51,7 @@ export const calculateCoordinates = (images, padding, alignElement) => {
       return coord;
     });
   } else if (alignElement === 'top-bottom') {
-    let xOffset = padding;
+    const xOffset = padding;
     let yOffset = padding;
 
     return images.map(img => {
@@ -27,6 +63,21 @@ export const calculateCoordinates = (images, padding, alignElement) => {
         img,
       };
       yOffset += img.height + padding;
+      return coord;
+    });
+  } else {
+    let xOffset = padding;
+    const yOffset = padding;
+
+    return images.map(img => {
+      const coord = {
+        x: xOffset,
+        y: yOffset,
+        width: img.width,
+        height: img.height,
+        img,
+      };
+      xOffset += img.width + padding;
       return coord;
     });
   }

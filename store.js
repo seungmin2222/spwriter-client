@@ -23,7 +23,7 @@ const useFileStore = create(set => ({
   history: [],
   redoHistory: [],
 
-  alignElement: 'left-right',
+  alignElement: 'best-fit-decreasing',
   setAlignElement: alignElement => set({ alignElement }),
 
   addHistory: prevCoordinates =>
