@@ -21,7 +21,7 @@ function Navbar() {
   const handlePaddingChange = event => {
     const value = Number(event.target.value);
     if (value <= 0) {
-      addToast('1 보다 작게 설정할 수 없습니다.');
+      addToast('Padding 값은 1보다 작을 수 없습니다.');
     } else {
       setPadding(value);
     }
@@ -30,10 +30,11 @@ function Navbar() {
   const drawImages = async (ctx, coordinates, padding, alignElement) => {
     let xOffset = padding;
     let yOffset = padding;
+    let currentRowHeight = 0;
 
-    if (alignElement === 'left-right') {
-      for (const coord of coordinates) {
-        const trimmedImg = await trimImage(coord.img);
+    for (const coord of coordinates) {
+      const trimmedImg = await trimImage(coord.img);
+      if (alignElement === 'left-right') {
         ctx.drawImage(
           trimmedImg,
           xOffset,
@@ -42,10 +43,7 @@ function Navbar() {
           trimmedImg.height
         );
         xOffset += trimmedImg.width + padding;
-      }
-    } else if (alignElement === 'top-bottom') {
-      for (const coord of coordinates) {
-        const trimmedImg = await trimImage(coord.img);
+      } else if (alignElement === 'top-bottom') {
         ctx.drawImage(
           trimmedImg,
           padding,
@@ -54,6 +52,21 @@ function Navbar() {
           trimmedImg.height
         );
         yOffset += trimmedImg.height + padding;
+      } else if (alignElement === 'best-fit-decreasing') {
+        if (xOffset + trimmedImg.width > ctx.canvas.width) {
+          xOffset = padding;
+          yOffset += currentRowHeight + padding;
+          currentRowHeight = 0;
+        }
+        ctx.drawImage(
+          trimmedImg,
+          xOffset,
+          yOffset,
+          trimmedImg.width,
+          trimmedImg.height
+        );
+        xOffset += trimmedImg.width + padding;
+        currentRowHeight = Math.max(currentRowHeight, trimmedImg.height);
       }
     }
   };
@@ -88,6 +101,10 @@ function Navbar() {
         (acc, coord) => acc + coord.height + paddingValue,
         paddingValue
       );
+    } else if (alignElement === 'best-fit-decreasing') {
+      totalWidth =
+        Math.max(...coordinates.map(coord => coord.width)) + paddingValue * 2;
+      maxHeight = Math.max(...coordinates.map(coord => coord.height)) * 3;
     }
 
     downloadCanvas.width = totalWidth;
@@ -163,7 +180,7 @@ function Navbar() {
             onChange={e => setAlignElement(e.target.value)}
             className="w-40 p-1 border rounded-md"
           >
-            <option value="best-fit">Best fit decreasing</option>
+            <option value="best-fit-decreasing">Best fit decreasing</option>
             <option value="left-right">Left-Right</option>
             <option value="top-bottom">Top-Bottom</option>
           </select>
