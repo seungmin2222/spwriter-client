@@ -156,63 +156,6 @@ function SpriteEditor() {
 
         yOffset += coord.height + padding;
       });
-    } else if (alignElement === 'best-fit') {
-      const bfdCoordinates = calculateCoordinates(
-        coordinates,
-        padding,
-        'best-fit'
-      );
-
-      const totalWidth =
-        Math.max(...bfdCoordinates.map(coord => coord.x + coord.width)) +
-        padding;
-      const totalHeight =
-        Math.max(...bfdCoordinates.map(coord => coord.y + coord.height)) +
-        padding;
-
-      canvas.width = totalWidth;
-      canvas.height = totalHeight;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      bfdCoordinates.forEach(coord => {
-        if (!coord.img.complete) return;
-
-        ctx.drawImage(coord.img, coord.x, coord.y, coord.width, coord.height);
-
-        const isSelected = selectedFiles.has(coord.img);
-
-        if (isSelected) {
-          ctx.strokeStyle = '#1a5a91';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(coord.x, coord.y, coord.width, coord.height);
-
-          const circleRadius = 8;
-          const circleOffset = -10;
-          ctx.beginPath();
-          ctx.arc(
-            coord.x + coord.width + circleOffset,
-            coord.y + coord.height + circleOffset,
-            circleRadius,
-            0,
-            2 * Math.PI
-          );
-          ctx.fillStyle = '#1a5a91';
-          ctx.fill();
-
-          coord.circle = {
-            x: coord.x + coord.width + circleOffset,
-            y: coord.y + coord.height + circleOffset,
-            radius: circleRadius,
-          };
-        } else {
-          coord.circle = null;
-        }
-      });
     }
   };
 
