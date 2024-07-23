@@ -28,10 +28,8 @@ function Navbar() {
   };
 
   const drawImages = async (ctx, coordinates, padding, alignElement) => {
-    let xOffset = padding;
-    let yOffset = padding;
-
     if (alignElement === 'left-right') {
+      let xOffset = padding;
       for (const coord of coordinates) {
         const trimmedImg = await trimImage(coord.img);
         ctx.drawImage(
@@ -44,6 +42,7 @@ function Navbar() {
         xOffset += trimmedImg.width + padding;
       }
     } else if (alignElement === 'top-bottom') {
+      let yOffset = padding;
       for (const coord of coordinates) {
         const trimmedImg = await trimImage(coord.img);
         ctx.drawImage(
@@ -54,6 +53,22 @@ function Navbar() {
           trimmedImg.height
         );
         yOffset += trimmedImg.height + padding;
+      }
+    } else if (alignElement === 'best-fit') {
+      const bfdCoordinates = calculateCoordinates(
+        coordinates,
+        padding,
+        'best-fit'
+      );
+      for (const coord of bfdCoordinates) {
+        const trimmedImg = await trimImage(coord.img);
+        ctx.drawImage(
+          trimmedImg,
+          coord.x,
+          coord.y,
+          trimmedImg.width,
+          trimmedImg.height
+        );
       }
     }
   };
@@ -88,6 +103,13 @@ function Navbar() {
         (acc, coord) => acc + coord.height + paddingValue,
         paddingValue
       );
+    } else if (alignElement === 'best-fit') {
+      totalWidth =
+        Math.max(...coordinates.map(coord => coord.x + coord.width)) +
+        paddingValue;
+      maxHeight =
+        Math.max(...coordinates.map(coord => coord.y + coord.height)) +
+        paddingValue;
     }
 
     downloadCanvas.width = totalWidth;
@@ -163,7 +185,7 @@ function Navbar() {
             onChange={e => setAlignElement(e.target.value)}
             className="w-40 p-1 border rounded-md"
           >
-            <option value="Best-fit">Best fit</option>
+            <option value="best-fit">Best-fit Decreasing</option>
             <option value="left-right">Left-Right</option>
             <option value="top-bottom">Top-Bottom</option>
           </select>
