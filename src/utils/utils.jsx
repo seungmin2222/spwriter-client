@@ -1,25 +1,35 @@
 export const calculateCoordinates = (images, padding, alignElement) => {
-  let xOffset = padding;
-  let yOffset = padding;
+  if (alignElement === 'left-right') {
+    let xOffset = padding;
+    let yOffset = padding;
 
-  return images.map((img, index) => {
-    const coord = {
-      index: Date.now() + index,
-      x: alignElement === 'top-bottom' ? padding : xOffset,
-      y: alignElement === 'left-right' ? padding : yOffset,
-      width: img.width,
-      height: img.height,
-      img,
-    };
-
-    if (alignElement === 'top-bottom') {
-      yOffset += img.height + padding;
-    } else if (alignElement === 'left-right') {
+    return images.map(img => {
+      const coord = {
+        x: xOffset,
+        y: yOffset,
+        width: img.width,
+        height: img.height,
+        img,
+      };
       xOffset += img.width + padding;
-    }
+      return coord;
+    });
+  } else if (alignElement === 'top-bottom') {
+    let xOffset = padding;
+    let yOffset = padding;
 
-    return coord;
-  });
+    return images.map(img => {
+      const coord = {
+        x: xOffset,
+        y: yOffset,
+        width: img.width,
+        height: img.height,
+        img,
+      };
+      yOffset += img.height + padding;
+      return coord;
+    });
+  }
 };
 
 export const sortAndSetCoordinates = (newCoords, setCoordinates) => {
