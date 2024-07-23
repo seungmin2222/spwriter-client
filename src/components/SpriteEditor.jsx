@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useFileStore from '../../store';
-import { handleFiles, handleDragOverFiles } from '../utils/utils';
+import {
+  handleFiles,
+  handleDragOverFiles,
+  resizeSelectedImages,
+  calculateCoordinates,
+} from '../utils/utils';
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 function SpriteEditor() {
@@ -13,6 +18,7 @@ function SpriteEditor() {
   const files = useFileStore(state => state.files);
   const setFiles = useFileStore(state => state.setFiles);
   const addHistory = useFileStore(state => state.addHistory);
+  const alignElement = useFileStore(state => state.alignElement);
 
   const [isResizing, setIsResizing] = useState(false);
   const [resizing, setResizing] = useState(null);
@@ -41,61 +47,173 @@ function SpriteEditor() {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    let maxWidth = 0;
-    let maxHeight = 0;
+    if (alignElement === 'left-right') {
+      const totalWidth = coordinates.reduce(
+        (acc, coord) => acc + coord.width + padding,
+        -padding
+      );
+      const maxHeight =
+        Math.max(...coordinates.map(coord => coord.height)) + padding * 2;
+      canvas.width = totalWidth;
+      canvas.height = maxHeight;
 
-    coordinates.forEach(coord => {
-      if (coord.x + coord.width > maxWidth) {
-        maxWidth = coord.x + coord.width;
-      }
-      if (coord.y + coord.height > maxHeight) {
-        maxHeight = coord.y + coord.height;
-      }
-    });
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    canvas.width = maxWidth + padding;
-    canvas.height = maxHeight + padding;
+      ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      let xOffset = 0;
 
-    ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      coordinates.forEach(coord => {
+        if (!coord.img.complete) return;
 
-    coordinates.forEach(coord => {
-      if (!coord.img.complete) return;
+        ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
 
-      ctx.drawImage(coord.img, coord.x, coord.y, coord.width, coord.height);
+        const isSelected = selectedFiles.has(coord.img);
 
-      const isSelected = selectedFiles.has(coord.img);
+        if (isSelected) {
+          ctx.strokeStyle = '#1a5a91';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(xOffset, padding, coord.width, coord.height);
 
-      if (isSelected) {
-        ctx.strokeStyle = '#1a5a91';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(coord.x, coord.y, coord.width, coord.height);
+          const circleRadius = 8;
+          const circleOffset = -10;
+          ctx.beginPath();
+          ctx.arc(
+            xOffset + coord.width + circleOffset,
+            padding + coord.height + circleOffset,
+            circleRadius,
+            0,
+            2 * Math.PI
+          );
+          ctx.fillStyle = '#1a5a91';
+          ctx.fill();
 
-        const circleRadius = 8;
-        const circleOffset = -10;
-        ctx.beginPath();
-        ctx.arc(
-          coord.x + coord.width + circleOffset,
-          coord.y + coord.height + circleOffset,
-          circleRadius,
-          0,
-          2 * Math.PI
-        );
-        ctx.fillStyle = '#1a5a91';
-        ctx.fill();
+          coord.circle = {
+            x: xOffset + coord.width + circleOffset,
+            y: padding + coord.height + circleOffset,
+            radius: circleRadius,
+          };
+        } else {
+          coord.circle = null;
+        }
 
-        coord.circle = {
-          x: coord.x + coord.width + circleOffset,
-          y: coord.y + coord.height + circleOffset,
-          radius: circleRadius,
-        };
-      } else {
-        coord.circle = null;
-      }
-    });
+        xOffset += coord.width + padding;
+      });
+    } else if (alignElement === 'top-bottom') {
+      const maxWidth =
+        Math.max(...coordinates.map(coord => coord.width)) + padding;
+      const totalHeight = coordinates.reduce(
+        (acc, coord) => acc + coord.height + padding,
+        0
+      );
+      canvas.width = maxWidth;
+      canvas.height = totalHeight;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      let yOffset = 0;
+
+      coordinates.forEach(coord => {
+        if (!coord.img.complete) return;
+
+        const xOffset = padding;
+        ctx.drawImage(coord.img, xOffset, yOffset, coord.width, coord.height);
+
+        const isSelected = selectedFiles.has(coord.img);
+
+        if (isSelected) {
+          ctx.strokeStyle = '#1a5a91';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(xOffset, yOffset, coord.width, coord.height);
+
+          const circleRadius = 8;
+          const circleOffset = -10;
+          ctx.beginPath();
+          ctx.arc(
+            xOffset + coord.width + circleOffset,
+            yOffset + coord.height + circleOffset,
+            circleRadius,
+            0,
+            2 * Math.PI
+          );
+          ctx.fillStyle = '#1a5a91';
+          ctx.fill();
+
+          coord.circle = {
+            x: xOffset + coord.width + circleOffset,
+            y: yOffset + coord.height + circleOffset,
+            radius: circleRadius,
+          };
+        } else {
+          coord.circle = null;
+        }
+
+        yOffset += coord.height + padding;
+      });
+    } else if (alignElement === 'best-fit') {
+      const bfdCoordinates = calculateCoordinates(
+        coordinates,
+        padding,
+        'best-fit'
+      );
+
+      const totalWidth =
+        Math.max(...bfdCoordinates.map(coord => coord.x + coord.width)) +
+        padding;
+      const totalHeight =
+        Math.max(...bfdCoordinates.map(coord => coord.y + coord.height)) +
+        padding;
+
+      canvas.width = totalWidth;
+      canvas.height = totalHeight;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      bfdCoordinates.forEach(coord => {
+        if (!coord.img.complete) return;
+
+        ctx.drawImage(coord.img, coord.x, coord.y, coord.width, coord.height);
+
+        const isSelected = selectedFiles.has(coord.img);
+
+        if (isSelected) {
+          ctx.strokeStyle = '#1a5a91';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(coord.x, coord.y, coord.width, coord.height);
+
+          const circleRadius = 8;
+          const circleOffset = -10;
+          ctx.beginPath();
+          ctx.arc(
+            coord.x + coord.width + circleOffset,
+            coord.y + coord.height + circleOffset,
+            circleRadius,
+            0,
+            2 * Math.PI
+          );
+          ctx.fillStyle = '#1a5a91';
+          ctx.fill();
+
+          coord.circle = {
+            x: coord.x + coord.width + circleOffset,
+            y: coord.y + coord.height + circleOffset,
+            radius: circleRadius,
+          };
+        } else {
+          coord.circle = null;
+        }
+      });
+    }
   };
 
   const handleCanvasMouseDown = event => {
@@ -163,6 +281,13 @@ function SpriteEditor() {
       setResizing(null);
       if (changeCoordinates) {
         addHistory(coordinates);
+        resizeSelectedImages(changeCoordinates, selectedFiles, setCoordinates);
+        const newCoordinates = calculateCoordinates(
+          changeCoordinates.map(coord => coord.img),
+          padding,
+          alignElement
+        );
+        setCoordinates(newCoordinates);
       }
     }
   };
@@ -199,14 +324,21 @@ function SpriteEditor() {
   const handleDrop = event => {
     event.preventDefault();
     const droppedFiles = Array.from(event.dataTransfer.files);
-    handleFiles(droppedFiles, setFiles, setCoordinates, coordinates, padding);
+    handleFiles(
+      droppedFiles,
+      setFiles,
+      setCoordinates,
+      coordinates,
+      padding,
+      alignElement
+    );
   };
 
   useEffect(() => {
     if (canvasRef.current && files.length > 0) {
       drawImages();
     }
-  }, [coordinates, padding, selectedFiles, files]);
+  }, [coordinates, padding, selectedFiles, files, alignElement]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
