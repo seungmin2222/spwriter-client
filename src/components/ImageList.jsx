@@ -75,14 +75,14 @@ function ImageList() {
     setShowModal(false);
   };
 
-  const generateCSS = (image, index) => `
-    .sprite-${index} {
-      width: ${image.width}px;
-      height: ${image.height}px;
-      background: url('${
-        fileName ? `${fileName}.png` : 'css_sprites.png'
-      }') -${image.x}px -${image.y}px;
-    }`;
+  const generateCSS = (image, index) =>
+    `.sprite-${index} {
+  width: ${image.width}px;
+  height: ${image.height}px;
+  background: url('${
+    fileName ? `${fileName}.png` : 'sprites.png'
+  }') -${image.x}px -${image.y}px;
+}`;
 
   const generateToast = message => {
     setToast({
@@ -100,15 +100,12 @@ function ImageList() {
       });
   };
 
-  const handleImageClick = (image, index) => {
+  const handleImageListClick = image => {
     const newSelectedFiles = new Set(selectedFiles);
     newSelectedFiles.has(image.img)
       ? newSelectedFiles.delete(image.img)
       : newSelectedFiles.add(image.img);
     setSelectedFiles(newSelectedFiles);
-
-    const cssText = generateCSS(image, index);
-    copyToClipboard(cssText);
   };
 
   const handleToastClose = id => {
@@ -174,7 +171,7 @@ function ImageList() {
       generateToast('선택된 리스트가 없습니다.');
     } else {
       const cssText = selectedCoordinates
-        .map((coord, index) => generateCSS(coord, coordinates.indexOf(coord)))
+        .map(coord => generateCSS(coord, coordinates.indexOf(coord)))
         .join('\n');
       copyToClipboard(cssText);
     }
@@ -187,34 +184,25 @@ function ImageList() {
     return (
       <article
         key={index}
+        onClick={() => handleImageListClick(image)}
         className={`flex w-full h-[70px] bg-[#f0f4f8] rounded-md transition-colors duration-300 shadow-sm border transition-border duration-250 ${
           !isButtonHovered ? 'hover:bg-[#e2e8f0]' : ''
         } ${isSelected ? 'border border-[#1f77b4]' : ''} ${
           isDeleting ? 'animate-fadeOut' : 'animate-fadeIn'
         }`}
       >
-        <button
-          className="flex w-[20%] items-center justify-center"
-          onClick={() => handleImageClick(image, index)}
-        >
+        <div className="flex w-[20%] items-center justify-center">
           <img
             src={image.img.src}
             alt={`Thumbnail ${index}`}
             className="max-h-[60px] p-[5px] border shadow-sm rounded-md"
           />
-        </button>
-        <button
-          className="flex w-[71%] h-full pl-[5px] text-[12px] leading-[24px] text-[#374151] overflow-hidden"
-          style={{
-            display: '-webkit-box',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 3,
-            textOverflow: 'ellipsis',
-          }}
-          onClick={() => handleImageClick(image, index)}
-        >
-          {generateCSS(image, index)}
-        </button>
+        </div>
+        <div className="flex items-center w-[71%] h-full pl-[5px] text-[12px] leading-[24px] text-[#374151] overflow-hidden">
+          <pre className="text-[10px] leading-tight">
+            {generateCSS(image, index)}
+          </pre>
+        </div>
 
         <button
           className="flex justify-center items-center w-[9%] h-full group"
