@@ -8,70 +8,89 @@ export const calculateCoordinates = (images, padding, alignElement) => {
       Math.max(...sortedImages.map(img => img.width)) + padding * 2;
     let canvasHeight = padding;
     const coordinates = [];
-    const occupiedSpaces = new Set();
+    const spaces = [
+      {
+        x: padding,
+        y: padding,
+        w: canvasWidth - padding * 2,
+        h: Number.MAX_SAFE_INTEGER,
+      },
+    ];
 
-    const memoPlaceImage = (() => {
-      const cache = new Map();
-      return img => {
-        const key = `${img.width},${img.height}`;
-        if (cache.has(key)) return cache.get(key);
-        const result = placeImage(img);
-        cache.set(key, result);
-        return result;
-      };
-    })();
+    const findBestSpace = img => {
+      let bestSpace = null;
+      let bestIndex = -1;
 
-    const placeImage = img => {
-      let bestX = padding;
-      let bestY = canvasHeight;
-
-      for (let y = padding; y < canvasHeight; y += padding) {
-        for (
-          let x = padding;
-          x < canvasWidth - img.width - padding;
-          x += padding
-        ) {
-          if (isSpaceFree(x, y, img.width + padding, img.height + padding)) {
-            if (y < bestY || (y === bestY && x < bestX)) {
-              bestX = x;
-              bestY = y;
-            }
-            break;
+      for (let i = 0; i < spaces.length; i++) {
+        const space = spaces[i];
+        if (img.width <= space.w && img.height <= space.h) {
+          if (
+            !bestSpace ||
+            space.y < bestSpace.y ||
+            (space.y === bestSpace.y && space.x < bestSpace.x)
+          ) {
+            bestSpace = space;
+            bestIndex = i;
           }
         }
-        if (bestY < canvasHeight) break;
       }
 
-      if (bestY + img.height + padding > canvasHeight) {
-        canvasHeight = bestY + img.height + padding * 2;
-      }
-
-      return { x: bestX, y: bestY };
+      return { bestSpace, bestIndex };
     };
 
-    const isSpaceFree = (x, y, width, height) => {
-      for (let i = x; i < x + width; i += padding) {
-        for (let j = y; j < y + height; j += padding) {
-          if (occupiedSpaces.has(`${i},${j}`)) return false;
-        }
+    const updateSpaces = (usedSpace, imgWidth, imgHeight) => {
+      const newSpaces = [];
+
+      if (usedSpace.w > imgWidth + padding) {
+        newSpaces.push({
+          x: usedSpace.x + imgWidth + padding,
+          y: usedSpace.y,
+          w: usedSpace.w - imgWidth - padding,
+          h: imgHeight,
+        });
       }
-      return true;
+
+      if (usedSpace.h > imgHeight + padding) {
+        newSpaces.push({
+          x: usedSpace.x,
+          y: usedSpace.y + imgHeight + padding,
+          w: usedSpace.w,
+          h: usedSpace.h - imgHeight - padding,
+        });
+      }
+
+      spaces.push(...newSpaces);
     };
 
     sortedImages.forEach(img => {
-      const { x, y } = memoPlaceImage(img);
-      coordinates.push({
-        x,
-        y,
-        width: img.width,
-        height: img.height,
-        img,
-      });
+      const { bestSpace, bestIndex } = findBestSpace(img);
 
-      for (let i = x; i < x + img.width + padding; i += padding) {
-        for (let j = y; j < y + img.height + padding; j += padding) {
-          occupiedSpaces.add(`${i},${j}`);
-        }
+      if (bestSpace) {
+        coordinates.push({
+          x: bestSpace.x,
+          y: bestSpace.y,
+          width: img.width,
+          height: img.height,
+          img,
+        });
+
+        spaces.splice(bestIndex, 1);
+        updateSpaces(bestSpace, img.width, img.height);
+
+        canvasHeight = Math.max(
+          canvasHeight,
+          bestSpace.y + img.height + padding
+        );
+      } else {
+        coordinates.push({
+          x: padding,
+          y: canvasHeight,
+          width: img.width,
+          height: img.height,
+          img,
+        });
+
+        canvasHeight += img.height + padding;
       }
     });
 
@@ -262,37 +281,45 @@ const processImage = async (coord, transformCallback) => {
     processedImg.onload = () => resolve(processedImg);
   });
 };
-
 export const cloneSelectedImages = (
   coordinates,
   selectedFiles,
-  setCoordinates
+  setCoordinates,
+  padding,
+  alignElement
 ) => {
   const newCoordinates = [...coordinates];
 
-  selectedFiles.forEach(img => {
+  const clonePromises = Array.from(selectedFiles).map(img => {
     const index = coordinates.findIndex(coord => coord.img === img);
     if (index !== -1) {
       const coord = coordinates[index];
       const newImg = new Image();
       newImg.src = coord.img.src;
 
-      const imageLoaded = new Promise(resolve => {
-        newImg.onload = () => resolve();
-      });
-
-      imageLoaded.then(() => {
-        newCoordinates.push({
-          img: newImg,
-          x: coord.x,
-          y: coord.y,
-          width: coord.width,
-          height: coord.height,
-        });
-
-        sortAndSetCoordinates(newCoordinates, setCoordinates);
+      return new Promise(resolve => {
+        newImg.onload = () => {
+          newCoordinates.push({
+            img: newImg,
+            width: coord.width,
+            height: coord.height,
+            x: 0,
+            y: 0,
+          });
+          resolve(newImg);
+        };
       });
     }
+  });
+
+  Promise.all(clonePromises).then(newImages => {
+    const allImages = newCoordinates.map(coord => coord.img);
+    const recalculatedCoordinates = calculateCoordinates(
+      allImages,
+      padding,
+      alignElement
+    );
+    setCoordinates(recalculatedCoordinates);
   });
 };
 

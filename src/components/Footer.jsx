@@ -22,6 +22,8 @@ function Footer() {
   const addToast = useFileStore(state => state.addToast);
   const history = useFileStore(state => state.history);
   const redoHistory = useFileStore(state => state.redoHistory);
+  const padding = useFileStore(state => state.padding);
+  const alignElement = useFileStore(state => state.alignElement);
 
   const buttonStyle =
     'p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300';
@@ -37,7 +39,13 @@ function Footer() {
   const handleCloneSelectedImages = () => {
     handleActionIfNoSelection(() => {
       addHistory(coordinates);
-      cloneSelectedImages(coordinates, selectedFiles, setCoordinates);
+      cloneSelectedImages(
+        coordinates,
+        selectedFiles,
+        setCoordinates,
+        padding,
+        alignElement
+      );
     });
   };
 
