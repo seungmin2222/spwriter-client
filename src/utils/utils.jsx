@@ -393,7 +393,7 @@ export const resizeSelectedImages = (
   });
 
   return Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
-    setCoordinates(newCoordinates);
+    sortAndSetCoordinates(newCoordinates, setCoordinates);
     setSelectedFiles(new Set(selectedFiles));
     return newCoordinates;
   });
