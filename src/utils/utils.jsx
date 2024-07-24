@@ -319,7 +319,7 @@ export const cloneSelectedImages = (
       padding,
       alignElement
     );
-    setCoordinates(recalculatedCoordinates);
+    sortAndSetCoordinates(recalculatedCoordinates, setCoordinates);
   });
 };
 
