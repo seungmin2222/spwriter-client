@@ -102,11 +102,36 @@ function Navbar() {
         paddingValue
       );
     } else if (alignElement === 'best-fit-decreasing') {
-      totalWidth =
-        Math.max(...coordinates.map(coord => coord.width)) + paddingValue * 2;
-      maxHeight = Math.max(...coordinates.map(coord => coord.height)) * 3;
-    }
+      const calculateOptimalWidth = (coords, padding) => {
+        const totalArea = coords.reduce(
+          (sum, coord) => sum + coord.width * coord.height,
+          0
+        );
+        const estimatedSideLength = Math.sqrt(totalArea);
+        return (
+          Math.max(estimatedSideLength, ...coords.map(coord => coord.width)) +
+          padding * 2
+        );
+      };
 
+      totalWidth = calculateOptimalWidth(coordinates, paddingValue);
+
+      let yOffset = paddingValue;
+      let xOffset = paddingValue;
+      let rowHeight = 0;
+
+      coordinates.forEach(coord => {
+        if (xOffset + coord.width > totalWidth) {
+          xOffset = paddingValue;
+          yOffset += rowHeight + paddingValue;
+          rowHeight = 0;
+        }
+        xOffset += coord.width + paddingValue;
+        rowHeight = Math.max(rowHeight, coord.height);
+      });
+
+      maxHeight = yOffset + rowHeight + paddingValue;
+    }
     downloadCanvas.width = totalWidth;
     downloadCanvas.height = maxHeight;
 

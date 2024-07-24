@@ -161,27 +161,34 @@ function SpriteEditor() {
         (a, b) => b.width * b.height - a.width * a.height
       );
 
-      const canvasWidth = canvasRef.current?.width || 0;
-      const canvasHeight = canvasRef.current?.height || 0;
+      const calculateOptimalWidth = (coords, padding) => {
+        const totalArea = coords.reduce(
+          (sum, coord) => sum + coord.width * coord.height,
+          0
+        );
+        const estimatedSideLength = Math.sqrt(totalArea);
+        return (
+          Math.max(estimatedSideLength, ...coords.map(coord => coord.width)) +
+          padding * 2
+        );
+      };
+
+      canvas.width = calculateOptimalWidth(sortedCoordinates, padding);
+
       let xOffset = padding;
       let yOffset = padding;
       let rowHeight = 0;
 
       sortedCoordinates.forEach(coord => {
-        if (!coord.img.complete) return;
-
-        if (xOffset + coord.width > canvasWidth) {
+        if (xOffset + coord.width > canvas.width) {
           xOffset = padding;
           yOffset += rowHeight + padding;
           rowHeight = 0;
         }
-
         xOffset += coord.width + padding;
         rowHeight = Math.max(rowHeight, coord.height);
       });
 
-      canvas.width =
-        Math.max(...sortedCoordinates.map(coord => coord.width)) + padding * 2;
       canvas.height = yOffset + rowHeight + padding;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
