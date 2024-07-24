@@ -312,7 +312,12 @@ function SpriteEditor() {
       setResizing(null);
       if (changeCoordinates) {
         addHistory(coordinates);
-        resizeSelectedImages(changeCoordinates, selectedFiles, setCoordinates);
+        resizeSelectedImages(
+          changeCoordinates,
+          selectedFiles,
+          setCoordinates,
+          setSelectedFiles
+        );
         const newCoordinates = calculateCoordinates(
           changeCoordinates.map(coord => coord.img),
           padding,
