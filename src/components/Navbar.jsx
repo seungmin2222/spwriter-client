@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Toast from './Toast';
 import useFileStore from '../../store';
-import { handleFiles, trimImage } from '../utils/utils';
+import { handleFiles } from '../utils/utils';
 import downloadIcon from '../assets/images/download-solid.svg';
 
 function Navbar() {
@@ -24,50 +24,6 @@ function Navbar() {
       addToast('Padding 값은 1보다 작을 수 없습니다.');
     } else {
       setPadding(value);
-    }
-  };
-
-  const drawImages = async (ctx, coordinates, padding, alignElement) => {
-    let xOffset = padding;
-    let yOffset = padding;
-    let currentRowHeight = 0;
-
-    for (const coord of coordinates) {
-      const trimmedImg = await trimImage(coord.img);
-      if (alignElement === 'left-right') {
-        ctx.drawImage(
-          trimmedImg,
-          xOffset,
-          padding,
-          trimmedImg.width,
-          trimmedImg.height
-        );
-        xOffset += trimmedImg.width + padding;
-      } else if (alignElement === 'top-bottom') {
-        ctx.drawImage(
-          trimmedImg,
-          padding,
-          yOffset,
-          trimmedImg.width,
-          trimmedImg.height
-        );
-        yOffset += trimmedImg.height + padding;
-      } else if (alignElement === 'best-fit-decreasing') {
-        if (xOffset + trimmedImg.width > ctx.canvas.width) {
-          xOffset = padding;
-          yOffset += currentRowHeight + padding;
-          currentRowHeight = 0;
-        }
-        ctx.drawImage(
-          trimmedImg,
-          xOffset,
-          yOffset,
-          trimmedImg.width,
-          trimmedImg.height
-        );
-        xOffset += trimmedImg.width + padding;
-        currentRowHeight = Math.max(currentRowHeight, trimmedImg.height);
-      }
     }
   };
 
@@ -102,42 +58,28 @@ function Navbar() {
         paddingValue
       );
     } else if (alignElement === 'best-fit-decreasing') {
-      const calculateOptimalWidth = (coords, padding) => {
-        const totalArea = coords.reduce(
-          (sum, coord) => sum + coord.width * coord.height,
-          0
-        );
-        const estimatedSideLength = Math.sqrt(totalArea);
-        return (
-          Math.max(estimatedSideLength, ...coords.map(coord => coord.width)) +
-          padding * 2
-        );
-      };
-
-      totalWidth = calculateOptimalWidth(coordinates, paddingValue);
-
-      let yOffset = paddingValue;
-      let xOffset = paddingValue;
-      let rowHeight = 0;
-
-      coordinates.forEach(coord => {
-        if (xOffset + coord.width > totalWidth) {
-          xOffset = paddingValue;
-          yOffset += rowHeight + paddingValue;
-          rowHeight = 0;
-        }
-        xOffset += coord.width + paddingValue;
-        rowHeight = Math.max(rowHeight, coord.height);
-      });
-
-      maxHeight = yOffset + rowHeight + paddingValue;
+      totalWidth =
+        Math.max(...coordinates.map(coord => coord.x + coord.width)) +
+        paddingValue;
+      maxHeight =
+        Math.max(...coordinates.map(coord => coord.y + coord.height)) +
+        paddingValue;
     }
+
     downloadCanvas.width = totalWidth;
     downloadCanvas.height = maxHeight;
 
     downloadCtx.clearRect(0, 0, downloadCanvas.width, downloadCanvas.height);
 
-    await drawImages(downloadCtx, coordinates, paddingValue, alignElement);
+    coordinates.forEach(coord => {
+      downloadCtx.drawImage(
+        coord.img,
+        coord.x,
+        coord.y,
+        coord.width,
+        coord.height
+      );
+    });
 
     const link = document.createElement('a');
     link.href = downloadCanvas.toDataURL('image/png');
