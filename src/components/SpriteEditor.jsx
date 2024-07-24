@@ -157,74 +157,38 @@ function SpriteEditor() {
         yOffset += coord.height + padding;
       });
     } else if (alignElement === 'best-fit-decreasing') {
-      const sortedCoordinates = [...coordinates].sort(
-        (a, b) => b.width * b.height - a.width * a.height
-      );
+      const maxWidth =
+        Math.max(...coordinates.map(coord => coord.x + coord.width)) + padding;
+      const maxHeight =
+        Math.max(...coordinates.map(coord => coord.y + coord.height)) + padding;
 
-      const calculateOptimalWidth = (coords, padding) => {
-        const totalArea = coords.reduce(
-          (sum, coord) => sum + coord.width * coord.height,
-          0
-        );
-        const estimatedSideLength = Math.sqrt(totalArea);
-        return (
-          Math.max(estimatedSideLength, ...coords.map(coord => coord.width)) +
-          padding * 2
-        );
-      };
+      canvas.width = maxWidth;
+      canvas.height = maxHeight;
 
-      canvas.width = calculateOptimalWidth(sortedCoordinates, padding);
-
-      let xOffset = padding;
-      let yOffset = padding;
-      let rowHeight = 0;
-
-      sortedCoordinates.forEach(coord => {
-        if (xOffset + coord.width > canvas.width) {
-          xOffset = padding;
-          yOffset += rowHeight + padding;
-          rowHeight = 0;
-        }
-        xOffset += coord.width + padding;
-        rowHeight = Math.max(rowHeight, coord.height);
-      });
-
-      canvas.height = yOffset + rowHeight + padding;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+
       ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      xOffset = padding;
-      yOffset = padding;
-      rowHeight = 0;
-
-      sortedCoordinates.forEach(coord => {
+      coordinates.forEach(coord => {
         if (!coord.img.complete) return;
 
-        if (xOffset + coord.width > canvas.width) {
-          xOffset = padding;
-          yOffset += rowHeight + padding;
-          rowHeight = 0;
-        }
-
-        ctx.drawImage(coord.img, xOffset, yOffset, coord.width, coord.height);
+        ctx.drawImage(coord.img, coord.x, coord.y, coord.width, coord.height);
 
         const isSelected = selectedFiles.has(coord.img);
 
         if (isSelected) {
           ctx.strokeStyle = '#1a5a91';
           ctx.lineWidth = 1;
-          ctx.strokeRect(xOffset, yOffset, coord.width, coord.height);
+          ctx.strokeRect(coord.x, coord.y, coord.width, coord.height);
 
           const circleRadius = 8;
           const circleOffset = -10;
           ctx.beginPath();
           ctx.arc(
-            xOffset + coord.width + circleOffset,
-            yOffset + coord.height + circleOffset,
+            coord.x + coord.width + circleOffset,
+            coord.y + coord.height + circleOffset,
             circleRadius,
             0,
             2 * Math.PI
@@ -233,16 +197,13 @@ function SpriteEditor() {
           ctx.fill();
 
           coord.circle = {
-            x: xOffset + coord.width + circleOffset,
-            y: yOffset + coord.height + circleOffset,
+            x: coord.x + coord.width + circleOffset,
+            y: coord.y + coord.height + circleOffset,
             radius: circleRadius,
           };
         } else {
           coord.circle = null;
         }
-
-        xOffset += coord.width + padding;
-        rowHeight = Math.max(rowHeight, coord.height);
       });
     }
   };

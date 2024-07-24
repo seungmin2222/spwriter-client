@@ -4,45 +4,75 @@ export const calculateCoordinates = (images, padding, alignElement) => {
       (a, b) => b.width * b.height - a.width * a.height
     );
 
-    const calculateOptimalWidth = (images, padding) => {
-      const totalArea = images.reduce(
-        (sum, img) => sum + img.width * img.height,
-        0
-      );
-      const estimatedSideLength = Math.sqrt(totalArea);
-      return (
-        Math.max(estimatedSideLength, ...images.map(img => img.width)) +
-        padding * 2
-      );
-    };
-
-    let canvasWidth = calculateOptimalWidth(sortedImages, padding);
-    let canvasHeight = Math.max(...sortedImages.map(img => img.height)) * 3;
-
+    let canvasWidth =
+      Math.max(...sortedImages.map(img => img.width)) + padding * 2;
+    let canvasHeight = padding;
     const coordinates = [];
-    let xOffset = padding;
-    let yOffset = padding;
-    let rowHeight = 0;
+    const occupiedSpaces = new Set();
 
-    sortedImages.forEach(img => {
-      if (xOffset + img.width > canvasWidth) {
-        xOffset = padding;
-        yOffset += rowHeight + padding;
-        rowHeight = 0;
+    const memoPlaceImage = (() => {
+      const cache = new Map();
+      return img => {
+        const key = `${img.width},${img.height}`;
+        if (cache.has(key)) return cache.get(key);
+        const result = placeImage(img);
+        cache.set(key, result);
+        return result;
+      };
+    })();
+
+    const placeImage = img => {
+      let bestX = padding;
+      let bestY = canvasHeight;
+
+      for (let y = padding; y < canvasHeight; y += padding) {
+        for (
+          let x = padding;
+          x < canvasWidth - img.width - padding;
+          x += padding
+        ) {
+          if (isSpaceFree(x, y, img.width + padding, img.height + padding)) {
+            if (y < bestY || (y === bestY && x < bestX)) {
+              bestX = x;
+              bestY = y;
+            }
+            break;
+          }
+        }
+        if (bestY < canvasHeight) break;
       }
 
+      if (bestY + img.height + padding > canvasHeight) {
+        canvasHeight = bestY + img.height + padding * 2;
+      }
+
+      return { x: bestX, y: bestY };
+    };
+
+    const isSpaceFree = (x, y, width, height) => {
+      for (let i = x; i < x + width; i += padding) {
+        for (let j = y; j < y + height; j += padding) {
+          if (occupiedSpaces.has(`${i},${j}`)) return false;
+        }
+      }
+      return true;
+    };
+
+    sortedImages.forEach(img => {
+      const { x, y } = memoPlaceImage(img);
       coordinates.push({
-        x: xOffset,
-        y: yOffset,
+        x,
+        y,
         width: img.width,
         height: img.height,
-        img: img,
+        img,
       });
 
-      xOffset += img.width + padding;
-      rowHeight = Math.max(rowHeight, img.height);
-
-      canvasHeight = Math.max(canvasHeight, yOffset + rowHeight + padding);
+      for (let i = x; i < x + img.width + padding; i += padding) {
+        for (let j = y; j < y + img.height + padding; j += padding) {
+          occupiedSpaces.add(`${i},${j}`);
+        }
+      }
     });
 
     return coordinates;
@@ -362,7 +392,9 @@ export const resizeSelectedImages = (
     return coord;
   });
 
-  Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
-    sortAndSetCoordinates(newCoordinates, setCoordinates);
+  return Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
+    setCoordinates(newCoordinates);
+    setSelectedFiles(new Set(selectedFiles));
+    return newCoordinates;
   });
 };
