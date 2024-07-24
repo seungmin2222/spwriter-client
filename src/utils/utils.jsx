@@ -335,7 +335,8 @@ export const rotateSelectedImages = (
 export const resizeSelectedImages = (
   coordinates,
   selectedFiles,
-  setCoordinates
+  setCoordinates,
+  setSelectedFiles
 ) => {
   const updatedCoordinatesPromises = coordinates.map(async coord => {
     if (selectedFiles.has(coord.img)) {
@@ -353,6 +354,8 @@ export const resizeSelectedImages = (
         x: coord.x,
         y: coord.y,
       };
+      selectedFiles.delete(coord.img);
+      selectedFiles.add(resizedImg);
 
       return updatedCoord;
     }

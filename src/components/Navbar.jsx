@@ -203,7 +203,7 @@ function Navbar() {
             id="align-elements"
             value={alignElement}
             onChange={e => setAlignElement(e.target.value)}
-            className="w-40 p-1 border rounded-md"
+            className="w-44 p-1 border rounded-md"
           >
             <option value="best-fit-decreasing">Best fit decreasing</option>
             <option value="left-right">Left-Right</option>
