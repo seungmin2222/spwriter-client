@@ -4,8 +4,19 @@ export const calculateCoordinates = (images, padding, alignElement) => {
       (a, b) => b.width * b.height - a.width * a.height
     );
 
-    let canvasWidth =
-      Math.max(...sortedImages.map(img => img.width)) + padding * 2;
+    const calculateOptimalWidth = (images, padding) => {
+      const totalArea = images.reduce(
+        (sum, img) => sum + img.width * img.height,
+        0
+      );
+      const estimatedSideLength = Math.sqrt(totalArea);
+      return (
+        Math.max(estimatedSideLength, ...images.map(img => img.width)) +
+        padding * 2
+      );
+    };
+
+    let canvasWidth = calculateOptimalWidth(sortedImages, padding);
     let canvasHeight = Math.max(...sortedImages.map(img => img.height)) * 3;
 
     const coordinates = [];
