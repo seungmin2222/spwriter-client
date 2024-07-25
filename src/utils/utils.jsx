@@ -1,9 +1,8 @@
-export const calculateCoordinates = (images, padding, alignElement) => {
+export const calculateCoordinates = (images, initialPadding, alignElement) => {
   if (alignElement === 'bin-packing') {
     const sortedImages = [...images].sort(
       (a, b) => b.width * b.height - a.width * a.height
     );
-
     class Rectangle {
       constructor(x, y, width, height) {
         this.x = x;
@@ -13,51 +12,67 @@ export const calculateCoordinates = (images, padding, alignElement) => {
       }
     }
 
-    class MaxRectsBinPack {
-      constructor(width, height) {
+    class AdvancedBinPack {
+      constructor(width, height, padding) {
         this.binWidth = width;
         this.binHeight = height;
+        this.padding = padding;
         this.usedRectangles = [];
         this.freeRectangles = [new Rectangle(0, 0, width, height)];
       }
 
       insert(width, height) {
-        const newNode = this.findPositionForNewNodeBestShortSideFit(
-          width,
-          height
+        const paddedWidth = width + this.padding * 2;
+        const paddedHeight = height + this.padding * 2;
+        let newNode = this.findPositionForNewNodeBestAreaFit(
+          paddedWidth,
+          paddedHeight
         );
-        if (newNode.height === 0) {
-          return null;
+        if (newNode.width !== 0) {
+          newNode.paddedWidth = paddedWidth;
+          newNode.paddedHeight = paddedHeight;
+          this.placeRectangle(newNode);
+          return newNode;
         }
 
-        this.placeRectangle(newNode);
-        return newNode;
+        newNode = this.findPositionForNewNodeBestAreaFit(
+          paddedHeight,
+          paddedWidth
+        );
+        if (newNode.width !== 0) {
+          newNode.paddedWidth = paddedHeight;
+          newNode.paddedHeight = paddedWidth;
+          this.placeRectangle(newNode);
+          return newNode;
+        }
+
+        return null;
       }
 
-      findPositionForNewNodeBestShortSideFit(width, height) {
+      findPositionForNewNodeBestAreaFit(width, height) {
         const bestNode = new Rectangle(0, 0, 0, 0);
+        let bestAreaFit = Number.MAX_VALUE;
         let bestShortSideFit = Number.MAX_VALUE;
-        let bestLongSideFit = Number.MAX_VALUE;
 
         for (let i = 0; i < this.freeRectangles.length; ++i) {
           const rect = this.freeRectangles[i];
+          const areaFit = rect.width * rect.height - width * height;
+
           if (rect.width >= width && rect.height >= height) {
             const leftoverHoriz = Math.abs(rect.width - width);
             const leftoverVert = Math.abs(rect.height - height);
             const shortSideFit = Math.min(leftoverHoriz, leftoverVert);
-            const longSideFit = Math.max(leftoverHoriz, leftoverVert);
 
             if (
-              shortSideFit < bestShortSideFit ||
-              (shortSideFit === bestShortSideFit &&
-                longSideFit < bestLongSideFit)
+              areaFit < bestAreaFit ||
+              (areaFit === bestAreaFit && shortSideFit < bestShortSideFit)
             ) {
               bestNode.x = rect.x;
               bestNode.y = rect.y;
               bestNode.width = width;
               bestNode.height = height;
+              bestAreaFit = areaFit;
               bestShortSideFit = shortSideFit;
-              bestLongSideFit = longSideFit;
             }
           }
         }
@@ -82,15 +97,15 @@ export const calculateCoordinates = (images, padding, alignElement) => {
       splitFreeNode(freeNode, usedNode) {
         if (
           usedNode.x >= freeNode.x + freeNode.width ||
-          usedNode.x + usedNode.width <= freeNode.x ||
+          usedNode.x + usedNode.paddedWidth <= freeNode.x ||
           usedNode.y >= freeNode.y + freeNode.height ||
-          usedNode.y + usedNode.height <= freeNode.y
+          usedNode.y + usedNode.paddedHeight <= freeNode.y
         )
           return false;
 
         if (
           usedNode.x < freeNode.x + freeNode.width &&
-          usedNode.x + usedNode.width > freeNode.x
+          usedNode.x + usedNode.paddedWidth > freeNode.x
         ) {
           if (
             usedNode.y > freeNode.y &&
@@ -105,12 +120,17 @@ export const calculateCoordinates = (images, padding, alignElement) => {
             this.freeRectangles.push(newNode);
           }
 
-          if (usedNode.y + usedNode.height < freeNode.y + freeNode.height) {
+          if (
+            usedNode.y + usedNode.paddedHeight <
+            freeNode.y + freeNode.height
+          ) {
             const newNode = new Rectangle(
               freeNode.x,
-              usedNode.y + usedNode.height,
+              usedNode.y + usedNode.paddedHeight,
               freeNode.width,
-              freeNode.y + freeNode.height - (usedNode.y + usedNode.height)
+              freeNode.y +
+                freeNode.height -
+                (usedNode.y + usedNode.paddedHeight)
             );
             this.freeRectangles.push(newNode);
           }
@@ -118,7 +138,7 @@ export const calculateCoordinates = (images, padding, alignElement) => {
 
         if (
           usedNode.y < freeNode.y + freeNode.height &&
-          usedNode.y + usedNode.height > freeNode.y
+          usedNode.y + usedNode.paddedHeight > freeNode.y
         ) {
           if (
             usedNode.x > freeNode.x &&
@@ -133,11 +153,11 @@ export const calculateCoordinates = (images, padding, alignElement) => {
             this.freeRectangles.push(newNode);
           }
 
-          if (usedNode.x + usedNode.width < freeNode.x + freeNode.width) {
+          if (usedNode.x + usedNode.paddedWidth < freeNode.x + freeNode.width) {
             const newNode = new Rectangle(
-              usedNode.x + usedNode.width,
+              usedNode.x + usedNode.paddedWidth,
               freeNode.y,
-              freeNode.x + freeNode.width - (usedNode.x + usedNode.width),
+              freeNode.x + freeNode.width - (usedNode.x + usedNode.paddedWidth),
               freeNode.height
             );
             this.freeRectangles.push(newNode);
@@ -148,7 +168,7 @@ export const calculateCoordinates = (images, padding, alignElement) => {
       }
 
       pruneFreeList() {
-        for (let i = 0; i < this.freeRectangles.length; ++i) {
+        for (let i = 0; i < this.freeRectangles.length; ++i)
           for (let j = i + 1; j < this.freeRectangles.length; ++j) {
             if (
               this.isContainedIn(this.freeRectangles[i], this.freeRectangles[j])
@@ -164,7 +184,6 @@ export const calculateCoordinates = (images, padding, alignElement) => {
               --j;
             }
           }
-        }
       }
 
       isContainedIn(a, b) {
@@ -178,12 +197,14 @@ export const calculateCoordinates = (images, padding, alignElement) => {
     }
 
     const totalArea = sortedImages.reduce(
-      (sum, img) => sum + (img.width + padding) * (img.height + padding),
+      (sum, img) =>
+        sum +
+        (img.width + initialPadding * 2) * (img.height + initialPadding * 2),
       0
     );
-    let binWidth = Math.ceil(Math.sqrt(totalArea * 1.1));
+    let binWidth = Math.ceil(Math.sqrt(totalArea));
     let binHeight = binWidth;
-    let packer = new MaxRectsBinPack(binWidth, binHeight);
+    let packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
 
     const packedImages = [];
     let allPacked = false;
@@ -192,33 +213,35 @@ export const calculateCoordinates = (images, padding, alignElement) => {
       allPacked = true;
       for (const img of sortedImages) {
         if (!packedImages.some(packed => packed.img === img)) {
-          const node = packer.insert(img.width + padding, img.height + padding);
+          const node = packer.insert(img.width, img.height);
           if (node) {
             packedImages.push({
-              x: node.x,
-              y: node.y,
+              x: node.x + initialPadding,
+              y: node.y + initialPadding,
               width: img.width,
               height: img.height,
               img,
+              rotated: node.paddedWidth !== img.width + initialPadding * 2,
             });
           } else {
             allPacked = false;
+            break;
           }
         }
       }
 
       if (!allPacked) {
-        binWidth = Math.ceil(binWidth * 1.2);
-        binHeight = Math.ceil(binHeight * 1.2);
-        packer = new MaxRectsBinPack(binWidth, binHeight);
+        binWidth = Math.ceil(binWidth * 1.1);
+        binHeight = Math.ceil(binHeight * 1.1);
+        packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
         packedImages.length = 0;
       }
     }
 
     return packedImages;
   } else if (alignElement === 'left-right') {
-    let xOffset = padding;
-    const yOffset = padding;
+    let xOffset = initialPadding;
+    const yOffset = initialPadding;
 
     return images.map(img => {
       const coord = {
@@ -228,12 +251,12 @@ export const calculateCoordinates = (images, padding, alignElement) => {
         height: img.height,
         img,
       };
-      xOffset += img.width + padding;
+      xOffset += img.width + initialPadding;
       return coord;
     });
   } else if (alignElement === 'top-bottom') {
-    const xOffset = padding;
-    let yOffset = padding;
+    const xOffset = initialPadding;
+    let yOffset = initialPadding;
 
     return images.map(img => {
       const coord = {
@@ -243,12 +266,12 @@ export const calculateCoordinates = (images, padding, alignElement) => {
         height: img.height,
         img,
       };
-      yOffset += img.height + padding;
+      yOffset += img.height + initialPadding;
       return coord;
     });
   } else {
-    let xOffset = padding;
-    const yOffset = padding;
+    let xOffset = initialPadding;
+    const yOffset = initialPadding;
 
     return images.map(img => {
       const coord = {
@@ -258,7 +281,7 @@ export const calculateCoordinates = (images, padding, alignElement) => {
         height: img.height,
         img,
       };
-      xOffset += img.width + padding;
+      xOffset += img.width + initialPadding;
       return coord;
     });
   }
