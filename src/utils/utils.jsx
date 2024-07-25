@@ -1,5 +1,5 @@
 export const calculateCoordinates = (images, padding, alignElement) => {
-  if (alignElement === 'best-fit-decreasing') {
+  if (alignElement === 'bin-packing') {
     const sortedImages = [...images].sort(
       (a, b) => b.width * b.height - a.width * a.height
     );
