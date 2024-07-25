@@ -4,97 +4,218 @@ export const calculateCoordinates = (images, padding, alignElement) => {
       (a, b) => b.width * b.height - a.width * a.height
     );
 
-    let canvasWidth =
-      Math.max(...sortedImages.map(img => img.width)) + padding * 2;
-    let canvasHeight = padding;
-    const coordinates = [];
-    const spaces = [
-      {
-        x: padding,
-        y: padding,
-        w: canvasWidth - padding * 2,
-        h: Number.MAX_SAFE_INTEGER,
-      },
-    ];
+    class Rectangle {
+      constructor(x, y, width, height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+      }
+    }
 
-    const findBestSpace = img => {
-      let bestSpace = null;
-      let bestIndex = -1;
+    class MaxRectsBinPack {
+      constructor(width, height) {
+        this.binWidth = width;
+        this.binHeight = height;
+        this.usedRectangles = [];
+        this.freeRectangles = [new Rectangle(0, 0, width, height)];
+      }
 
-      for (let i = 0; i < spaces.length; i++) {
-        const space = spaces[i];
-        if (img.width <= space.w && img.height <= space.h) {
+      insert(width, height) {
+        const newNode = this.findPositionForNewNodeBestShortSideFit(
+          width,
+          height
+        );
+        if (newNode.height === 0) {
+          return null;
+        }
+
+        this.placeRectangle(newNode);
+        return newNode;
+      }
+
+      findPositionForNewNodeBestShortSideFit(width, height) {
+        const bestNode = new Rectangle(0, 0, 0, 0);
+        let bestShortSideFit = Number.MAX_VALUE;
+        let bestLongSideFit = Number.MAX_VALUE;
+
+        for (let i = 0; i < this.freeRectangles.length; ++i) {
+          const rect = this.freeRectangles[i];
+          if (rect.width >= width && rect.height >= height) {
+            const leftoverHoriz = Math.abs(rect.width - width);
+            const leftoverVert = Math.abs(rect.height - height);
+            const shortSideFit = Math.min(leftoverHoriz, leftoverVert);
+            const longSideFit = Math.max(leftoverHoriz, leftoverVert);
+
+            if (
+              shortSideFit < bestShortSideFit ||
+              (shortSideFit === bestShortSideFit &&
+                longSideFit < bestLongSideFit)
+            ) {
+              bestNode.x = rect.x;
+              bestNode.y = rect.y;
+              bestNode.width = width;
+              bestNode.height = height;
+              bestShortSideFit = shortSideFit;
+              bestLongSideFit = longSideFit;
+            }
+          }
+        }
+
+        return bestNode;
+      }
+
+      placeRectangle(node) {
+        let numRectanglesToProcess = this.freeRectangles.length;
+        for (let i = 0; i < numRectanglesToProcess; i++) {
+          if (this.splitFreeNode(this.freeRectangles[i], node)) {
+            this.freeRectangles.splice(i, 1);
+            --i;
+            --numRectanglesToProcess;
+          }
+        }
+
+        this.pruneFreeList();
+        this.usedRectangles.push(node);
+      }
+
+      splitFreeNode(freeNode, usedNode) {
+        if (
+          usedNode.x >= freeNode.x + freeNode.width ||
+          usedNode.x + usedNode.width <= freeNode.x ||
+          usedNode.y >= freeNode.y + freeNode.height ||
+          usedNode.y + usedNode.height <= freeNode.y
+        )
+          return false;
+
+        if (
+          usedNode.x < freeNode.x + freeNode.width &&
+          usedNode.x + usedNode.width > freeNode.x
+        ) {
           if (
-            !bestSpace ||
-            space.y < bestSpace.y ||
-            (space.y === bestSpace.y && space.x < bestSpace.x)
+            usedNode.y > freeNode.y &&
+            usedNode.y < freeNode.y + freeNode.height
           ) {
-            bestSpace = space;
-            bestIndex = i;
+            const newNode = new Rectangle(
+              freeNode.x,
+              freeNode.y,
+              freeNode.width,
+              usedNode.y - freeNode.y
+            );
+            this.freeRectangles.push(newNode);
+          }
+
+          if (usedNode.y + usedNode.height < freeNode.y + freeNode.height) {
+            const newNode = new Rectangle(
+              freeNode.x,
+              usedNode.y + usedNode.height,
+              freeNode.width,
+              freeNode.y + freeNode.height - (usedNode.y + usedNode.height)
+            );
+            this.freeRectangles.push(newNode);
+          }
+        }
+
+        if (
+          usedNode.y < freeNode.y + freeNode.height &&
+          usedNode.y + usedNode.height > freeNode.y
+        ) {
+          if (
+            usedNode.x > freeNode.x &&
+            usedNode.x < freeNode.x + freeNode.width
+          ) {
+            const newNode = new Rectangle(
+              freeNode.x,
+              freeNode.y,
+              usedNode.x - freeNode.x,
+              freeNode.height
+            );
+            this.freeRectangles.push(newNode);
+          }
+
+          if (usedNode.x + usedNode.width < freeNode.x + freeNode.width) {
+            const newNode = new Rectangle(
+              usedNode.x + usedNode.width,
+              freeNode.y,
+              freeNode.x + freeNode.width - (usedNode.x + usedNode.width),
+              freeNode.height
+            );
+            this.freeRectangles.push(newNode);
+          }
+        }
+
+        return true;
+      }
+
+      pruneFreeList() {
+        for (let i = 0; i < this.freeRectangles.length; ++i) {
+          for (let j = i + 1; j < this.freeRectangles.length; ++j) {
+            if (
+              this.isContainedIn(this.freeRectangles[i], this.freeRectangles[j])
+            ) {
+              this.freeRectangles.splice(i, 1);
+              --i;
+              break;
+            }
+            if (
+              this.isContainedIn(this.freeRectangles[j], this.freeRectangles[i])
+            ) {
+              this.freeRectangles.splice(j, 1);
+              --j;
+            }
           }
         }
       }
 
-      return { bestSpace, bestIndex };
-    };
-
-    const updateSpaces = (usedSpace, imgWidth, imgHeight) => {
-      const newSpaces = [];
-
-      if (usedSpace.w > imgWidth + padding) {
-        newSpaces.push({
-          x: usedSpace.x + imgWidth + padding,
-          y: usedSpace.y,
-          w: usedSpace.w - imgWidth - padding,
-          h: imgHeight,
-        });
-      }
-
-      if (usedSpace.h > imgHeight + padding) {
-        newSpaces.push({
-          x: usedSpace.x,
-          y: usedSpace.y + imgHeight + padding,
-          w: usedSpace.w,
-          h: usedSpace.h - imgHeight - padding,
-        });
-      }
-
-      spaces.push(...newSpaces);
-    };
-
-    sortedImages.forEach(img => {
-      const { bestSpace, bestIndex } = findBestSpace(img);
-
-      if (bestSpace) {
-        coordinates.push({
-          x: bestSpace.x,
-          y: bestSpace.y,
-          width: img.width,
-          height: img.height,
-          img,
-        });
-
-        spaces.splice(bestIndex, 1);
-        updateSpaces(bestSpace, img.width, img.height);
-
-        canvasHeight = Math.max(
-          canvasHeight,
-          bestSpace.y + img.height + padding
+      isContainedIn(a, b) {
+        return (
+          a.x >= b.x &&
+          a.y >= b.y &&
+          a.x + a.width <= b.x + b.width &&
+          a.y + a.height <= b.y + b.height
         );
-      } else {
-        coordinates.push({
-          x: padding,
-          y: canvasHeight,
-          width: img.width,
-          height: img.height,
-          img,
-        });
-
-        canvasHeight += img.height + padding;
       }
-    });
+    }
 
-    return coordinates;
+    const totalArea = sortedImages.reduce(
+      (sum, img) => sum + (img.width + padding) * (img.height + padding),
+      0
+    );
+    let binWidth = Math.ceil(Math.sqrt(totalArea * 1.1));
+    let binHeight = binWidth;
+    let packer = new MaxRectsBinPack(binWidth, binHeight);
+
+    const packedImages = [];
+    let allPacked = false;
+
+    while (!allPacked) {
+      allPacked = true;
+      for (const img of sortedImages) {
+        if (!packedImages.some(packed => packed.img === img)) {
+          const node = packer.insert(img.width + padding, img.height + padding);
+          if (node) {
+            packedImages.push({
+              x: node.x,
+              y: node.y,
+              width: img.width,
+              height: img.height,
+              img,
+            });
+          } else {
+            allPacked = false;
+          }
+        }
+      }
+
+      if (!allPacked) {
+        binWidth = Math.ceil(binWidth * 1.2);
+        binHeight = Math.ceil(binHeight * 1.2);
+        packer = new MaxRectsBinPack(binWidth, binHeight);
+        packedImages.length = 0;
+      }
+    }
+
+    return packedImages;
   } else if (alignElement === 'left-right') {
     let xOffset = padding;
     const yOffset = padding;
