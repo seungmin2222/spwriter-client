@@ -57,7 +57,7 @@ function Navbar() {
         (acc, coord) => acc + coord.height + paddingValue,
         paddingValue
       );
-    } else if (alignElement === 'best-fit-decreasing') {
+    } else if (alignElement === 'bin-packing') {
       totalWidth =
         Math.max(...coordinates.map(coord => coord.x + coord.width)) +
         paddingValue;
@@ -147,7 +147,7 @@ function Navbar() {
             onChange={e => setAlignElement(e.target.value)}
             className="w-44 p-1 border rounded-md"
           >
-            <option value="best-fit-decreasing">Best fit decreasing</option>
+            <option value="bin-packing">Bin-Packing</option>
             <option value="left-right">Left-Right</option>
             <option value="top-bottom">Top-Bottom</option>
           </select>

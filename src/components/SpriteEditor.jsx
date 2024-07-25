@@ -156,7 +156,7 @@ function SpriteEditor() {
 
         yOffset += coord.height + padding;
       });
-    } else if (alignElement === 'best-fit-decreasing') {
+    } else if (alignElement === 'bin-packing') {
       const maxWidth =
         Math.max(...coordinates.map(coord => coord.x + coord.width)) + padding;
       const maxHeight =
