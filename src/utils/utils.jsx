@@ -537,8 +537,11 @@ export const resizeSelectedImages = (
   coordinates,
   selectedFiles,
   setCoordinates,
-  setSelectedFiles
+  setSelectedFiles,
+  setResizedImage
 ) => {
+  let resizedImage = null;
+
   const updatedCoordinatesPromises = coordinates.map(async coord => {
     if (selectedFiles.has(coord.img)) {
       const resizedImg = await processImage(coord, (ctx, canvas) => {
@@ -552,9 +555,15 @@ export const resizeSelectedImages = (
         img: resizedImg,
         width: coord.width,
         height: coord.height,
-        x: coord.x,
-        y: coord.y,
       };
+
+      if (
+        updatedCoord.width !== coord.img.width ||
+        updatedCoord.height !== coord.img.height
+      ) {
+        resizedImage = updatedCoord;
+      }
+
       selectedFiles.delete(coord.img);
       selectedFiles.add(resizedImg);
 
@@ -566,6 +575,6 @@ export const resizeSelectedImages = (
   return Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
     sortAndSetCoordinates(newCoordinates, setCoordinates);
     setSelectedFiles(new Set(selectedFiles));
-    return newCoordinates;
+    return { newCoordinates, resizedImage };
   });
 };

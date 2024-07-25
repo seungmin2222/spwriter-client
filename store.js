@@ -20,6 +20,9 @@ const useFileStore = create(set => ({
   fileName: '',
   setFileName: fileName => set({ fileName }),
 
+  resizedImage: null,
+  setResizedImage: resizedImage => set({ resizedImage }),
+
   history: [],
   redoHistory: [],
 
