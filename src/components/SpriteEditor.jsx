@@ -277,17 +277,57 @@ function SpriteEditor() {
           changeCoordinates,
           selectedFiles,
           setCoordinates,
-          setSelectedFiles
-        );
-        const newCoordinates = calculateCoordinates(
-          changeCoordinates.map(coord => coord.img),
-          padding,
-          alignElement
-        );
+          setSelectedFiles,
+          useFileStore.getState().setResizedImage
+        ).then(({ newCoordinates, resizedImage }) => {
+          const calculatedCoordinates = calculateCoordinates(
+            newCoordinates.map(coord => coord.img),
+            padding,
+            alignElement
+          );
+          setCoordinates(calculatedCoordinates);
 
-        setCoordinates(newCoordinates);
+          if (resizedImage) {
+            const updatedResizedImage = calculatedCoordinates.find(
+              coord => coord.img === resizedImage.img
+            );
+            if (updatedResizedImage) {
+              scrollToResizedImage(updatedResizedImage);
+            }
+          }
+        });
       }
     }
+  };
+
+  const scrollToResizedImage = resizedCoord => {
+    const container = document.querySelector('.sprite-editor');
+    const canvas = canvasRef.current;
+
+    if (!container || !canvas) return;
+
+    const containerRect = container.getBoundingClientRect();
+
+    const centerX = resizedCoord.x + resizedCoord.width / 2;
+    const centerY = resizedCoord.y + resizedCoord.height / 2;
+
+    let scrollLeft = centerX - containerRect.width / 2;
+    let scrollTop = centerY - containerRect.height / 2;
+
+    scrollLeft = Math.max(
+      0,
+      Math.min(scrollLeft, canvas.width - containerRect.width)
+    );
+    scrollTop = Math.max(
+      0,
+      Math.min(scrollTop, canvas.height - containerRect.height)
+    );
+
+    container.scrollTo({
+      left: scrollLeft,
+      top: scrollTop,
+      behavior: 'smooth',
+    });
   };
 
   const handleCanvasClick = event => {
@@ -358,7 +398,7 @@ function SpriteEditor() {
 
   return (
     <div
-      className="relative w-full h-[80%] overflow-auto bg-[#f0f4f8]"
+      className="relative w-full h-[80%] overflow-auto bg-[#f0f4f8] sprite-editor"
       data-testid="sprite-editor"
       onClick={handleCanvasClick}
       onDrop={handleDrop}
