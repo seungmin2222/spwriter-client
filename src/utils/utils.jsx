@@ -3,6 +3,7 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
     const sortedImages = [...images].sort(
       (a, b) => b.width * b.height - a.width * a.height
     );
+
     class Rectangle {
       constructor(x, y, width, height) {
         this.x = x;
@@ -251,7 +252,9 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
         height: img.height,
         img,
       };
+
       xOffset += img.width + initialPadding;
+
       return coord;
     });
   } else if (alignElement === 'top-bottom') {
@@ -266,7 +269,9 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
         height: img.height,
         img,
       };
+
       yOffset += img.height + initialPadding;
+
       return coord;
     });
   } else {
@@ -281,7 +286,9 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
         height: img.height,
         img,
       };
+
       xOffset += img.width + initialPadding;
+
       return coord;
     });
   }
@@ -291,6 +298,7 @@ export const sortAndSetCoordinates = (newCoords, setCoordinates) => {
   const sortedCoordinates = [...newCoords].sort(
     (a, b) => b.width * b.height - a.width * a.height
   );
+
   setCoordinates(sortedCoordinates);
 };
 
@@ -537,8 +545,7 @@ export const resizeSelectedImages = (
   coordinates,
   selectedFiles,
   setCoordinates,
-  setSelectedFiles,
-  setResizedImage
+  setSelectedFiles
 ) => {
   let resizedImage = null;
 
