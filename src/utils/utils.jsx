@@ -240,58 +240,26 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
     }
 
     return packedImages;
-  } else if (alignElement === 'left-right') {
-    let xOffset = initialPadding;
-    const yOffset = initialPadding;
-
-    return images.map(img => {
-      const coord = {
-        x: xOffset,
-        y: yOffset,
-        width: img.width,
-        height: img.height,
-        img,
-      };
-
-      xOffset += img.width + initialPadding;
-
-      return coord;
-    });
   } else if (alignElement === 'top-bottom') {
-    const xOffset = initialPadding;
-    let yOffset = initialPadding;
-
-    return images.map(img => {
-      const coord = {
-        x: xOffset,
-        y: yOffset,
-        width: img.width,
-        height: img.height,
-        img,
-      };
-
-      yOffset += img.height + initialPadding;
-
-      return coord;
-    });
-  } else {
-    let xOffset = initialPadding;
-    const yOffset = initialPadding;
-
-    return images.map(img => {
-      const coord = {
-        x: xOffset,
-        y: yOffset,
-        width: img.width,
-        height: img.height,
-        img,
-      };
-
-      xOffset += img.width + initialPadding;
-
-      return coord;
-    });
+    return arrangeImages(images, initialPadding, true);
+  } else if (alignElement === 'left-right') {
+    return arrangeImages(images, initialPadding);
   }
+};
+
+const arrangeImages = (images, initialPadding, isVertical = false) => {
+  let offset = initialPadding;
+  return images.map(img => {
+    const coord = {
+      x: isVertical ? initialPadding : offset,
+      y: isVertical ? offset : initialPadding,
+      width: img.width,
+      height: img.height,
+      img,
+    };
+    offset += (isVertical ? img.height : img.width) + initialPadding;
+    return coord;
+  });
 };
 
 export const sortAndSetCoordinates = (newCoords, setCoordinates) => {
@@ -365,53 +333,30 @@ export const handleFiles = (
   const filesArray = Array.from(files);
   setFiles(prevFiles => [...prevFiles, ...filesArray]);
 
-  const newImages = [];
-  filesArray.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        trimImage(img).then(trimmedImg => {
-          newImages.push(trimmedImg);
-          if (newImages.length === filesArray.length) {
-            const newCoordinates = calculateCoordinates(
-              newImages,
-              padding,
-              alignElement
-            );
-            const updatedCoordinates = [...coordinates, ...newCoordinates];
-            if (
-              JSON.stringify(updatedCoordinates) !== JSON.stringify(coordinates)
-            ) {
-              sortAndSetCoordinates(updatedCoordinates, setCoordinates);
-            }
-          }
-        });
-      };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
+  Promise.all(
+    filesArray.map(
+      file =>
+        new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const img = new Image();
+            img.onload = () => trimImage(img).then(resolve);
+            img.src = reader.result;
+          };
+          reader.readAsDataURL(file);
+        })
+    )
+  ).then(newImages => {
+    const newCoordinates = calculateCoordinates(
+      newImages,
+      padding,
+      alignElement
+    );
+    const updatedCoordinates = [...coordinates, ...newCoordinates];
+    if (JSON.stringify(updatedCoordinates) !== JSON.stringify(coordinates)) {
+      sortAndSetCoordinates(updatedCoordinates, setCoordinates);
+    }
   });
-};
-
-export const handleDropFiles = (
-  event,
-  setFiles,
-  setCoordinates,
-  coordinates,
-  padding,
-  alignElement
-) => {
-  event.preventDefault();
-  const droppedFiles = Array.from(event.dataTransfer.files);
-  handleFiles(
-    droppedFiles,
-    setFiles,
-    setCoordinates,
-    coordinates,
-    padding,
-    alignElement
-  );
 };
 
 export const handleDragOverFiles = event => {

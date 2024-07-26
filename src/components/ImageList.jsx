@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Modal from './Modal';
 import Toast from './Toast';
 import useFileStore from '../../store';
-import { handleDropFiles, calculateCoordinates } from '../utils/utils';
+import { handleFiles, calculateCoordinates } from '../utils/utils';
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 function ImageList() {
@@ -155,7 +155,15 @@ function ImageList() {
 
   const handleDrop = event => {
     event.preventDefault();
-    handleDropFiles(event, setFiles, setCoordinates, coordinates, padding);
+    const droppedFiles = Array.from(event.dataTransfer.files);
+    handleFiles(
+      droppedFiles,
+      setFiles,
+      setCoordinates,
+      coordinates,
+      padding,
+      alignElement
+    );
   };
 
   const handleDragOver = event => {
