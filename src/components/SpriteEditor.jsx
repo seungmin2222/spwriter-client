@@ -277,8 +277,7 @@ function SpriteEditor() {
           changeCoordinates,
           selectedFiles,
           setCoordinates,
-          setSelectedFiles,
-          useFileStore.getState().setResizedImage
+          setSelectedFiles
         ).then(({ newCoordinates, resizedImage }) => {
           const calculatedCoordinates = calculateCoordinates(
             newCoordinates.map(coord => coord.img),
