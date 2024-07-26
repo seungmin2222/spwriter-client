@@ -29,20 +29,9 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
           paddedWidth,
           paddedHeight
         );
-        if (newNode.width !== 0) {
-          newNode.paddedWidth = paddedWidth;
-          newNode.paddedHeight = paddedHeight;
-          this.placeRectangle(newNode);
-          return newNode;
-        }
-
-        newNode = this.findPositionForNewNodeBestAreaFit(
-          paddedHeight,
-          paddedWidth
-        );
-        if (newNode.width !== 0) {
-          newNode.paddedWidth = paddedHeight;
-          newNode.paddedHeight = paddedWidth;
+        if (newNode.height !== 0) {
+          newNode.width = width;
+          newNode.height = height;
           this.placeRectangle(newNode);
           return newNode;
         }
@@ -56,20 +45,28 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
         let bestShortSideFit = Number.MAX_VALUE;
 
         for (let i = 0; i < this.freeRectangles.length; ++i) {
-          const rect = this.freeRectangles[i];
-          const areaFit = rect.width * rect.height - width * height;
+          const areaFit =
+            this.freeRectangles[i].width * this.freeRectangles[i].height -
+            width * height;
 
-          if (rect.width >= width && rect.height >= height) {
-            const leftoverHoriz = Math.abs(rect.width - width);
-            const leftoverVert = Math.abs(rect.height - height);
+          if (
+            this.freeRectangles[i].width >= width &&
+            this.freeRectangles[i].height >= height
+          ) {
+            const leftoverHoriz = Math.abs(
+              this.freeRectangles[i].width - width
+            );
+            const leftoverVert = Math.abs(
+              this.freeRectangles[i].height - height
+            );
             const shortSideFit = Math.min(leftoverHoriz, leftoverVert);
 
             if (
               areaFit < bestAreaFit ||
               (areaFit === bestAreaFit && shortSideFit < bestShortSideFit)
             ) {
-              bestNode.x = rect.x;
-              bestNode.y = rect.y;
+              bestNode.x = this.freeRectangles[i].x;
+              bestNode.y = this.freeRectangles[i].y;
               bestNode.width = width;
               bestNode.height = height;
               bestAreaFit = areaFit;
@@ -96,17 +93,20 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
       }
 
       splitFreeNode(freeNode, usedNode) {
+        const paddedUsedWidth = usedNode.width + this.padding * 2;
+        const paddedUsedHeight = usedNode.height + this.padding * 2;
+
         if (
           usedNode.x >= freeNode.x + freeNode.width ||
-          usedNode.x + usedNode.paddedWidth <= freeNode.x ||
+          usedNode.x + paddedUsedWidth <= freeNode.x ||
           usedNode.y >= freeNode.y + freeNode.height ||
-          usedNode.y + usedNode.paddedHeight <= freeNode.y
+          usedNode.y + paddedUsedHeight <= freeNode.y
         )
           return false;
 
         if (
           usedNode.x < freeNode.x + freeNode.width &&
-          usedNode.x + usedNode.paddedWidth > freeNode.x
+          usedNode.x + paddedUsedWidth > freeNode.x
         ) {
           if (
             usedNode.y > freeNode.y &&
@@ -121,17 +121,12 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
             this.freeRectangles.push(newNode);
           }
 
-          if (
-            usedNode.y + usedNode.paddedHeight <
-            freeNode.y + freeNode.height
-          ) {
+          if (usedNode.y + paddedUsedHeight < freeNode.y + freeNode.height) {
             const newNode = new Rectangle(
               freeNode.x,
-              usedNode.y + usedNode.paddedHeight,
+              usedNode.y + paddedUsedHeight,
               freeNode.width,
-              freeNode.y +
-                freeNode.height -
-                (usedNode.y + usedNode.paddedHeight)
+              freeNode.y + freeNode.height - (usedNode.y + paddedUsedHeight)
             );
             this.freeRectangles.push(newNode);
           }
@@ -139,7 +134,7 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
 
         if (
           usedNode.y < freeNode.y + freeNode.height &&
-          usedNode.y + usedNode.paddedHeight > freeNode.y
+          usedNode.y + paddedUsedHeight > freeNode.y
         ) {
           if (
             usedNode.x > freeNode.x &&
@@ -154,11 +149,11 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
             this.freeRectangles.push(newNode);
           }
 
-          if (usedNode.x + usedNode.paddedWidth < freeNode.x + freeNode.width) {
+          if (usedNode.x + paddedUsedWidth < freeNode.x + freeNode.width) {
             const newNode = new Rectangle(
-              usedNode.x + usedNode.paddedWidth,
+              usedNode.x + paddedUsedWidth,
               freeNode.y,
-              freeNode.x + freeNode.width - (usedNode.x + usedNode.paddedWidth),
+              freeNode.x + freeNode.width - (usedNode.x + paddedUsedWidth),
               freeNode.height
             );
             this.freeRectangles.push(newNode);
@@ -222,7 +217,6 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
               width: img.width,
               height: img.height,
               img,
-              rotated: node.paddedWidth !== img.width + initialPadding * 2,
             });
           } else {
             allPacked = false;
