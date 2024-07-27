@@ -33,7 +33,7 @@ function Toast({ id, message, onClose }) {
         className="ml-4"
         data-testid="toast-close-button"
       >
-        Close
+        닫기
       </button>
     </div>
   );
