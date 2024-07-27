@@ -216,9 +216,8 @@ function SpriteEditor() {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const scrollLeft =
-      window.pageXOffset || document.documentElement.scrollLeft;
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
     const x = event.clientX - rect.left - scrollLeft;
     const y = event.clientY - rect.top - scrollTop;
 
@@ -254,9 +253,8 @@ function SpriteEditor() {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const scrollLeft =
-      window.pageXOffset || document.documentElement.scrollLeft;
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
     const x = event.clientX - rect.left - scrollLeft;
     const y = event.clientY - rect.top - scrollTop;
 
@@ -279,12 +277,10 @@ function SpriteEditor() {
       });
       changeCoordinates = updatedCoordinates;
       setCoordinates(updatedCoordinates);
+      drawImages();
     } else if (isDragging) {
       setDragEnd({ x, y });
-    }
-
-    drawImages();
-    if (isDragging) {
+      drawImages();
       drawSelectionBox();
     }
   };
@@ -294,9 +290,8 @@ function SpriteEditor() {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const scrollLeft =
-      window.pageXOffset || document.documentElement.scrollLeft;
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
     const x = event.clientX - rect.left - scrollLeft;
     const y = event.clientY - rect.top - scrollTop;
 
@@ -318,6 +313,7 @@ function SpriteEditor() {
             alignElement
           );
           setCoordinates(calculatedCoordinates);
+          drawImages();
 
           if (resizedImage) {
             const updatedResizedImage = calculatedCoordinates.find(
@@ -375,6 +371,7 @@ function SpriteEditor() {
       }
     });
     setSelectedFiles(newSelectedFiles);
+    drawImages();
   };
 
   const isImageInSelectionBox = coord => {
