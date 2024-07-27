@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from 'react';
 import useFileStore from '../../store';
 import {
   handleFiles,
@@ -27,8 +33,39 @@ function SpriteEditor() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragEnd, setDragEnd] = useState({ x: 0, y: 0 });
+  const [showExtractButton, setShowExtractButton] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
+  const isSingleImage = useMemo(() => coordinates.length === 1, [coordinates]);
 
   let changeCoordinates = null;
+
+  useEffect(() => {
+    setShowExtractButton(isSingleImage);
+  }, [isSingleImage]);
+
+  useEffect(() => {
+    if (canvasRef.current && files.length > 0) {
+      drawImages();
+    }
+  }, [coordinates, padding, selectedFiles, files, alignElement]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+
+    if (canvas) {
+      canvas.addEventListener('mousemove', handleCanvasMouseMove);
+      canvas.addEventListener('mouseup', handleCanvasMouseUp);
+      canvas.addEventListener('mousedown', handleCanvasMouseDown);
+    }
+
+    return () => {
+      if (canvas) {
+        canvas.removeEventListener('mousemove', handleCanvasMouseMove);
+        canvas.removeEventListener('mouseup', handleCanvasMouseUp);
+        canvas.removeEventListener('mousedown', handleCanvasMouseDown);
+      }
+    };
+  }, [isResizing, resizing, startPos]);
 
   const createCheckerboardPattern = () => {
     const patternCanvas = document.createElement('canvas');
@@ -369,42 +406,93 @@ function SpriteEditor() {
     });
   };
 
-  const handleDrop = event => {
-    event.preventDefault();
-    const droppedFiles = Array.from(event.dataTransfer.files);
-    handleFiles(
-      droppedFiles,
-      setFiles,
-      setCoordinates,
-      coordinates,
-      padding,
-      alignElement
-    );
+  const handleDrop = useCallback(
+    event => {
+      event.preventDefault();
+      const droppedFiles = Array.from(event.dataTransfer.files);
+      handleFiles(
+        droppedFiles,
+        setFiles,
+        setCoordinates,
+        coordinates,
+        padding,
+        alignElement
+      );
+    },
+    [setFiles, setCoordinates, coordinates, padding, alignElement]
+  );
+
+  const extractSpritesFromSheet = useCallback(async () => {
+    if (coordinates.length !== 1) return;
+    setIsExtracting(true);
+
+    try {
+      const image = coordinates[0].img;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      ctx.drawImage(image, 0, 0);
+
+      const imageData = ctx.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      ).data;
+
+      const worker = new Worker(
+        new URL('../utils/spriteWorker.js', import.meta.url)
+      );
+
+      worker.onmessage = async e => {
+        const sprites = e.data;
+        const spriteImages = await Promise.all(
+          sprites.map(sprite => createImageFromSprite(canvas, sprite))
+        );
+
+        setFiles(prevFiles => [...prevFiles, ...spriteImages]);
+
+        const newCoordinates = calculateCoordinates(
+          spriteImages,
+          padding,
+          alignElement
+        );
+        setCoordinates(newCoordinates);
+        setIsExtracting(false);
+        setShowExtractButton(false);
+      };
+
+      worker.postMessage({
+        imageData,
+        width: canvas.width,
+        height: canvas.height,
+      });
+    } catch (error) {
+      console.error('스프라이트 추출 중 오류 발생:', error);
+      setIsExtracting(false);
+    }
+  }, [coordinates, setFiles, padding, alignElement, setCoordinates]);
+
+  const createImageFromSprite = async (canvas, sprite) => {
+    const { x, y, width, height } = sprite;
+    const spriteCanvas = document.createElement('canvas');
+    const ctx = spriteCanvas.getContext('2d');
+    spriteCanvas.width = width;
+    spriteCanvas.height = height;
+    ctx.drawImage(canvas, x, y, width, height, 0, 0, width, height);
+
+    return new Promise(resolve => {
+      spriteCanvas.toBlob(blob => {
+        const file = new File([blob], `sprite_${Date.now()}.png`, {
+          type: 'image/png',
+        });
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = () => resolve(img);
+      });
+    });
   };
-
-  useEffect(() => {
-    if (canvasRef.current && files.length > 0) {
-      drawImages();
-    }
-  }, [coordinates, padding, selectedFiles, files, alignElement]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-
-    if (canvas) {
-      canvas.addEventListener('mousemove', handleCanvasMouseMove);
-      canvas.addEventListener('mouseup', handleCanvasMouseUp);
-      canvas.addEventListener('mousedown', handleCanvasMouseDown);
-    }
-
-    return () => {
-      if (canvas) {
-        canvas.removeEventListener('mousemove', handleCanvasMouseMove);
-        canvas.removeEventListener('mouseup', handleCanvasMouseUp);
-        canvas.removeEventListener('mousedown', handleCanvasMouseDown);
-      }
-    };
-  }, [isResizing, resizing, startPos]);
 
   return (
     <div
@@ -426,7 +514,24 @@ function SpriteEditor() {
           </span>
         </div>
       ) : (
-        <canvas ref={canvasRef} className="flex" data-testid="canvas"></canvas>
+        <>
+          <canvas
+            ref={canvasRef}
+            className="flex"
+            data-testid="canvas"
+          ></canvas>
+          {coordinates.length === 1 && (
+            <button
+              onClick={extractSpritesFromSheet}
+              disabled={isExtracting}
+              className={`absolute top-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
+                isExtracting ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {isExtracting ? '추출 중...' : '스프라이트 시트 추출'}
+            </button>
+          )}
+        </>
       )}
     </div>
   );
