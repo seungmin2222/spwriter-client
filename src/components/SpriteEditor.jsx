@@ -48,7 +48,45 @@ function SpriteEditor() {
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const setupCanvas = (width, height) => {
+      canvas.width = width;
+      canvas.height = height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    };
+
+    const drawImage = (coord, xOffset = 0, yOffset = 0) => {
+      if (!coord.img.complete) return;
+      ctx.drawImage(coord.img, xOffset, yOffset, coord.width, coord.height);
+    };
+
+    const drawSelection = (coord, xOffset = 0, yOffset = 0) => {
+      const isSelected = selectedFiles.has(coord.img);
+      if (!isSelected) {
+        coord.circle = null;
+        return;
+      }
+
+      ctx.strokeStyle = '#1a5a91';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(xOffset, yOffset, coord.width, coord.height);
+
+      const circleRadius = 8;
+      const circleOffset = -10;
+      const circleX = xOffset + coord.width + circleOffset;
+      const circleY = yOffset + coord.height + circleOffset;
+
+      ctx.beginPath();
+      ctx.arc(circleX, circleY, circleRadius, 0, 2 * Math.PI);
+      ctx.fillStyle = '#1a5a91';
+      ctx.fill();
+
+      coord.circle = { x: circleX, y: circleY, radius: circleRadius };
+    };
 
     if (alignElement === 'left-right') {
       const totalWidth = coordinates.reduce(
@@ -57,51 +95,12 @@ function SpriteEditor() {
       );
       const maxHeight =
         Math.max(...coordinates.map(coord => coord.height)) + padding * 2;
-      canvas.width = totalWidth;
-      canvas.height = maxHeight;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      setupCanvas(totalWidth, maxHeight);
 
       let xOffset = 0;
-
       coordinates.forEach(coord => {
-        if (!coord.img.complete) return;
-
-        ctx.drawImage(coord.img, xOffset, padding, coord.width, coord.height);
-
-        const isSelected = selectedFiles.has(coord.img);
-
-        if (isSelected) {
-          ctx.strokeStyle = '#1a5a91';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(xOffset, padding, coord.width, coord.height);
-
-          const circleRadius = 8;
-          const circleOffset = -10;
-          ctx.beginPath();
-          ctx.arc(
-            xOffset + coord.width + circleOffset,
-            padding + coord.height + circleOffset,
-            circleRadius,
-            0,
-            2 * Math.PI
-          );
-          ctx.fillStyle = '#1a5a91';
-          ctx.fill();
-
-          coord.circle = {
-            x: xOffset + coord.width + circleOffset,
-            y: padding + coord.height + circleOffset,
-            radius: circleRadius,
-          };
-        } else {
-          coord.circle = null;
-        }
-
+        drawImage(coord, xOffset, padding);
+        drawSelection(coord, xOffset, padding);
         xOffset += coord.width + padding;
       });
     } else if (alignElement === 'top-bottom') {
@@ -111,52 +110,13 @@ function SpriteEditor() {
         (acc, coord) => acc + coord.height + padding,
         0
       );
-      canvas.width = maxWidth;
-      canvas.height = totalHeight;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      setupCanvas(maxWidth, totalHeight);
 
       let yOffset = 0;
-
       coordinates.forEach(coord => {
-        if (!coord.img.complete) return;
-
         const xOffset = padding;
-        ctx.drawImage(coord.img, xOffset, yOffset, coord.width, coord.height);
-
-        const isSelected = selectedFiles.has(coord.img);
-
-        if (isSelected) {
-          ctx.strokeStyle = '#1a5a91';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(xOffset, yOffset, coord.width, coord.height);
-
-          const circleRadius = 8;
-          const circleOffset = -10;
-          ctx.beginPath();
-          ctx.arc(
-            xOffset + coord.width + circleOffset,
-            yOffset + coord.height + circleOffset,
-            circleRadius,
-            0,
-            2 * Math.PI
-          );
-          ctx.fillStyle = '#1a5a91';
-          ctx.fill();
-
-          coord.circle = {
-            x: xOffset + coord.width + circleOffset,
-            y: yOffset + coord.height + circleOffset,
-            radius: circleRadius,
-          };
-        } else {
-          coord.circle = null;
-        }
-
+        drawImage(coord, xOffset, yOffset);
+        drawSelection(coord, xOffset, yOffset);
         yOffset += coord.height + padding;
       });
     } else if (alignElement === 'bin-packing') {
@@ -164,49 +124,11 @@ function SpriteEditor() {
         Math.max(...coordinates.map(coord => coord.x + coord.width)) + padding;
       const maxHeight =
         Math.max(...coordinates.map(coord => coord.y + coord.height)) + padding;
-
-      canvas.width = maxWidth;
-      canvas.height = maxHeight;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat');
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      setupCanvas(maxWidth, maxHeight);
 
       coordinates.forEach(coord => {
-        if (!coord.img.complete) return;
-
-        ctx.drawImage(coord.img, coord.x, coord.y, coord.width, coord.height);
-
-        const isSelected = selectedFiles.has(coord.img);
-
-        if (isSelected) {
-          ctx.strokeStyle = '#1a5a91';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(coord.x, coord.y, coord.width, coord.height);
-
-          const circleRadius = 8;
-          const circleOffset = -10;
-          ctx.beginPath();
-          ctx.arc(
-            coord.x + coord.width + circleOffset,
-            coord.y + coord.height + circleOffset,
-            circleRadius,
-            0,
-            2 * Math.PI
-          );
-          ctx.fillStyle = '#1a5a91';
-          ctx.fill();
-
-          coord.circle = {
-            x: coord.x + coord.width + circleOffset,
-            y: coord.y + coord.height + circleOffset,
-            radius: circleRadius,
-          };
-        } else {
-          coord.circle = null;
-        }
+        drawImage(coord, coord.x, coord.y);
+        drawSelection(coord, coord.x, coord.y);
       });
     }
   };
@@ -288,12 +210,6 @@ function SpriteEditor() {
   const handleCanvasMouseUp = event => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const x = event.clientX - rect.left - scrollLeft;
-    const y = event.clientY - rect.top - scrollTop;
 
     if (isResizing) {
       setIsResizing(false);
@@ -427,9 +343,8 @@ function SpriteEditor() {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const scrollLeft =
-      window.pageXOffset || document.documentElement.scrollLeft;
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
     const x = event.clientX - rect.left - scrollLeft;
     const y = event.clientY - rect.top - scrollTop;
 
