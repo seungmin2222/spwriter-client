@@ -257,8 +257,12 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
 };
 
 const arrangeImages = (images, initialPadding, isVertical = false) => {
+  const sortedImages = [...images].sort(
+    (a, b) => b.width * b.height - a.width * a.height
+  );
+
   let offset = initialPadding;
-  return images.map(img => {
+  return sortedImages.map(img => {
     const coord = {
       x: isVertical ? initialPadding : offset,
       y: isVertical ? offset : initialPadding,
