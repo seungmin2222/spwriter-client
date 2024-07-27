@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from './Modal';
-import Toast from './Toast';
 import ResizeModal from './ResizeModal';
+import Toast from './Toast';
 import useFileStore from '../../store';
 import { handleFiles, calculateCoordinates } from '../utils/utils';
 import fileImageIcon from '../assets/images/file-image-regular.svg';
@@ -201,37 +201,6 @@ function ImageList() {
     setSelectedFiles(new Set());
   };
 
-  const deleteSelectedImages = () => {
-    addHistory(coordinates);
-    setDeletingImages(new Set(selectedFiles));
-
-    setTimeout(() => {
-      const updatedCoordinates = coordinates.filter(
-        coord => !selectedFiles.has(coord.img)
-      );
-
-      setCoordinates(updatedCoordinates);
-      setSelectedFiles(new Set());
-      setDeletingImages(new Set());
-      generateToast('선택된 이미지가 삭제되었습니다.');
-    }, 400);
-  };
-
-  const deleteImage = imgSrc => {
-    addHistory(coordinates);
-    setDeletingImages(new Set([imgSrc]));
-
-    setTimeout(() => {
-      const updatedCoordinates = coordinates.filter(
-        coord => coord.img !== imgSrc
-      );
-
-      setCoordinates(updatedCoordinates);
-      setDeletingImages(new Set());
-      generateToast('이미지가 삭제되었습니다.');
-    }, 400);
-  };
-
   const handleDrop = event => {
     event.preventDefault();
     const droppedFiles = Array.from(event.dataTransfer.files);
@@ -247,6 +216,32 @@ function ImageList() {
 
   const handleDragOver = event => {
     event.preventDefault();
+  };
+
+  const deleteImages = imagesToDelete => {
+    addHistory(coordinates);
+    setDeletingImages(new Set(imagesToDelete));
+
+    setTimeout(() => {
+      const updatedCoordinates = coordinates.filter(
+        coord => !imagesToDelete.has(coord.img)
+      );
+
+      setCoordinates(updatedCoordinates);
+      setSelectedFiles(new Set());
+      setDeletingImages(new Set());
+      generateToast(
+        `${imagesToDelete.size > 1 ? '선택된 이미지가' : '이미지가'} 삭제되었습니다.`
+      );
+    }, 400);
+  };
+
+  const deleteSelectedImages = () => {
+    deleteImages(selectedFiles);
+  };
+
+  const deleteImage = imgSrc => {
+    deleteImages(new Set([imgSrc]));
   };
 
   const copySelectedCoordinates = () => {
