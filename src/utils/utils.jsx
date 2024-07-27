@@ -1,8 +1,19 @@
 export const calculateCoordinates = (images, initialPadding, alignElement) => {
   if (alignElement === 'bin-packing') {
-    const sortedImages = [...images].sort(
-      (a, b) => b.width * b.height - a.width * a.height
-    );
+    const sortImages = images => {
+      return [...images].sort((a, b) => {
+        const aRatio = a.width / a.height;
+        const bRatio = b.width / b.height;
+        const aArea = a.width * a.height;
+        const bArea = b.width * b.height;
+        return (
+          bArea * (1 + Math.abs(1 - bRatio)) -
+          aArea * (1 + Math.abs(1 - aRatio))
+        );
+      });
+    };
+
+    const sortedImages = sortImages(images);
 
     class Rectangle {
       constructor(x, y, width, height) {
@@ -25,7 +36,7 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
       insert(width, height) {
         const paddedWidth = width + this.padding * 2;
         const paddedHeight = height + this.padding * 2;
-        let newNode = this.findPositionForNewNodeBestAreaFit(
+        let newNode = this.findPositionForNewNodeBestShortSideFit(
           paddedWidth,
           paddedHeight
         );
@@ -35,20 +46,15 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
           this.placeRectangle(newNode);
           return newNode;
         }
-
         return null;
       }
 
-      findPositionForNewNodeBestAreaFit(width, height) {
+      findPositionForNewNodeBestShortSideFit(width, height) {
         const bestNode = new Rectangle(0, 0, 0, 0);
-        let bestAreaFit = Number.MAX_VALUE;
         let bestShortSideFit = Number.MAX_VALUE;
+        let bestLongSideFit = Number.MAX_VALUE;
 
         for (let i = 0; i < this.freeRectangles.length; ++i) {
-          const areaFit =
-            this.freeRectangles[i].width * this.freeRectangles[i].height -
-            width * height;
-
           if (
             this.freeRectangles[i].width >= width &&
             this.freeRectangles[i].height >= height
@@ -60,17 +66,19 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
               this.freeRectangles[i].height - height
             );
             const shortSideFit = Math.min(leftoverHoriz, leftoverVert);
+            const longSideFit = Math.max(leftoverHoriz, leftoverVert);
 
             if (
-              areaFit < bestAreaFit ||
-              (areaFit === bestAreaFit && shortSideFit < bestShortSideFit)
+              shortSideFit < bestShortSideFit ||
+              (shortSideFit === bestShortSideFit &&
+                longSideFit < bestLongSideFit)
             ) {
               bestNode.x = this.freeRectangles[i].x;
               bestNode.y = this.freeRectangles[i].y;
               bestNode.width = width;
               bestNode.height = height;
-              bestAreaFit = areaFit;
               bestShortSideFit = shortSideFit;
+              bestLongSideFit = longSideFit;
             }
           }
         }
@@ -198,8 +206,12 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
         (img.width + initialPadding * 2) * (img.height + initialPadding * 2),
       0
     );
-    let binWidth = Math.ceil(Math.sqrt(totalArea));
-    let binHeight = binWidth;
+    const avgAspectRatio =
+      sortedImages.reduce((sum, img) => sum + img.width / img.height, 0) /
+      sortedImages.length;
+    let binWidth = Math.ceil(Math.sqrt(totalArea * avgAspectRatio));
+    let binHeight = Math.ceil(Math.sqrt(totalArea / avgAspectRatio));
+
     let packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
 
     const packedImages = [];
@@ -226,8 +238,11 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
       }
 
       if (!allPacked) {
-        binWidth = Math.ceil(binWidth * 1.1);
-        binHeight = Math.ceil(binHeight * 1.1);
+        if (binWidth <= binHeight) {
+          binWidth = Math.ceil(binWidth * 1.01);
+        } else {
+          binHeight = Math.ceil(binHeight * 1.01);
+        }
         packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
         packedImages.length = 0;
       }
