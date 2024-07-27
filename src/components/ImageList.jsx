@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from './Modal';
 import Toast from './Toast';
+import ResizeModal from './ResizeModal';
 import useFileStore from '../../store';
 import { handleFiles, calculateCoordinates } from '../utils/utils';
 import fileImageIcon from '../assets/images/file-image-regular.svg';
@@ -22,6 +23,84 @@ function ImageList() {
   const fileName = useFileStore(state => state.fileName);
   const addHistory = useFileStore(state => state.addHistory);
   const alignElement = useFileStore(state => state.alignElement);
+  const [resizeModalOpen, setResizeModalOpen] = useState(false);
+  const [modalWidth, setModalWidth] = useState('');
+  const [modalHeight, setModalHeight] = useState('');
+
+  const handleResizeImages = () => {
+    if (selectedFiles.size === 0) {
+      generateToast('선택된 이미지가 없습니다.');
+      return;
+    }
+    setModalWidth('');
+    setModalHeight('');
+    setResizeModalOpen(true);
+  };
+
+  const handleResizeConfirm = () => {
+    const width = parseInt(modalWidth);
+    const height = parseInt(modalHeight);
+
+    if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
+      generateToast('유효한 너비와 높이를 입력해주세요.');
+      return;
+    }
+
+    addHistory(coordinates);
+
+    const newSelectedFiles = new Set();
+
+    const resizePromises = coordinates.map(async coord => {
+      if (selectedFiles.has(coord.img)) {
+        const resizedImg = await processImage(coord, (ctx, canvas) => {
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(coord.img, 0, 0, width, height);
+        });
+
+        newSelectedFiles.add(resizedImg);
+
+        return {
+          ...coord,
+          img: resizedImg,
+          width: width,
+          height: height,
+        };
+      }
+      return coord;
+    });
+
+    Promise.all(resizePromises).then(updatedCoordinates => {
+      const reorderedCoordinates = calculateCoordinates(
+        updatedCoordinates.map(coord => coord.img),
+        padding,
+        alignElement
+      );
+
+      setCoordinates(reorderedCoordinates);
+      setSelectedFiles(newSelectedFiles);
+      setResizeModalOpen(false);
+      setModalWidth('');
+      setModalHeight('');
+      generateToast('선택된 이미지의 크기가 조정되었습니다.');
+    });
+  };
+
+  const processImage = async (coord, transformCallback) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = coord.img.width;
+    canvas.height = coord.img.height;
+
+    await transformCallback(ctx, canvas, coord.img);
+
+    const processedImg = new Image();
+    processedImg.src = canvas.toDataURL();
+
+    return new Promise(resolve => {
+      processedImg.onload = () => resolve(processedImg);
+    });
+  };
 
   const prevCoordinatesRef = useRef(coordinates);
 
@@ -239,7 +318,7 @@ function ImageList() {
 
   return (
     <aside
-      className="flex flex-col w-[26%] h-full min-w-[380px] mr-[2%] text-gray-700 bg-[#f9fafb] rounded-md shadow-md"
+      className="flex flex-col w-[28%] h-full min-w-[380px] mr-[2%] text-gray-700 bg-[#f9fafb] rounded-md shadow-md"
       data-testid="image-list"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -258,20 +337,26 @@ function ImageList() {
                 전체 선택
               </button>
               <button
-                className="p-1 border mr-2 rounded-md shadow-sm hover:bg-[#cbd5e1] transition-colors"
+                className="p-1 border mr-2 rounded-md shadow-sm hover:bg-[#cbd5e1] transition-colors duration-300"
                 onClick={handleDeselectAll}
               >
                 전체 해제
               </button>
               <button
-                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
+                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors duration-300"
                 onClick={copySelectedCoordinates}
               >
                 선택좌표 복사
               </button>
+              <button
+                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors duration-300"
+                onClick={handleResizeImages}
+              >
+                크기 조정
+              </button>
             </div>
             <button
-              className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#e53e3e] transition-colors"
+              className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#e53e3e] transition-colors duration-300"
               onClick={handleOpenModal}
             >
               선택삭제
@@ -295,6 +380,15 @@ function ImageList() {
           </div>
         )}
       </section>
+      {resizeModalOpen && (
+        <ResizeModal
+          isOpen={resizeModalOpen}
+          onClose={() => setResizeModalOpen(false)}
+          onConfirm={handleResizeConfirm}
+          setWidth={setModalWidth}
+          setHeight={setModalHeight}
+        />
+      )}
       {showModal && (
         <Modal
           showModal={showModal}
