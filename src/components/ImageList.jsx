@@ -132,7 +132,7 @@ function ImageList() {
 
   const handleOpenModal = () => {
     if (selectedFiles.size === 0) {
-      generateToast('선택된 리스트가 없습니다.');
+      generateToast('선택된 이미지가 없습니다.');
       return;
     }
     setShowModal(true);
@@ -250,7 +250,7 @@ function ImageList() {
     );
 
     if (selectedCoordinates.length === 0) {
-      generateToast('선택된 리스트가 없습니다.');
+      generateToast('선택된 이미지가 없습니다.');
     } else {
       const cssText = selectedCoordinates
         .map(coord => generateCSS(coord, coordinates.indexOf(coord)))

@@ -30,7 +30,7 @@ function Footer() {
 
   const handleActionIfNoSelection = action => {
     if (selectedFiles.size === 0) {
-      addToast('선택된 이미지가 없습니다');
+      addToast('선택된 이미지가 없습니다.');
     } else {
       action();
     }
@@ -67,7 +67,7 @@ function Footer() {
     if (history.length) {
       popHistory();
     } else {
-      addToast('뒤로 갈 기록이 없습니다');
+      addToast('뒤로 갈 기록이 없습니다.');
     }
   };
 
@@ -75,7 +75,7 @@ function Footer() {
     if (redoHistory.length) {
       pushHistory();
     } else {
-      addToast('앞으로 갈 기록이 없습니다');
+      addToast('앞으로 갈 기록이 없습니다.');
     }
   };
 
