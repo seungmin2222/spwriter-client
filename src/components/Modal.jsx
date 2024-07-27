@@ -20,36 +20,38 @@ function Modal({ showModal, handleClose, handleConfirm, message }) {
   };
 
   const handleKeyDown = e => {
-    if (e.key === 'Escape') handleClose();
+    if (e.key === 'Enter') {
+      handleConfirm();
+    } else if (e.key === 'Escape') handleClose();
   };
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+      className="fixed inset-0 flex justify-center z-50 bg-black bg-opacity-50"
       data-testid="modal"
       onClick={handleBackgroundClick}
       tabIndex={-1}
     >
       <div
-        className="bg-white rounded-lg shadow-lg p-6 w-[350px] h-[130px]"
+        className="relative top-96 w-[350px] h-[200px] bg-white rounded-lg shadow-lg p-6"
         onClick={handleContentClick}
         tabIndex={0}
         ref={modalContentRef}
         onKeyDown={handleKeyDown}
       >
-        <h2 className="text-xl mb-5">{message}</h2>
-        <div className="flex justify-end space-x-4">
+        <h2 className="text-xl mb-5 text-gray-900 text-center">{message}</h2>
+        <div className="items-center px-4 py-3">
           <button
-            className="w-[70px] px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-            onClick={handleClose}
+            onClick={handleConfirm}
+            className="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 duration-300"
           >
-            No
+            확인
           </button>
           <button
-            className="w-[70px] rounded-md bg-[#1f77b4] text-white font-semibold hover:bg-[#1a5a91] transition-colors duration-300"
-            onClick={handleConfirm}
+            onClick={handleClose}
+            className="mt-3 px-4 py-2 bg-gray-100 text-gray-700 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 duration-300"
           >
-            Yes
+            취소
           </button>
         </div>
       </div>
