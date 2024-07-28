@@ -12,7 +12,7 @@ describe('Toast component', () => {
     const toastElement = screen.getByText(testMessage);
     expect(toastElement).toBeInTheDocument();
     expect(toastElement).toHaveClass(
-      'fixed top-4 left-1/2 transform -translate-x-1/2 bg-[#1f77b4] font-semibold text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300'
+      'top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 font-bold text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 opacity-0'
     );
   });
 

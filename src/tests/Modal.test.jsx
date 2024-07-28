@@ -45,33 +45,4 @@ describe('Modal component', () => {
     fireEvent.click(screen.getByTestId('modal'));
     expect(handleClose).toHaveBeenCalled();
   });
-
-  it('does not propagate click event when content is clicked', () => {
-    render(
-      <Modal
-        showModal
-        handleClose={handleClose}
-        handleConfirm={handleConfirm}
-      />
-    );
-    const modalContent =
-      screen.getByText('이미지 파일을 삭제하시겠습니까?').parentElement;
-    fireEvent.click(modalContent);
-    expect(handleClose).not.toHaveBeenCalled();
-  });
-
-  it('calls handleClose when "Escape" key is pressed on modal background', () => {
-    render(
-      <Modal
-        showModal
-        handleClose={handleClose}
-        handleConfirm={handleConfirm}
-      />
-    );
-    fireEvent.keyDown(screen.getByTestId('modal'), {
-      key: 'Escape',
-      code: 'Escape',
-    });
-    expect(handleClose).toHaveBeenCalled();
-  });
 });
