@@ -299,7 +299,7 @@ function ImageList() {
           aria-label="cross"
         >
           <svg
-            className="h-6 w-6 bg-[#1f77b4] transition-colors duration-300 group-hover:fill-current group-hover:text-white group-hover:bg-[#c53030] rounded-full"
+            className="h-6 w-6 bg-[#3b82f6] transition-colors duration-300 group-hover:fill-current group-hover:text-white group-hover:bg-[#c53030] rounded-full"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="#ffffff"
@@ -326,7 +326,7 @@ function ImageList() {
           <div className="flex w-full justify-between">
             <div>
               <button
-                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors"
+                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#3b82f6] transition-colors"
                 onClick={handleSelectAll}
               >
                 전체 선택
@@ -338,13 +338,13 @@ function ImageList() {
                 전체 해제
               </button>
               <button
-                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors duration-300"
+                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#3b82f6] transition-colors duration-300"
                 onClick={copySelectedCoordinates}
               >
                 선택좌표 복사
               </button>
               <button
-                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#1f77b4] transition-colors duration-300"
+                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#3b82f6] transition-colors duration-300"
                 onClick={handleResizeImages}
               >
                 크기 조정
