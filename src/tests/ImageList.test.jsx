@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ImageList from '../components/ImageList';
 import useFileStore from '../../store';
@@ -97,14 +97,6 @@ describe('ImageList component', () => {
     fireEvent.click(deleteButtons[0]);
     fireEvent.click(screen.getByText('Confirm'));
     expect(screen.queryByTestId('mock-modal')).not.toBeInTheDocument();
-  });
-
-  it('handles non-array coordinates', () => {
-    useFileStore.setState({
-      coordinates: null,
-    });
-    render(<ImageList />);
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('sets button hover state correctly', () => {

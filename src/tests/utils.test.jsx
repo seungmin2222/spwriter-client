@@ -1,10 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  calculateCoordinates,
-  sortAndSetCoordinates,
-  trimImage,
-  handleFiles,
-} from '../utils/utils';
+import { handleFiles } from '../utils/utils';
 
 beforeEach(() => {
   vi.useFakeTimers();

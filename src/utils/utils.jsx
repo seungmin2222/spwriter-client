@@ -335,7 +335,7 @@ export const trimImage = async img => {
   });
 };
 
-export const handleFiles = (
+export const handleFiles = async (
   files,
   setFiles,
   setCoordinates,
@@ -346,7 +346,7 @@ export const handleFiles = (
   const filesArray = Array.from(files);
   setFiles(prevFiles => [...prevFiles, ...filesArray]);
 
-  Promise.all(
+  const newImages = await Promise.all(
     filesArray.map(
       file =>
         new Promise(resolve => {
@@ -359,17 +359,14 @@ export const handleFiles = (
           reader.readAsDataURL(file);
         })
     )
-  ).then(newImages => {
-    const newCoordinates = calculateCoordinates(
-      newImages,
-      padding,
-      alignElement
-    );
-    const updatedCoordinates = [...coordinates, ...newCoordinates];
-    if (JSON.stringify(updatedCoordinates) !== JSON.stringify(coordinates)) {
-      sortAndSetCoordinates(updatedCoordinates, setCoordinates);
-    }
-  });
+  );
+
+  const newCoordinates = calculateCoordinates(newImages, padding, alignElement);
+  const updatedCoordinates = coordinates.concat(newCoordinates);
+
+  if (JSON.stringify(updatedCoordinates) !== JSON.stringify(coordinates)) {
+    sortAndSetCoordinates(updatedCoordinates, setCoordinates);
+  }
 };
 
 export const handleDragOverFiles = event => {

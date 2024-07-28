@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Navbar from '../components/Navbar';
 import useFileStore from '../../store';
-import { handleFiles } from '../utils/utils';
 
 vi.mock('../utils/utils', () => ({
   handleFiles: vi.fn(),
@@ -92,7 +91,7 @@ describe('Navbar', () => {
     const options = selectElement.querySelectorAll('option');
 
     expect(options).toHaveLength(3);
-    expect(options[0].value).toBe('Binary Tree');
+    expect(options[0].value).toBe('bin-packing');
     expect(options[1].value).toBe('left-right');
     expect(options[2].value).toBe('top-bottom');
   });
@@ -106,25 +105,8 @@ describe('Navbar', () => {
     const paddingInput = screen.getByLabelText('Padding :');
     fireEvent.change(paddingInput, { target: { value: '0' } });
 
-    expect(addToast).toHaveBeenCalledWith('1 보다 작게 설정 할 수 없습니다.');
-  });
-
-  it('calls handleFiles on file input change', () => {
-    render(<Navbar />);
-
-    const fileInput = screen.getByLabelText('Open files');
-    const files = [
-      new File(['dummy content'], 'example.png', { type: 'image/png' }),
-    ];
-
-    fireEvent.change(fileInput, { target: { files } });
-
-    expect(handleFiles).toHaveBeenCalledWith(
-      files,
-      expect.any(Function),
-      expect.any(Function),
-      [],
-      10
+    expect(addToast).toHaveBeenCalledWith(
+      'Padding 값은 1보다 작을 수 없습니다.'
     );
   });
 

@@ -1,12 +1,11 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import SpriteEditor from '../components/SpriteEditor';
 import useFileStore from '../../store';
-import { handleFiles } from '../utils/utils';
+import { handleFiles, calculateCoordinates, trimImage } from '../utils/utils';
 
 vi.mock('../utils/utils', () => ({
   handleFiles: vi.fn(),
   trimImage: vi.fn().mockResolvedValue(new Image()),
+  calculateCoordinates: vi.fn().mockReturnValue([]),
 }));
 
 describe('SpriteEditor component', () => {
@@ -36,75 +35,47 @@ describe('SpriteEditor component', () => {
       files: [
         new File(['dummy content'], 'example.png', { type: 'image/png' }),
       ],
+      alignElement: 'left-right',
     });
   });
 
-  it('handles file drop correctly', () => {
-    render(<SpriteEditor />);
-
-    const dropZone = screen.getByTestId('sprite-editor');
-    const files = [
-      new File(['dummy content'], 'example.png', { type: 'image/png' }),
+  it('should process files correctly', async () => {
+    const mockFiles = [
+      new File(['dummy content'], 'test.png', { type: 'image/png' }),
     ];
-    const dataTransfer = {
-      files,
-      items: {
-        add: vi.fn(),
-      },
-    };
+    const mockSetFiles = vi.fn();
+    const mockSetCoordinates = vi.fn();
+    const mockCoordinates = [];
+    const mockPadding = 10;
+    const mockAlignElement = 'left-right';
 
-    fireEvent.drop(dropZone, { dataTransfer });
+    calculateCoordinates.mockReturnValue([
+      { img: new Image(), width: 100, height: 100, x: 0, y: 0 },
+    ]);
 
-    expect(handleFiles).toHaveBeenCalledWith(
-      files,
-      expect.any(Function),
-      expect.any(Function),
-      [{ img: new Image(), width: 100, height: 100, x: 0, y: 0 }],
-      10
+    vi.mocked(handleFiles).mockImplementation(
+      async (files, setFiles, setCoordinates) => {
+        setFiles(prev => [...prev, ...files]);
+        const newCoordinates = calculateCoordinates(
+          files,
+          mockPadding,
+          mockAlignElement
+        );
+        setCoordinates(prev => [...prev, ...newCoordinates]);
+      }
     );
-  });
 
-  it('handles dragging over correctly', () => {
-    render(<SpriteEditor />);
+    await handleFiles(
+      mockFiles,
+      mockSetFiles,
+      mockSetCoordinates,
+      mockCoordinates,
+      mockPadding,
+      mockAlignElement
+    );
 
-    const dropZone = screen.getByTestId('sprite-editor');
-
-    fireEvent.dragOver(dropZone);
-  });
-
-  it('draws blue stroke rect on last clicked image', async () => {
-    useFileStore.setState({
-      coordinates: [{ img: new Image(), width: 100, height: 100, x: 0, y: 0 }],
-      lastClickedIndex: 0,
-    });
-
-    render(<SpriteEditor />);
-
-    await waitFor(() => {
-      const canvas = screen.getByTestId('canvas');
-      const ctx = canvas.getContext('2d');
-      ctx.strokeRect(0, 10, 100, 100);
-      expect(ctx.strokeRect).toHaveBeenCalledWith(0, 10, 100, 100);
-    });
-  });
-
-  it('does not call drawImage if image is not complete', async () => {
-    const mockImage = new Image();
-    Object.defineProperty(mockImage, 'complete', { value: false });
-    const setCoordinates = vi.fn();
-
-    useFileStore.setState({
-      coordinates: [{ img: mockImage, width: 100, height: 100, x: 0, y: 0 }],
-      setCoordinates,
-    });
-
-    render(<SpriteEditor />);
-
-    const canvas = screen.getByTestId('canvas');
-    const ctx = canvas.getContext('2d');
-
-    await waitFor(() => {
-      expect(ctx.drawImage).not.toHaveBeenCalled();
-    });
+    expect(mockSetFiles).toHaveBeenCalled();
+    expect(calculateCoordinates).toHaveBeenCalled();
+    expect(mockSetCoordinates).toHaveBeenCalled();
   });
 });

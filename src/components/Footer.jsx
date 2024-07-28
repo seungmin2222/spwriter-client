@@ -100,7 +100,7 @@ function Footer() {
           <img src={leftIcon} alt="Left Icon" className="h-6 w-6" />
         </button>
         <button className={buttonStyle} onClick={handleRedo}>
-          <img src={rightIcon} alt="Redo Icon" className="h-6 w-6" />{' '}
+          <img src={rightIcon} alt="Right Icon" className="h-6 w-6" />{' '}
         </button>
       </div>
     </footer>
