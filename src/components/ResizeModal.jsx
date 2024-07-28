@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 
 function ResizeModal({ isOpen, onClose, onConfirm, setWidth, setHeight }) {
-  const modalRef = useRef(null);
+  const inputRef = useRef(null);
+  const modalContainerRef = useRef(null);
 
   useEffect(() => {
     const handleKeyDown = e => {
@@ -12,20 +13,20 @@ function ResizeModal({ isOpen, onClose, onConfirm, setWidth, setHeight }) {
       }
     };
 
-    if (modalRef.current) {
-      modalRef.current.addEventListener('keydown', handleKeyDown);
+    if (isOpen && modalContainerRef.current) {
+      modalContainerRef.current.addEventListener('keydown', handleKeyDown);
     }
 
     return () => {
-      if (modalRef.current) {
-        modalRef.current.removeEventListener('keydown', handleKeyDown);
+      if (modalContainerRef.current) {
+        modalContainerRef.current.removeEventListener('keydown', handleKeyDown);
       }
     };
-  }, [onConfirm, onClose]);
+  }, [isOpen, onConfirm, onClose]);
 
   useEffect(() => {
-    if (isOpen && modalRef.current) {
-      modalRef.current.focus();
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
     }
   }, [isOpen]);
 
@@ -33,14 +34,14 @@ function ResizeModal({ isOpen, onClose, onConfirm, setWidth, setHeight }) {
 
   return (
     <div
+      ref={modalContainerRef}
       className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50"
       onClick={onClose}
+      tabIndex="-1"
     >
       <div
-        ref={modalRef}
         className="relative top-72 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
         onClick={e => e.stopPropagation()}
-        tabIndex="-1"
       >
         <div className="mt-3 text-center">
           <h3 className="text-xl leading-6 text-gray-900">
@@ -48,6 +49,7 @@ function ResizeModal({ isOpen, onClose, onConfirm, setWidth, setHeight }) {
           </h3>
           <div className="mt-2 px-4 py-3">
             <input
+              ref={inputRef}
               type="text"
               placeholder="새 너비"
               onChange={e => setWidth(e.target.value)}
