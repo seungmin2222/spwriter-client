@@ -99,7 +99,7 @@ function Navbar() {
       data-testid="navbar"
     >
       <div className="flex gap-4">
-        <div className="relative inline-block bg-[#1f77b4] hover:bg-[#1a5a91] transition-colors duration-300 rounded-md">
+        <div className="relative inline-block bg-blue-500 hover:bg-blue-700 transition-colors duration-300 rounded-md">
           <input
             type="file"
             id="fileInput"
@@ -164,7 +164,7 @@ function Navbar() {
           />
           <button
             onClick={handleDownload}
-            className="p-2 rounded-full bg-[#1f77b4] text-white hover:bg-[#1a5a91] transition-colors duration-300"
+            className="p-2 rounded-full bg-blue-500 hover:bg-blue-700 text-white transition-colors duration-300"
           >
             <img src={downloadIcon} alt="Download Icon" className="h-6 w-6" />
           </button>

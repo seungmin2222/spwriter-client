@@ -22,7 +22,7 @@ function Toast({ id, message, onClose }) {
   return (
     <div
       data-testid="toast"
-      className={`fixed top-4 left-1/2 transform -translate-x-1/2 bg-[#1f77b4] font-semibold text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 ${
+      className={`fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 font-bold text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 ${
         visible ? 'opacity-100' : 'opacity-0'
       }`}
     >
