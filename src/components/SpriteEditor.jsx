@@ -12,6 +12,7 @@ import {
   resizeSelectedImages,
   calculateCoordinates,
 } from '../utils/utils';
+import { analyzeSpritesSheet } from '../utils/spriteAnalyzer';
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 function SpriteEditor() {
@@ -33,15 +34,9 @@ function SpriteEditor() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragEnd, setDragEnd] = useState({ x: 0, y: 0 });
-  const [showExtractButton, setShowExtractButton] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
-  const isSingleImage = useMemo(() => coordinates.length === 1, [coordinates]);
 
   let changeCoordinates = null;
-
-  useEffect(() => {
-    setShowExtractButton(isSingleImage);
-  }, [isSingleImage]);
 
   useEffect(() => {
     if (canvasRef.current && files.length > 0) {
@@ -108,7 +103,7 @@ function SpriteEditor() {
         return;
       }
 
-      ctx.strokeStyle = '#1a5a91';
+      ctx.strokeStyle = '#1d4ed8';
       ctx.lineWidth = 1;
       ctx.strokeRect(xOffset, yOffset, coord.width, coord.height);
 
@@ -119,7 +114,7 @@ function SpriteEditor() {
 
       ctx.beginPath();
       ctx.arc(circleX, circleY, circleRadius, 0, 2 * Math.PI);
-      ctx.fillStyle = '#1a5a91';
+      ctx.fillStyle = '#1d4ed8';
       ctx.fill();
 
       coord.circle = { x: circleX, y: circleY, radius: circleRadius };
@@ -441,33 +436,26 @@ function SpriteEditor() {
         canvas.height
       ).data;
 
-      const worker = new Worker(
-        new URL('../utils/spriteWorker.js', import.meta.url)
+      const sprites = analyzeSpritesSheet(
+        imageData,
+        canvas.width,
+        canvas.height
       );
 
-      worker.onmessage = async e => {
-        const sprites = e.data;
-        const spriteImages = await Promise.all(
-          sprites.map(sprite => createImageFromSprite(canvas, sprite))
-        );
+      const spriteImages = await Promise.all(
+        sprites.map(sprite => createImageFromSprite(canvas, sprite))
+      );
 
-        setFiles(prevFiles => [...prevFiles, ...spriteImages]);
+      setFiles(prevFiles => [...prevFiles, ...spriteImages]);
 
-        const newCoordinates = calculateCoordinates(
-          spriteImages,
-          padding,
-          alignElement
-        );
-        setCoordinates(newCoordinates);
-        setIsExtracting(false);
-        setShowExtractButton(false);
-      };
-
-      worker.postMessage({
-        imageData,
-        width: canvas.width,
-        height: canvas.height,
-      });
+      const newCoordinates = calculateCoordinates(
+        spriteImages,
+        padding,
+        alignElement
+      );
+      setCoordinates(newCoordinates);
+      setIsExtracting(false);
+      setShowExtractButton(false);
     } catch (error) {
       console.error('스프라이트 추출 중 오류 발생:', error);
       setIsExtracting(false);
