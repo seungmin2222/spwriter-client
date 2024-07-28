@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useMemo,
-} from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import useFileStore from '../../store';
 import {
   handleFiles,
@@ -26,6 +20,7 @@ function SpriteEditor() {
   const setFiles = useFileStore(state => state.setFiles);
   const addHistory = useFileStore(state => state.addHistory);
   const alignElement = useFileStore(state => state.alignElement);
+  const addToast = useFileStore(state => state.addToast);
 
   const [isResizing, setIsResizing] = useState(false);
   const [resizing, setResizing] = useState(null);
@@ -421,44 +416,37 @@ function SpriteEditor() {
     if (coordinates.length !== 1) return;
     setIsExtracting(true);
 
-    try {
-      const image = coordinates[0].img;
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = image.width;
-      canvas.height = image.height;
-      ctx.drawImage(image, 0, 0);
+    const image = coordinates[0].img;
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0);
 
-      const imageData = ctx.getImageData(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      ).data;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
-      const sprites = analyzeSpritesSheet(
-        imageData,
-        canvas.width,
-        canvas.height
+    const sprites = analyzeSpritesSheet(imageData, canvas.width, canvas.height);
+
+    const spriteImages = await Promise.all(
+      sprites.map(sprite => createImageFromSprite(canvas, sprite))
+    );
+
+    setFiles(prevFiles => [...prevFiles, ...spriteImages]);
+
+    const newCoordinates = calculateCoordinates(
+      spriteImages,
+      padding,
+      alignElement
+    );
+    setCoordinates(newCoordinates);
+    setIsExtracting(false);
+
+    if (spriteImages.length === 1) {
+      addToast('추출할 스프라이트 이미지가 없습니다.');
+    } else {
+      addToast(
+        `${spriteImages.length}개의 이미지가 성공적으로 추출되었습니다.`
       );
-
-      const spriteImages = await Promise.all(
-        sprites.map(sprite => createImageFromSprite(canvas, sprite))
-      );
-
-      setFiles(prevFiles => [...prevFiles, ...spriteImages]);
-
-      const newCoordinates = calculateCoordinates(
-        spriteImages,
-        padding,
-        alignElement
-      );
-      setCoordinates(newCoordinates);
-      setIsExtracting(false);
-      setShowExtractButton(false);
-    } catch (error) {
-      console.error('스프라이트 추출 중 오류 발생:', error);
-      setIsExtracting(false);
     }
   }, [coordinates, setFiles, padding, alignElement, setCoordinates]);
 
