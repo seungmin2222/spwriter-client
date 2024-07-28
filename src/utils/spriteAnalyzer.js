@@ -1,10 +1,4 @@
-self.onmessage = function (e) {
-  const { imageData, width, height } = e.data;
-  const sprites = analyzeSpritesSheet(imageData, width, height);
-  self.postMessage(sprites);
-};
-
-function analyzeSpritesSheet(imageData, width, height) {
+export function analyzeSpritesSheet(imageData, width, height) {
   const labels = new Array(width * height).fill(0);
   let nextLabel = 1;
 
