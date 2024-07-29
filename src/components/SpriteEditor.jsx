@@ -30,6 +30,7 @@ function SpriteEditor() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragEnd, setDragEnd] = useState({ x: 0, y: 0 });
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isShiftPressed, setIsShiftPressed] = useState(false);
 
   let changeCoordinates = null;
 
@@ -56,6 +57,23 @@ function SpriteEditor() {
       }
     };
   }, [isResizing, resizing, startPos]);
+
+  useEffect(() => {
+    const handleKeyDown = e => {
+      if (e.key === 'Shift') setIsShiftPressed(true);
+    };
+    const handleKeyUp = e => {
+      if (e.key === 'Shift') setIsShiftPressed(false);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
 
   const createCheckerboardPattern = () => {
     const patternCanvas = document.createElement('canvas');
@@ -211,8 +229,21 @@ function SpriteEditor() {
       const deltaX = x - startPos.x;
       const deltaY = y - startPos.y;
 
-      const newWidth = Math.max(originalSize.width + deltaX, 10);
-      const newHeight = Math.max(originalSize.height + deltaY, 10);
+      let newWidth, newHeight;
+
+      if (isShiftPressed) {
+        const aspectRatio = originalSize.width / originalSize.height;
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          newWidth = Math.max(originalSize.width + deltaX, 10);
+          newHeight = newWidth / aspectRatio;
+        } else {
+          newHeight = Math.max(originalSize.height + deltaY, 10);
+          newWidth = newHeight * aspectRatio;
+        }
+      } else {
+        newWidth = Math.max(originalSize.width + deltaX, 10);
+        newHeight = Math.max(originalSize.height + deltaY, 10);
+      }
 
       const updatedCoordinates = coordinates.map(coord => {
         if (coord === resizing) {
@@ -232,6 +263,19 @@ function SpriteEditor() {
       drawImages();
       drawSelectionBox();
     }
+
+    let cursorStyle = 'default';
+    coordinates.forEach(coord => {
+      if (coord.circle) {
+        const dist = Math.sqrt(
+          Math.pow(x - coord.circle.x, 2) + Math.pow(y - coord.circle.y, 2)
+        );
+        if (dist <= coord.circle.radius) {
+          cursorStyle = 'nwse-resize';
+        }
+      }
+    });
+    canvas.style.cursor = cursorStyle;
   };
 
   const handleCanvasMouseUp = event => {
