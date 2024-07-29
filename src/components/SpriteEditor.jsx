@@ -98,7 +98,7 @@ function SpriteEditor() {
         return;
       }
 
-      ctx.strokeStyle = '#1d4ed8';
+      ctx.strokeStyle = 'black';
       ctx.lineWidth = 1;
       ctx.strokeRect(xOffset, yOffset, coord.width, coord.height);
 
@@ -109,7 +109,7 @@ function SpriteEditor() {
 
       ctx.beginPath();
       ctx.arc(circleX, circleY, circleRadius, 0, 2 * Math.PI);
-      ctx.fillStyle = '#1d4ed8';
+      ctx.fillStyle = '#2b67d1';
       ctx.fill();
 
       coord.circle = { x: circleX, y: circleY, radius: circleRadius };
@@ -294,10 +294,10 @@ function SpriteEditor() {
     const width = Math.abs(dragEnd.x - dragStart.x);
     const height = Math.abs(dragEnd.y - dragStart.y);
 
-    ctx.fillStyle = 'rgba(135, 206, 250, 0.3)';
+    ctx.fillStyle = 'rgba(35, 33, 47, 0.3)';
     ctx.fillRect(left, top, width, height);
 
-    ctx.strokeStyle = 'rgb(30, 144, 255)';
+    ctx.strokeStyle = '#23212f';
     ctx.lineWidth = 2;
     ctx.strokeRect(left, top, width, height);
   };
@@ -416,6 +416,8 @@ function SpriteEditor() {
     if (coordinates.length !== 1) return;
     setIsExtracting(true);
 
+    addHistory(coordinates);
+
     const image = coordinates[0].img;
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -472,7 +474,7 @@ function SpriteEditor() {
 
   return (
     <div
-      className="relative w-full h-[80%] overflow-auto bg-[#f0f4f8] sprite-editor"
+      className="relative w-full h-[84%] overflow-auto sprite-editor"
       data-testid="sprite-editor"
       onDrop={handleDrop}
       onDragOver={handleDragOverFiles}
@@ -484,7 +486,7 @@ function SpriteEditor() {
     >
       {coordinates.length === 0 ? (
         <div className="flex items-center justify-center h-full">
-          <span className="flex text-[#6b7280] text-xl border rounded-md p-2 animate-fadeIn select-none">
+          <span className="flex bg-[#f8f8fd] text-[#6b7280] text-xl border rounded-[1rem] p-3 animate-fadeIn select-none">
             이미지 파일을 드래그하여 놓으세요.
             <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
           </span>
@@ -500,7 +502,7 @@ function SpriteEditor() {
             <button
               onClick={extractSpritesFromSheet}
               disabled={isExtracting}
-              className={`absolute top-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
+              className={`absolute top-4 right-4 bg-[#241f3a] hover:bg-[#565465] text-white font-bold py-2 px-4 rounded-[1rem] animate-fadeIn duration-300 ${
                 isExtracting ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >

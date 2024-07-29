@@ -35,43 +35,43 @@ function ResizeModal({ isOpen, onClose, onConfirm, setWidth, setHeight }) {
   return (
     <div
       ref={modalContainerRef}
-      className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50"
+      className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center"
       onClick={onClose}
       tabIndex="-1"
     >
       <div
-        className="relative top-72 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+        className="p-6 border w-96 shadow-lg rounded-[1rem] bg-white"
         onClick={e => e.stopPropagation()}
       >
-        <div className="mt-3 text-center">
-          <h3 className="text-xl leading-6 text-gray-900">
+        <div className="text-center">
+          <h3 className="text-xl leading-6 text-gray-900 mb-4">
             이미지 크기를 조정하시겠습니까?
           </h3>
-          <div className="mt-2 px-4 py-3">
+          <div className="mb-4">
             <input
               ref={inputRef}
               type="text"
               placeholder="새 너비"
               onChange={e => setWidth(e.target.value)}
-              className="border rounded p-1 w-full mb-2"
+              className="border rounded-md p-2 w-full mb-3"
             />
             <input
               type="text"
               placeholder="새 높이"
               onChange={e => setHeight(e.target.value)}
-              className="border rounded p-1 w-full"
+              className="border rounded-md p-2 w-full"
             />
           </div>
-          <div className="items-center px-4 py-3">
+          <div>
             <button
               onClick={onConfirm}
-              className="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 duration-300"
+              className="px-4 py-2 bg-[#241f3a] text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-[#565465] duration-300 mb-3"
             >
               확인
             </button>
             <button
               onClick={onClose}
-              className="mt-3 px-4 py-2 bg-gray-100 text-gray-700 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 duration-300"
+              className="px-4 py-2 bg-[#f0f0f2] text-gray-700 text-base font-medium rounded-md w-full shadow-sm hover:bg-[#c9c7d2] duration-300"
             >
               취소
             </button>

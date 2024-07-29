@@ -26,7 +26,7 @@ function Footer() {
   const alignElement = useFileStore(state => state.alignElement);
 
   const buttonStyle =
-    'p-2 rounded-full bg-blue-500 hover:bg-blue-700 text-white font-bold font-bold transition-colors duration-300';
+    'p-[0.7rem] rounded-full bg-[#241f3a] hover:bg-[#565465] text-white hover:text-black font-bold font-bold transition-background duration-300';
 
   const handleActionIfNoSelection = action => {
     if (selectedFiles.size === 0) {
@@ -81,7 +81,7 @@ function Footer() {
 
   return (
     <footer
-      className="flex justify-between items-center w-full h-[10%] p-[3%] select-none"
+      className="flex justify-between items-center w-full h-[9%] p-[3%] rounded-[2rem] select-none"
       data-testid="footer"
     >
       <div className="flex space-x-4">

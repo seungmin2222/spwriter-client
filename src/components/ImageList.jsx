@@ -267,20 +267,20 @@ function ImageList() {
       <article
         key={index}
         onClick={() => handleImageListClick(image)}
-        className={`flex w-full h-[70px] bg-[#f0f4f8] rounded-md transition-colors duration-300 shadow-sm border transition-border duration-250 ${
-          !isButtonHovered ? 'hover:bg-[#e2e8f0]' : ''
-        } ${isSelected ? 'border border-[#1f77b4]' : ''} ${
+        className={`flex w-full h-[70px] bg-[#f8f8f8] rounded-[1rem] transition-colors duration-300 shadow-sm border transition-border duration-250 ${
+          !isButtonHovered ? 'hover:bg-[#e9eaf1]' : ''
+        } ${isSelected ? 'border border-[#23212f]' : ''} ${
           isDeleting ? 'animate-fadeOut' : 'animate-fadeIn'
         }`}
       >
-        <div className="flex w-[20%] items-center justify-center">
+        <div className="flex w-[19%] items-center justify-center">
           <img
             src={image.img.src}
             alt={`Thumbnail ${index}`}
-            className="max-h-[60px] p-[5px] border shadow-sm rounded-md"
+            className="max-h-[50px] p-[5px] border shadow-sm rounded-lg"
           />
         </div>
-        <div className="flex items-center w-[71%] h-full pl-[5px] text-[12px] leading-[24px] text-[#374151] overflow-hidden">
+        <div className="flex items-center w-[72%] h-full pl-[5px] text-[12px] leading-[24px] text-[#374151] overflow-hidden">
           <pre className="text-[10px] leading-tight">
             {generateCSS(image, index)}
           </pre>
@@ -299,7 +299,7 @@ function ImageList() {
           aria-label="cross"
         >
           <svg
-            className="h-6 w-6 bg-[#3b82f6] transition-colors duration-300 group-hover:fill-current group-hover:text-white group-hover:bg-[#c53030] rounded-full"
+            className="h-6 w-6 bg-[#241f3a] transition-colors duration-300 group-hover:bg-[#c53030] rounded-full"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="#ffffff"
@@ -313,45 +313,45 @@ function ImageList() {
 
   return (
     <aside
-      className="flex flex-col w-[28%] h-full min-w-[380px] mr-[2%] text-gray-700 bg-[#f9fafb] rounded-md shadow-md"
+      className="flex flex-col w-[26%] h-full min-w-[370px] mr-[2%] text-gray-700 bg-[#f7f7f7] rounded-[2.375rem] shadow-md"
       data-testid="image-list"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
-      <header className="flex w-full h-[10%] justify-center items-center text-3xl font-semibold text-[#1f2937] select-none">
+      <header className="flex justify-center items-center w-auto h-[5%] m-5  text-3xl font-semibold text-[#1f2937] select-none">
         Image List
       </header>
       {coordinates.length > 0 && (
-        <div className="flex w-full h-[5%] items-center mb-3 px-[20px] border-[#e2e8f0] bg-[#f9fafb] transition-opacity duration-500 animate-fadeIn select-none">
+        <div className="flex w-full h-[5%] items-center mb-3 px-[20px] border-[#e2e8f0] transition-opacity duration-500 animate-fadeIn select-none">
           <div className="flex w-full justify-between">
             <div>
               <button
-                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#3b82f6] transition-colors"
+                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#25203b] transition-colors"
                 onClick={handleSelectAll}
               >
                 전체 선택
               </button>
               <button
-                className="p-1 border mr-2 rounded-md shadow-sm hover:bg-[#cbd5e1] transition-colors duration-300"
+                className="p-1 border mr-2 rounded-md shadow-sm hover:bg-[#c9c7d2] transition-colors duration-300"
                 onClick={handleDeselectAll}
               >
                 전체 해제
               </button>
               <button
-                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#3b82f6] transition-colors duration-300"
+                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#25203b] transition-colors duration-300"
                 onClick={copySelectedCoordinates}
               >
                 선택좌표 복사
               </button>
               <button
-                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#3b82f6] transition-colors duration-300"
+                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#25203b] transition-colors duration-300"
                 onClick={handleResizeImages}
               >
                 크기 조정
               </button>
             </div>
             <button
-              className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#e53e3e] transition-colors duration-300"
+              className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#c53030] transition-colors duration-300"
               onClick={handleOpenModal}
             >
               선택삭제
@@ -367,8 +367,8 @@ function ImageList() {
         {coordinates.length > 0 ? (
           coordinates.map((image, index) => renderImageList(image, index))
         ) : (
-          <div className="flex w-full justify-center border-[#e2e8f0] bg-[#f9fafb] transition-opacity duration-500">
-            <span className="flex items-center text-[#6b7280] text-[15px] border rounded-md p-2 animate-fadeIn select-none">
+          <div className="flex w-full justify-center border-[#e2e8f0] transition-opacity duration-500">
+            <span className="flex items-center bg-[#f8f8fd] text-[#6b7280] text-[15px] border rounded-[1rem] p-2 animate-fadeIn select-none">
               이미지 파일을 드래그하여 놓으세요.
               <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
             </span>

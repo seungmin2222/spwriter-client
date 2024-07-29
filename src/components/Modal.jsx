@@ -43,13 +43,13 @@ function Modal({ showModal, handleClose, handleConfirm, message }) {
         <div className="items-center px-4 py-3">
           <button
             onClick={handleConfirm}
-            className="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 duration-300"
+            className="px-4 py-2 bg-[#241f3a] text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-[#565465] focus:outline-none focus:ring-2 focus:ring-blue-300 duration-300"
           >
             확인
           </button>
           <button
             onClick={handleClose}
-            className="mt-3 px-4 py-2 bg-gray-100 text-gray-700 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 duration-300"
+            className="mt-3 px-4 py-2 bg-[#f0f0f2] text-gray-700 text-base font-medium rounded-md w-full shadow-sm hover:bg-[#c9c7d2] focus:outline-none focus:ring-2 focus:ring-gray-300 duration-300"
           >
             취소
           </button>
