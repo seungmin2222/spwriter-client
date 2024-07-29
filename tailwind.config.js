@@ -32,6 +32,10 @@ export default {
         fadeIn: 'fadeIn 0.5s ease-out',
         fadeOut: 'fadeOut 0.5s ease-in',
       },
+      colors: {
+        'custom-purple': '#2d2d2e',
+        'custom-light-purple': '#ecebe8',
+      },
     },
   },
   plugins: [],

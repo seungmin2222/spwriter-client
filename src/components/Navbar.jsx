@@ -95,11 +95,11 @@ function Navbar() {
 
   return (
     <nav
-      className="flex w-full h-[10%] min-h-[50px] px-[1rem] py-[10px] bg-white rounded-t-md items-center justify-between shadow-md select-none"
+      className="flex justify-between w-auto h-[5%] min-h-[50px] m-5 text-[17px] font-medium rounded-t-[2.375rem] select-none"
       data-testid="navbar"
     >
-      <div className="flex gap-4">
-        <div className="relative inline-block bg-blue-500 hover:bg-blue-700 transition-colors duration-300 rounded-md">
+      <div className="flex h-[100%] gap-4">
+        <div className="relative inline-block bg-[#241f3a] hover:bg-[#565465] duration-300 rounded-[1rem]">
           <input
             type="file"
             id="fileInput"
@@ -118,34 +118,37 @@ function Navbar() {
           />
           <label
             htmlFor="fileInput"
-            className="p-2 w-full h-full text-white font-semibold cursor-pointer flex items-center justify-center"
+            className="flex items-center justify-center text-[18px] w-[8rem] h-full px-3 text-white font-semibold cursor-pointer"
           >
             Open files
           </label>
         </div>
-        <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
-          <label htmlFor="paddingInput" className="text-[#374151]">
-            Padding :
-          </label>
+        <div className="flex justify-center items-center w-[13rem] h-full space-x-1 border rounded-[1rem] shadow-sm bg-[#ffffff]">
+          <label htmlFor="paddingInput">Padding :</label>
           <div className="flex items-center space-x-1">
             <input
               type="number"
               id="paddingInput"
               value={paddingValue}
               onChange={handlePaddingChange}
-              className="w-16 p-1 border rounded-md text-center"
+              className="w-16 p-1 border rounded-[0.5rem] text-center"
               min="1"
             />
             <span>px</span>
           </div>
         </div>
-        <div className="flex items-center space-x-2 h-[40px] p-2 border rounded-md shadow-sm bg-[#ffffff]">
-          <label htmlFor="align-elements">정렬 옵션 :</label>
+        <div className="flex h-full justify-center p-2 border rounded-[1rem] shadow-sm bg-[#ffffff]">
+          <label
+            htmlFor="align-elements"
+            className="flex h-full p-1 items-center"
+          >
+            정렬 옵션 :
+          </label>
           <select
             id="align-elements"
             value={alignElement}
             onChange={e => setAlignElement(e.target.value)}
-            className="w-44 p-1 border rounded-md"
+            className="w-32"
           >
             <option value="bin-packing">Bin-Packing</option>
             <option value="left-right">Left-Right</option>
@@ -153,18 +156,18 @@ function Navbar() {
           </select>
         </div>
       </div>
-      <div className="flex gap-4 w-[28%]">
-        <div className="flex items-center space-x-2 h-[40px] w-full">
+      <div className="flex w-[26%]">
+        <div className="flex items-center space-x-2 h-auto w-full">
           <input
             type="text"
-            className="flex-grow focus:outline-none h-full p-2 border-b-2 border-gray-400 focus-within:border-gray-600"
+            className="flex-grow h-auto p-2 bg-[#f8f8f8] border-b-2 border-gray-400 focus-within:border-[#241f3a] focus:outline-none"
             placeholder="파일 이름을 입력해주세요."
             value={fileName}
             onChange={e => setFileName(e.target.value)}
           />
           <button
             onClick={handleDownload}
-            className="p-2 rounded-full bg-blue-500 hover:bg-blue-700 text-white transition-colors duration-300"
+            className="p-[0.7rem] rounded-full bg-[#241f3a] hover:bg-[#565465] text-white transition-colors duration-300"
           >
             <img src={downloadIcon} alt="Download Icon" className="h-6 w-6" />
           </button>

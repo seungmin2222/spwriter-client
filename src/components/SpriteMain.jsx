@@ -6,7 +6,7 @@ import Footer from './Footer';
 function SpriteMain() {
   return (
     <main
-      className="flex flex-col w-[70%] w-min-[955px] h-full bg-[#ffffff] rounded-md shadow-md"
+      className="flex flex-col w-[72%] w-min-[955px] h-full bg-[#f7f7f7] rounded-[2rem] shadow-md"
       data-testid="sprite-main"
     >
       <Navbar />
