@@ -67,7 +67,7 @@ function Footer() {
     if (history.length) {
       popHistory();
     } else {
-      addToast('뒤로 갈 기록이 없습니다.');
+      addToast('이전 작업 내역이 없습니다.');
     }
   };
 
@@ -75,7 +75,7 @@ function Footer() {
     if (redoHistory.length) {
       pushHistory();
     } else {
-      addToast('앞으로 갈 기록이 없습니다.');
+      addToast('다시 실행할 작업 내역이 없습니다.');
     }
   };
 
