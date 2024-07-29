@@ -2,14 +2,11 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
   if (alignElement === 'bin-packing') {
     const sortImages = images => {
       return [...images].sort((a, b) => {
-        const aRatio = a.width / a.height;
-        const bRatio = b.width / b.height;
+        const aPerimeter = 2 * (a.width + a.height);
+        const bPerimeter = 2 * (b.width + b.height);
         const aArea = a.width * a.height;
         const bArea = b.width * b.height;
-        return (
-          bArea * (1 + Math.abs(1 - bRatio)) -
-          aArea * (1 + Math.abs(1 - aRatio))
-        );
+        return bPerimeter * Math.sqrt(bArea) - aPerimeter * Math.sqrt(aArea);
       });
     };
 
@@ -24,179 +21,112 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
       }
     }
 
+    class Skyline {
+      constructor(width) {
+        this.width = width;
+        this.segments = [{ x: 0, y: 0, width: width }];
+      }
+
+      addRectangle(rect) {
+        let index = 0;
+        while (index < this.segments.length) {
+          const segment = this.segments[index];
+          if (segment.x + segment.width <= rect.x) {
+            index++;
+            continue;
+          }
+          if (segment.x >= rect.x + rect.width) {
+            break;
+          }
+          if (segment.y < rect.y + rect.height) {
+            if (segment.x < rect.x) {
+              this.segments.splice(index, 0, {
+                x: segment.x,
+                y: segment.y,
+                width: rect.x - segment.x,
+              });
+              index++;
+              segment.x = rect.x;
+              segment.width -= rect.x - segment.x;
+            }
+            if (segment.x + segment.width > rect.x + rect.width) {
+              this.segments.splice(index + 1, 0, {
+                x: rect.x + rect.width,
+                y: segment.y,
+                width: segment.x + segment.width - (rect.x + rect.width),
+              });
+              segment.width = rect.x + rect.width - segment.x;
+            }
+            segment.y = rect.y + rect.height;
+          }
+          index++;
+        }
+        this.mergeSegments();
+      }
+
+      mergeSegments() {
+        let i = 0;
+        while (i < this.segments.length - 1) {
+          if (this.segments[i].y === this.segments[i + 1].y) {
+            this.segments[i].width += this.segments[i + 1].width;
+            this.segments.splice(i + 1, 1);
+          } else {
+            i++;
+          }
+        }
+      }
+
+      findPosition(width, height) {
+        let bestY = Infinity;
+        let bestX = 0;
+        for (let i = 0; i < this.segments.length; i++) {
+          const segment = this.segments[i];
+          if (segment.width >= width) {
+            const y = segment.y;
+            if (y < bestY) {
+              bestY = y;
+              bestX = segment.x;
+            }
+          }
+        }
+        return bestY !== Infinity
+          ? new Rectangle(bestX, bestY, width, height)
+          : null;
+      }
+    }
+
     class AdvancedBinPack {
       constructor(width, height, padding) {
         this.binWidth = width;
         this.binHeight = height;
         this.padding = padding;
-        this.usedRectangles = [];
-        this.freeRectangles = [new Rectangle(0, 0, width, height)];
+        this.skyline = new Skyline(width);
       }
 
       insert(width, height) {
         const paddedWidth = width + this.padding * 2;
         const paddedHeight = height + this.padding * 2;
-        let newNode = this.findPositionForNewNodeBestShortSideFit(
-          paddedWidth,
-          paddedHeight
-        );
-        if (newNode.height !== 0) {
-          newNode.width = width;
-          newNode.height = height;
-          this.placeRectangle(newNode);
-          return newNode;
+
+        let newNode = this.skyline.findPosition(paddedWidth, paddedHeight);
+        if (!newNode) {
+          newNode = this.skyline.findPosition(paddedHeight, paddedWidth);
+          if (newNode) {
+            [newNode.width, newNode.height] = [newNode.height, newNode.width];
+          }
         }
+
+        if (newNode) {
+          this.skyline.addRectangle(newNode);
+          return {
+            x: newNode.x + this.padding,
+            y: newNode.y + this.padding,
+            width: newNode.width - this.padding * 2,
+            height: newNode.height - this.padding * 2,
+            rotated: newNode.width !== paddedWidth,
+          };
+        }
+
         return null;
-      }
-
-      findPositionForNewNodeBestShortSideFit(width, height) {
-        const bestNode = new Rectangle(0, 0, 0, 0);
-        let bestShortSideFit = Number.MAX_VALUE;
-        let bestLongSideFit = Number.MAX_VALUE;
-
-        for (let i = 0; i < this.freeRectangles.length; ++i) {
-          if (
-            this.freeRectangles[i].width >= width &&
-            this.freeRectangles[i].height >= height
-          ) {
-            const leftoverHoriz = Math.abs(
-              this.freeRectangles[i].width - width
-            );
-            const leftoverVert = Math.abs(
-              this.freeRectangles[i].height - height
-            );
-            const shortSideFit = Math.min(leftoverHoriz, leftoverVert);
-            const longSideFit = Math.max(leftoverHoriz, leftoverVert);
-
-            if (
-              shortSideFit < bestShortSideFit ||
-              (shortSideFit === bestShortSideFit &&
-                longSideFit < bestLongSideFit)
-            ) {
-              bestNode.x = this.freeRectangles[i].x;
-              bestNode.y = this.freeRectangles[i].y;
-              bestNode.width = width;
-              bestNode.height = height;
-              bestShortSideFit = shortSideFit;
-              bestLongSideFit = longSideFit;
-            }
-          }
-        }
-
-        return bestNode;
-      }
-
-      placeRectangle(node) {
-        let numRectanglesToProcess = this.freeRectangles.length;
-        for (let i = 0; i < numRectanglesToProcess; i++) {
-          if (this.splitFreeNode(this.freeRectangles[i], node)) {
-            this.freeRectangles.splice(i, 1);
-            --i;
-            --numRectanglesToProcess;
-          }
-        }
-
-        this.pruneFreeList();
-        this.usedRectangles.push(node);
-      }
-
-      splitFreeNode(freeNode, usedNode) {
-        const paddedUsedWidth = usedNode.width + this.padding * 2;
-        const paddedUsedHeight = usedNode.height + this.padding * 2;
-
-        if (
-          usedNode.x >= freeNode.x + freeNode.width ||
-          usedNode.x + paddedUsedWidth <= freeNode.x ||
-          usedNode.y >= freeNode.y + freeNode.height ||
-          usedNode.y + paddedUsedHeight <= freeNode.y
-        )
-          return false;
-
-        if (
-          usedNode.x < freeNode.x + freeNode.width &&
-          usedNode.x + paddedUsedWidth > freeNode.x
-        ) {
-          if (
-            usedNode.y > freeNode.y &&
-            usedNode.y < freeNode.y + freeNode.height
-          ) {
-            const newNode = new Rectangle(
-              freeNode.x,
-              freeNode.y,
-              freeNode.width,
-              usedNode.y - freeNode.y
-            );
-            this.freeRectangles.push(newNode);
-          }
-
-          if (usedNode.y + paddedUsedHeight < freeNode.y + freeNode.height) {
-            const newNode = new Rectangle(
-              freeNode.x,
-              usedNode.y + paddedUsedHeight,
-              freeNode.width,
-              freeNode.y + freeNode.height - (usedNode.y + paddedUsedHeight)
-            );
-            this.freeRectangles.push(newNode);
-          }
-        }
-
-        if (
-          usedNode.y < freeNode.y + freeNode.height &&
-          usedNode.y + paddedUsedHeight > freeNode.y
-        ) {
-          if (
-            usedNode.x > freeNode.x &&
-            usedNode.x < freeNode.x + freeNode.width
-          ) {
-            const newNode = new Rectangle(
-              freeNode.x,
-              freeNode.y,
-              usedNode.x - freeNode.x,
-              freeNode.height
-            );
-            this.freeRectangles.push(newNode);
-          }
-
-          if (usedNode.x + paddedUsedWidth < freeNode.x + freeNode.width) {
-            const newNode = new Rectangle(
-              usedNode.x + paddedUsedWidth,
-              freeNode.y,
-              freeNode.x + freeNode.width - (usedNode.x + paddedUsedWidth),
-              freeNode.height
-            );
-            this.freeRectangles.push(newNode);
-          }
-        }
-
-        return true;
-      }
-
-      pruneFreeList() {
-        for (let i = 0; i < this.freeRectangles.length; ++i)
-          for (let j = i + 1; j < this.freeRectangles.length; ++j) {
-            if (
-              this.isContainedIn(this.freeRectangles[i], this.freeRectangles[j])
-            ) {
-              this.freeRectangles.splice(i, 1);
-              --i;
-              break;
-            }
-            if (
-              this.isContainedIn(this.freeRectangles[j], this.freeRectangles[i])
-            ) {
-              this.freeRectangles.splice(j, 1);
-              --j;
-            }
-          }
-      }
-
-      isContainedIn(a, b) {
-        return (
-          a.x >= b.x &&
-          a.y >= b.y &&
-          a.x + a.width <= b.x + b.width &&
-          a.y + a.height <= b.y + b.height
-        );
       }
     }
 
@@ -206,11 +136,11 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
         (img.width + initialPadding * 2) * (img.height + initialPadding * 2),
       0
     );
-    const avgAspectRatio =
+    const aspectRatio =
       sortedImages.reduce((sum, img) => sum + img.width / img.height, 0) /
       sortedImages.length;
-    let binWidth = Math.ceil(Math.sqrt(totalArea * avgAspectRatio));
-    let binHeight = Math.ceil(Math.sqrt(totalArea / avgAspectRatio));
+    let binWidth = Math.ceil(Math.sqrt(totalArea * aspectRatio));
+    let binHeight = Math.ceil(Math.sqrt(totalArea / aspectRatio));
 
     let packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
 
@@ -224,10 +154,11 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
           const node = packer.insert(img.width, img.height);
           if (node) {
             packedImages.push({
-              x: node.x + initialPadding,
-              y: node.y + initialPadding,
-              width: img.width,
-              height: img.height,
+              x: node.x,
+              y: node.y,
+              width: node.width,
+              height: node.height,
+              rotated: node.rotated,
               img,
             });
           } else {
@@ -239,9 +170,9 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
 
       if (!allPacked) {
         if (binWidth <= binHeight) {
-          binWidth = Math.ceil(binWidth * 1.01);
+          binWidth = Math.ceil(binWidth * 1.1);
         } else {
-          binHeight = Math.ceil(binHeight * 1.01);
+          binHeight = Math.ceil(binHeight * 1.1);
         }
         packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
         packedImages.length = 0;
