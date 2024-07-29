@@ -40,7 +40,7 @@ function ResizeModal({ isOpen, onClose, onConfirm, setWidth, setHeight }) {
       tabIndex="-1"
     >
       <div
-        className="p-6 border w-96 shadow-lg rounded-[1rem] bg-white"
+        className="p-6 border w-[23rem] shadow-lg rounded-[1rem] bg-white"
         onClick={e => e.stopPropagation()}
       >
         <div className="text-center">
