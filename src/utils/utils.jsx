@@ -139,8 +139,8 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
     const aspectRatio =
       sortedImages.reduce((sum, img) => sum + img.width / img.height, 0) /
       sortedImages.length;
-    let binWidth = Math.ceil(Math.sqrt(totalArea * aspectRatio));
-    let binHeight = Math.ceil(Math.sqrt(totalArea / aspectRatio));
+    let binWidth = Math.ceil(Math.sqrt(totalArea * aspectRatio) * 1.25);
+    let binHeight = Math.ceil(Math.sqrt(totalArea / aspectRatio) * 1.25);
 
     let packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
 
@@ -169,10 +169,9 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
       }
 
       if (!allPacked) {
-        if (binWidth <= binHeight) {
-          binWidth = Math.ceil(binWidth * 1.1);
-        } else {
-          binHeight = Math.ceil(binHeight * 1.1);
+        binWidth = Math.ceil(binWidth * 1.25);
+        if (binWidth > binHeight * 1.25) {
+          binHeight = Math.ceil(binHeight * 1.25);
         }
         packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
         packedImages.length = 0;
