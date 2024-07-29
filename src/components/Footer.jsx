@@ -9,8 +9,8 @@ import {
 import rotateIcon from '../assets/images/arrows-spin-solid.svg';
 import inversionIcon from '../assets/images/right-left-solid.svg';
 import cloneIcon from '../assets/images/copy-regular.svg';
-import leftIcon from '../assets/images/angles-left-solid.svg';
-import rightIcon from '../assets/images/angles-right-solid.svg';
+import leftIcon from '../assets/images/historyBack.png';
+import rightIcon from '../assets/images/historyReturn.png';
 
 function Footer() {
   const coordinates = useFileStore(state => state.coordinates);
@@ -97,10 +97,18 @@ function Footer() {
       </div>
       <div className="flex space-x-4">
         <button className={buttonStyle} onClick={handleUndo}>
-          <img src={leftIcon} alt="Left Icon" className="h-6 w-6" />
+          <img
+            src={leftIcon}
+            alt="Left Icon"
+            className="h-6 w-6 invert hue-rotate-180"
+          />
         </button>
         <button className={buttonStyle} onClick={handleRedo}>
-          <img src={rightIcon} alt="Right Icon" className="h-6 w-6" />{' '}
+          <img
+            src={rightIcon}
+            alt="Right Icon"
+            className="h-6 w-6 invert hue-rotate-180"
+          />
         </button>
       </div>
     </footer>
