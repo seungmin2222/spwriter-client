@@ -201,9 +201,9 @@ function ImageList() {
     setSelectedFiles(new Set());
   };
 
-  const handleDrop = event => {
-    event.preventDefault();
-    const droppedFiles = Array.from(event.dataTransfer.files);
+  const handleDrop = e => {
+    e.preventDefault();
+    const droppedFiles = Array.from(e.dataTransfer.files);
     handleFiles(
       droppedFiles,
       setFiles,
@@ -214,8 +214,8 @@ function ImageList() {
     );
   };
 
-  const handleDragOver = event => {
-    event.preventDefault();
+  const handleDragOver = e => {
+    e.preventDefault();
   };
 
   const deleteImages = imagesToDelete => {

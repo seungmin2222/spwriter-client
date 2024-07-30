@@ -221,6 +221,7 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
     return arrangeImages(images, initialPadding);
   }
 };
+
 const arrangeImages = (images, initialPadding, isVertical = false) => {
   const sortedImages = [...images].sort(
     (a, b) => b.width * b.height - a.width * a.height
@@ -353,6 +354,7 @@ const processImage = async (coord, transformCallback) => {
     processedImg.onload = () => resolve(processedImg);
   });
 };
+
 export const cloneSelectedImages = (
   coordinates,
   selectedFiles,

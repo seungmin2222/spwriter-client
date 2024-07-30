@@ -179,15 +179,15 @@ function SpriteEditor() {
     }
   };
 
-  const handleCanvasMouseDown = event => {
+  const handleCanvasMouseDown = e => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const x = event.clientX - rect.left - scrollLeft;
-    const y = event.clientY - rect.top - scrollTop;
+    const x = e.clientX - rect.left - scrollLeft;
+    const y = e.clientY - rect.top - scrollTop;
 
     let clickedOnResizeHandle = false;
     coordinates.forEach(coord => {
@@ -216,15 +216,15 @@ function SpriteEditor() {
     }
   };
 
-  const handleCanvasMouseMove = event => {
+  const handleCanvasMouseMove = e => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const x = event.clientX - rect.left - scrollLeft;
-    const y = event.clientY - rect.top - scrollTop;
+    const x = e.clientX - rect.left - scrollLeft;
+    const y = e.clientY - rect.top - scrollTop;
 
     if (isResizing && resizing) {
       const deltaX = x - startPos.x;
@@ -288,7 +288,7 @@ function SpriteEditor() {
     setTooltip({ show: showTooltip, x: tooltipX, y: tooltipY });
   };
 
-  const handleCanvasMouseUp = event => {
+  const handleCanvasMouseUp = e => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -330,7 +330,7 @@ function SpriteEditor() {
       ) {
         selectImagesInBox();
       } else {
-        handleCanvasClick(event);
+        handleCanvasClick(e);
       }
       clearSelectionBox();
     }
@@ -419,15 +419,15 @@ function SpriteEditor() {
     });
   };
 
-  const handleCanvasClick = event => {
+  const handleCanvasClick = e => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const x = event.clientX - rect.left - scrollLeft;
-    const y = event.clientY - rect.top - scrollTop;
+    const x = e.clientX - rect.left - scrollLeft;
+    const y = e.clientY - rect.top - scrollTop;
 
     const newSelectedFiles = new Set(selectedFiles);
 
@@ -451,9 +451,9 @@ function SpriteEditor() {
   };
 
   const handleDrop = useCallback(
-    event => {
-      event.preventDefault();
-      const droppedFiles = Array.from(event.dataTransfer.files);
+    e => {
+      e.preventDefault();
+      const droppedFiles = Array.from(e.dataTransfer.files);
       handleFiles(
         droppedFiles,
         setFiles,
