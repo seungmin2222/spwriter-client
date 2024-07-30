@@ -182,9 +182,9 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
       }
 
       if (!allPacked) {
-        binWidth = Math.ceil(binWidth * 2);
-        if (binWidth > binHeight * 2) {
-          binHeight = Math.ceil(binHeight * 2);
+        binWidth = Math.ceil(binWidth * 1.2);
+        if (binWidth > binHeight * 1.2) {
+          binHeight = Math.ceil(binHeight * 1.2);
         }
         packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
         packedImages.length = 0;
