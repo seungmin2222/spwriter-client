@@ -31,6 +31,7 @@ function SpriteEditor() {
   const [dragEnd, setDragEnd] = useState({ x: 0, y: 0 });
   const [isExtracting, setIsExtracting] = useState(false);
   const [isShiftPressed, setIsShiftPressed] = useState(false);
+  const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0 });
 
   let changeCoordinates = null;
 
@@ -265,6 +266,10 @@ function SpriteEditor() {
     }
 
     let cursorStyle = 'default';
+    let showTooltip = false;
+    let tooltipX = 0;
+    let tooltipY = 0;
+
     coordinates.forEach(coord => {
       if (coord.circle) {
         const dist = Math.sqrt(
@@ -272,10 +277,15 @@ function SpriteEditor() {
         );
         if (dist <= coord.circle.radius) {
           cursorStyle = 'nwse-resize';
+          showTooltip = true;
+          tooltipX = x;
+          tooltipY = y;
         }
       }
     });
+
     canvas.style.cursor = cursorStyle;
+    setTooltip({ show: showTooltip, x: tooltipX, y: tooltipY });
   };
 
   const handleCanvasMouseUp = event => {
@@ -554,6 +564,14 @@ function SpriteEditor() {
             </button>
           )}
         </>
+      )}
+      {tooltip.show && (
+        <div
+          className="absolute bg-[#241f3a] text-white p-2 rounded-[1rem] text-sm z-10 animate-fadeInFast"
+          style={{ left: tooltip.x + 10, top: tooltip.y + 10 }}
+        >
+          Shift 키를 누른 채로 리사이즈하면 비율이 유지됩니다.
+        </div>
       )}
     </div>
   );

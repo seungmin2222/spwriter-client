@@ -31,6 +31,7 @@ export default {
       animation: {
         fadeIn: 'fadeIn 0.5s ease-out',
         fadeOut: 'fadeOut 0.5s ease-in',
+        fadeInFast: 'fadeIn 0.3s ease-out',
       },
       colors: {
         'custom-purple': '#2d2d2e',
