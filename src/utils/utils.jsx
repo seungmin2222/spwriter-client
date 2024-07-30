@@ -130,6 +130,18 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
       }
     }
 
+    function optimizeCanvasSize(packedImages, padding) {
+      let maxRight = 0;
+      let maxBottom = 0;
+      packedImages.forEach(img => {
+        maxRight = Math.max(maxRight, img.x + img.width);
+        maxBottom = Math.max(maxBottom, img.y + img.height);
+      });
+      const optimizedWidth = maxRight + padding;
+      const optimizedHeight = maxBottom + padding;
+      return { width: optimizedWidth, height: optimizedHeight };
+    }
+
     const totalArea = sortedImages.reduce(
       (sum, img) =>
         sum +
@@ -139,8 +151,9 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
     const aspectRatio =
       sortedImages.reduce((sum, img) => sum + img.width / img.height, 0) /
       sortedImages.length;
-    let binWidth = Math.ceil(Math.sqrt(totalArea * aspectRatio) * 1.25);
-    let binHeight = Math.ceil(Math.sqrt(totalArea / aspectRatio) * 1.25);
+    const fixedAspectRatio = 1;
+    let binWidth = Math.ceil(Math.sqrt(totalArea * fixedAspectRatio));
+    let binHeight = Math.ceil(Math.sqrt(totalArea / fixedAspectRatio));
 
     let packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
 
@@ -169,23 +182,45 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
       }
 
       if (!allPacked) {
-        binWidth = Math.ceil(binWidth * 1.25);
-        if (binWidth > binHeight * 1.25) {
-          binHeight = Math.ceil(binHeight * 1.25);
+        binWidth = Math.ceil(binWidth * 2);
+        if (binWidth > binHeight * 2) {
+          binHeight = Math.ceil(binHeight * 2);
         }
         packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
         packedImages.length = 0;
       }
     }
 
-    return packedImages;
+    const optimizedSize = optimizeCanvasSize(packedImages, initialPadding);
+
+    packer = new AdvancedBinPack(
+      optimizedSize.width,
+      optimizedSize.height,
+      initialPadding
+    );
+    const finalPackedImages = [];
+
+    for (const img of sortedImages) {
+      const node = packer.insert(img.width, img.height);
+      if (node) {
+        finalPackedImages.push({
+          x: node.x,
+          y: node.y,
+          width: node.width,
+          height: node.height,
+          rotated: node.rotated,
+          img,
+        });
+      }
+    }
+
+    return finalPackedImages;
   } else if (alignElement === 'top-bottom') {
     return arrangeImages(images, initialPadding, true);
   } else if (alignElement === 'left-right') {
     return arrangeImages(images, initialPadding);
   }
 };
-
 const arrangeImages = (images, initialPadding, isVertical = false) => {
   const sortedImages = [...images].sort(
     (a, b) => b.width * b.height - a.width * a.height
