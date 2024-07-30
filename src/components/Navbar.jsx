@@ -18,8 +18,8 @@ function Navbar() {
   const alignElement = useFileStore(state => state.alignElement);
   const setAlignElement = useFileStore(state => state.setAlignElement);
 
-  const handlePaddingChange = event => {
-    const value = Number(event.target.value);
+  const handlePaddingChange = e => {
+    const value = Number(e.target.value);
     if (value <= 0) {
       addToast('Padding 값은 1보다 작을 수 없습니다.');
     } else {
@@ -105,9 +105,9 @@ function Navbar() {
             id="fileInput"
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             multiple
-            onChange={event =>
+            onChange={e =>
               handleFiles(
-                Array.from(event.target.files),
+                Array.from(e.target.files),
                 setFiles,
                 setCoordinates,
                 coordinates,
