@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 
 function ResizeModal({ isOpen, onClose, onConfirm, setWidth, setHeight }) {
   const inputRef = useRef(null);
-  const modalContainerRef = useRef(null);
 
   useEffect(() => {
     const handleKeyDown = e => {
@@ -13,13 +12,13 @@ function ResizeModal({ isOpen, onClose, onConfirm, setWidth, setHeight }) {
       }
     };
 
-    if (isOpen && modalContainerRef.current) {
-      modalContainerRef.current.addEventListener('keydown', handleKeyDown);
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
     }
 
     return () => {
-      if (modalContainerRef.current) {
-        modalContainerRef.current.removeEventListener('keydown', handleKeyDown);
+      if (isOpen) {
+        document.removeEventListener('keydown', handleKeyDown);
       }
     };
   }, [isOpen, onConfirm, onClose]);
@@ -34,14 +33,15 @@ function ResizeModal({ isOpen, onClose, onConfirm, setWidth, setHeight }) {
 
   return (
     <div
-      ref={modalContainerRef}
       className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center"
       onClick={onClose}
-      tabIndex="-1"
+      role="dialog"
+      aria-modal="true"
     >
       <div
         className="p-6 border w-[23rem] shadow-lg rounded-[1rem] bg-white"
         onClick={e => e.stopPropagation()}
+        role="document"
       >
         <div className="text-center">
           <h3 className="text-xl leading-6 text-gray-900 mb-4">

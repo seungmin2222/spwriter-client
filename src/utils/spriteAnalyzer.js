@@ -1,4 +1,4 @@
-export function analyzeSpritesSheet(imageData, width, height) {
+export default function analyzeSpritesSheet(imageData, width, height) {
   const labels = new Array(width * height).fill(0);
   let nextLabel = 1;
 
@@ -45,22 +45,20 @@ function floodFill(imageData, width, height, startX, startY, label, labels) {
     const index = y * width + x;
 
     if (
-      x < 0 ||
-      x >= width ||
-      y < 0 ||
-      y >= height ||
-      labels[index] !== 0 ||
-      isTransparent(imageData, x, y, width)
+      x >= 0 &&
+      x < width &&
+      y >= 0 &&
+      y < height &&
+      labels[index] === 0 &&
+      !isTransparent(imageData, x, y, width)
     ) {
-      continue;
+      labels[index] = label;
+
+      stack.push({ x: x + 1, y });
+      stack.push({ x: x - 1, y });
+      stack.push({ x, y: y + 1 });
+      stack.push({ x, y: y - 1 });
     }
-
-    labels[index] = label;
-
-    stack.push({ x: x + 1, y: y });
-    stack.push({ x: x - 1, y: y });
-    stack.push({ x: x, y: y + 1 });
-    stack.push({ x: x, y: y - 1 });
   }
 }
 
@@ -73,15 +71,15 @@ function mergeBoundingBoxes(boxes) {
   const merged = [];
 
   for (const box of boxes) {
-    let merged_box = false;
+    let mergedBox = false;
     for (let i = 0; i < merged.length; i++) {
       if (isAdjacent(merged[i], box)) {
         merged[i] = mergeBoxes(merged[i], box);
-        merged_box = true;
+        mergedBox = true;
         break;
       }
     }
-    if (!merged_box) {
+    if (!mergedBox) {
       merged.push(box);
     }
   }

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import useFileStore from '../../store';
-import { handleFiles, calculateCoordinates, trimImage } from '../utils/utils';
+import { handleFiles, calculateCoordinates } from '../utils/utils';
 
 vi.mock('../utils/utils', () => ({
   handleFiles: vi.fn(),

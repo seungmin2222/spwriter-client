@@ -41,7 +41,8 @@ function Navbar() {
       return;
     }
 
-    let totalWidth, maxHeight;
+    let totalWidth;
+    let maxHeight;
 
     if (alignElement === 'left-right') {
       totalWidth = coordinates.reduce(
