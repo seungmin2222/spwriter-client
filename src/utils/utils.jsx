@@ -1,7 +1,7 @@
 export const calculateCoordinates = (images, initialPadding, alignElement) => {
   if (alignElement === 'bin-packing') {
-    const sortImages = images => {
-      return [...images].sort((a, b) => {
+    const sortImages = imagesToSort => {
+      return [...imagesToSort].sort((a, b) => {
         const aPerimeter = 2 * (a.width + a.height);
         const bPerimeter = 2 * (b.width + b.height);
         const aArea = a.width * a.height;
@@ -24,40 +24,38 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
     class Skyline {
       constructor(width) {
         this.width = width;
-        this.segments = [{ x: 0, y: 0, width: width }];
+        this.segments = [{ x: 0, y: 0, width }];
       }
 
       addRectangle(rect) {
         let index = 0;
         while (index < this.segments.length) {
           const segment = this.segments[index];
-          if (segment.x + segment.width <= rect.x) {
-            index++;
-            continue;
-          }
-          if (segment.x >= rect.x + rect.width) {
-            break;
-          }
-          if (segment.y < rect.y + rect.height) {
-            if (segment.x < rect.x) {
-              this.segments.splice(index, 0, {
-                x: segment.x,
-                y: segment.y,
-                width: rect.x - segment.x,
-              });
-              index++;
-              segment.x = rect.x;
-              segment.width -= rect.x - segment.x;
+          if (segment.x + segment.width > rect.x) {
+            if (segment.x >= rect.x + rect.width) {
+              break;
             }
-            if (segment.x + segment.width > rect.x + rect.width) {
-              this.segments.splice(index + 1, 0, {
-                x: rect.x + rect.width,
-                y: segment.y,
-                width: segment.x + segment.width - (rect.x + rect.width),
-              });
-              segment.width = rect.x + rect.width - segment.x;
+            if (segment.y < rect.y + rect.height) {
+              if (segment.x < rect.x) {
+                this.segments.splice(index, 0, {
+                  x: segment.x,
+                  y: segment.y,
+                  width: rect.x - segment.x,
+                });
+                index++;
+                segment.x = rect.x;
+                segment.width -= rect.x - segment.x;
+              }
+              if (segment.x + segment.width > rect.x + rect.width) {
+                this.segments.splice(index + 1, 0, {
+                  x: rect.x + rect.width,
+                  y: segment.y,
+                  width: segment.x + segment.width - (rect.x + rect.width),
+                });
+                segment.width = rect.x + rect.width - segment.x;
+              }
+              segment.y = rect.y + rect.height;
             }
-            segment.y = rect.y + rect.height;
           }
           index++;
         }
@@ -80,12 +78,11 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
         let bestY = Infinity;
         let bestX = 0;
         for (let i = 0; i < this.segments.length; i++) {
-          const segment = this.segments[i];
-          if (segment.width >= width) {
-            const y = segment.y;
+          const { width: segmentWidth, y, x } = this.segments[i];
+          if (segmentWidth >= width) {
             if (y < bestY) {
               bestY = y;
-              bestX = segment.x;
+              bestX = x;
             }
           }
         }
@@ -128,18 +125,6 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
 
         return null;
       }
-    }
-
-    function optimizeCanvasSize(packedImages, padding) {
-      let maxRight = 0;
-      let maxBottom = 0;
-      packedImages.forEach(img => {
-        maxRight = Math.max(maxRight, img.x + img.width);
-        maxBottom = Math.max(maxBottom, img.y + img.height);
-      });
-      const optimizedWidth = maxRight + padding;
-      const optimizedHeight = maxBottom + padding;
-      return { width: optimizedWidth, height: optimizedHeight };
     }
 
     const totalArea = sortedImages.reduce(
@@ -213,12 +198,30 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
     }
 
     return finalPackedImages;
-  } else if (alignElement === 'top-bottom') {
+  }
+
+  if (alignElement === 'top-bottom') {
     return arrangeImages(images, initialPadding, true);
-  } else if (alignElement === 'left-right') {
+  }
+
+  if (alignElement === 'left-right') {
     return arrangeImages(images, initialPadding);
   }
+
+  return [];
 };
+
+function optimizeCanvasSize(packedImages, padding) {
+  let maxRight = 0;
+  let maxBottom = 0;
+  packedImages.forEach(img => {
+    maxRight = Math.max(maxRight, img.x + img.width);
+    maxBottom = Math.max(maxBottom, img.y + img.height);
+  });
+  const optimizedWidth = maxRight + padding;
+  const optimizedHeight = maxBottom + padding;
+  return { width: optimizedWidth, height: optimizedHeight };
+}
 
 const arrangeImages = (images, initialPadding, isVertical = false) => {
   const sortedImages = [...images].sort(
@@ -382,9 +385,10 @@ export const cloneSelectedImages = (
         };
       });
     }
+    return Promise.resolve();
   });
 
-  Promise.all(clonePromises).then(newImages => {
+  Promise.all(clonePromises).then(() => {
     const allImages = newCoordinates.map(coord => coord.img);
     const recalculatedCoordinates = calculateCoordinates(
       allImages,

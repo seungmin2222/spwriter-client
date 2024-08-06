@@ -1,4 +1,5 @@
 import { act } from 'react-dom/test-utils';
+import { describe, it, expect, beforeEach } from 'vitest';
 import useFileStore from '../../store';
 
 describe('useFileStore', () => {

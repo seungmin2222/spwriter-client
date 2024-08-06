@@ -41,7 +41,12 @@ function ImageList() {
     const width = parseInt(modalWidth);
     const height = parseInt(modalHeight);
 
-    if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
+    if (
+      Number.isNaN(width) ||
+      Number.isNaN(height) ||
+      width <= 0 ||
+      height <= 0
+    ) {
       generateToast('유효한 너비와 높이를 입력해주세요.');
       return;
     }
@@ -63,8 +68,8 @@ function ImageList() {
         return {
           ...coord,
           img: resizedImg,
-          width: width,
-          height: height,
+          width,
+          height,
         };
       }
       return coord;
@@ -174,16 +179,18 @@ function ImageList() {
     navigator.clipboard
       .writeText(text)
       .then(() => generateToast('좌표값이 클립보드에 복사되었습니다.'))
-      .catch(err => {
+      .catch(() => {
         generateToast('클립보드 복사 실패.');
       });
   };
 
   const handleImageListClick = image => {
     const newSelectedFiles = new Set(selectedFiles);
-    newSelectedFiles.has(image.img)
-      ? newSelectedFiles.delete(image.img)
-      : newSelectedFiles.add(image.img);
+    if (newSelectedFiles.has(image.img)) {
+      newSelectedFiles.delete(image.img);
+    } else {
+      newSelectedFiles.add(image.img);
+    }
     setSelectedFiles(newSelectedFiles);
   };
 
@@ -264,9 +271,16 @@ function ImageList() {
     const isDeleting = deletingImages.has(image.img);
 
     return (
-      <article
+      <div
         key={index}
         onClick={() => handleImageListClick(image)}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            handleImageListClick(image);
+          }
+        }}
+        role="button"
+        tabIndex="0"
         className={`flex w-full h-[70px] bg-[#f8f8f8] rounded-[1rem] transition-colors duration-300 shadow-sm border transition-border duration-250 ${
           !isButtonHovered ? 'hover:bg-[#e9eaf1]' : ''
         } ${isSelected ? 'border border-[#23212f]' : ''} ${
@@ -306,7 +320,7 @@ function ImageList() {
             <path d="M12 10.586l4.95-4.95 1.414 1.414L13.414 12l4.95 4.95-1.414 1.414L12 13.414l-4.95 4.95-1.414-1.414L10.586 12 5.636 7.05l1.414-1.414z" />
           </svg>
         </button>
-      </article>
+      </div>
     );
   };
 

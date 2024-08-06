@@ -6,7 +6,7 @@ import {
   resizeSelectedImages,
   calculateCoordinates,
 } from '../utils/utils';
-import { analyzeSpritesSheet } from '../utils/spriteAnalyzer';
+import analyzeSpritesSheet from '../utils/spriteAnalyzer';
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 function SpriteEditor() {
@@ -193,7 +193,7 @@ function SpriteEditor() {
     coordinates.forEach(coord => {
       if (coord.circle) {
         const dist = Math.sqrt(
-          Math.pow(x - coord.circle.x, 2) + Math.pow(y - coord.circle.y, 2)
+          (x - coord.circle.x) ** 2 + (y - coord.circle.y) ** 2
         );
 
         if (dist <= coord.circle.radius) {
@@ -203,7 +203,6 @@ function SpriteEditor() {
           setOriginalSize({ width: coord.width, height: coord.height });
           setIsResizing(true);
           setIsDragging(false);
-          return;
         }
       }
     });
@@ -230,7 +229,8 @@ function SpriteEditor() {
       const deltaX = x - startPos.x;
       const deltaY = y - startPos.y;
 
-      let newWidth, newHeight;
+      let newWidth;
+      let newHeight;
 
       if (isShiftPressed) {
         const aspectRatio = originalSize.width / originalSize.height;
@@ -273,7 +273,7 @@ function SpriteEditor() {
     coordinates.forEach(coord => {
       if (coord.circle) {
         const dist = Math.sqrt(
-          Math.pow(x - coord.circle.x, 2) + Math.pow(y - coord.circle.y, 2)
+          (x - coord.circle.x) ** 2 + (y - coord.circle.y) ** 2
         );
         if (dist <= coord.circle.radius) {
           cursorStyle = 'nwse-resize';
@@ -536,6 +536,7 @@ function SpriteEditor() {
       onMouseMove={handleCanvasMouseMove}
       onMouseUp={handleCanvasMouseUp}
       tabIndex={0}
+      role="application"
       aria-label="Sprite Editor Canvas"
     >
       {coordinates.length === 0 ? (
