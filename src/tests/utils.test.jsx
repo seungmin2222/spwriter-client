@@ -14,7 +14,7 @@ beforeEach(() => {
     fillRect: vi.fn(),
   });
 
-  global.FileReader = vi.fn(function () {
+  global.FileReader = vi.fn(function FileReaderMock() {
     this.readAsDataURL = vi.fn(() => {
       setTimeout(() => this.onload && this.onload(), 0);
     });
@@ -23,7 +23,7 @@ beforeEach(() => {
     this.onload = null;
   });
 
-  global.Image = vi.fn(function () {
+  global.Image = vi.fn(function ImageMock() {
     this.onload = null;
     this.src = '';
     setTimeout(() => this.onload && this.onload(), 0);
