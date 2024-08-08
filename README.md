@@ -300,18 +300,20 @@ const newImages = await Promise.all(
   </tr>
   <tr>
     <td align="center">
-    <img width="400" height="75" alt="image" src="https://github.com/user-attachments/assets/58975955-3f96-47e1-92b5-71fcbf8b9b5a">
+    <img width="400" height="75" alt="image" src="https://github.com/user-attachments/assets/4886ec09-5e92-4be9-a938-b778dc0db454">
     </td>
     <td align="center">
-    <img width="400" height="75" alt="image" src="https://github.com/user-attachments/assets/f3595027-5fb0-4cbc-b537-10cd6a4b6c1a">
+    <img width="400" height="75" alt="image" src="https://github.com/user-attachments/assets/7b14c8aa-79fc-49b4-8d21-cf306befec1a">
     </td>
   </tr>
 </table>
 
 여백 최적화 과정을 통해 동일한 시각적 요소를 유지하면서도 이미지 크기의 변화를 보실 수 있습니다.
-<br><br>마지막으로 각 이미지에 대한 'CSS 명함'을 만듭니다.
+<br><br>
+마지막으로 각 이미지에 대한 'CSS 명함'을 만듭니다.
 이 CSS는 브라우저에게 "이 이미지는 스프라이트 시트의 이 위치에 있고, 이만큼의 크기를 가지고 있어"라고 정확히 알려주는 역할을 합니다.
 이러한 과정을 거쳐, 사용자가 업로드한 이미지들의 불필요한 여백을 깔끔히 제거하고, 이들을 효율적으로 정리된 하나의 스프라이트 시트로 만들어냅니다.
+<br><br>
 
 ### ❗️여기서 잠시❗️ Trim(트리밍)이란?
 
@@ -322,7 +324,7 @@ const newImages = await Promise.all(
 
 ### 3) 캔버스의 여백 제거
 
-<img width="336" alt="image" src="https://github.com/user-attachments/assets/46d1c60b-b889-4ff8-9935-bffb8a71e4f4">
+<img width="336" alt="image" src="https://github.com/user-attachments/assets/61f1f5d2-8d91-43ed-abf9-e23d3dfc2b37">
 
 이미지 요소 주변의 불필요한 여백을 정밀하게 제거함으로써, 스프라이트 파일의 용량을 최적화하고 리소스 효율성을 극대화합니다.<br>
 (참고: 배경의 격자 패턴은 실제 활용되는 캔버스 영역을 나타내며, 주변의 회색 공간은 미사용 영역을 시각화한 것입니다.)<br><br>
@@ -532,7 +534,7 @@ packedImages.length = 0;
 
   ### ❗️여기서 잠시❗️ 그리디(greedy) 접근 방식이란?
 
-  <img width="650" alt="image" src="https://github.com/user-attachments/assets/f6fa1563-9973-4d7b-95f6-64e6865b7347">
+  <img width="650" alt="image" src="https://github.com/user-attachments/assets/20e645b8-4027-43e5-b4c1-1499b0877e10">
 
 - 정의
   - 각 단계에서 그 순간에 최적이라고 생각되는 선택을 합니다.
@@ -687,7 +689,7 @@ if (selectedFiles.has(coord.img) {
 }
 ```
 
-<img width="498" alt="image" src="https://github.com/user-attachments/assets/f66e0554-1cac-4cb4-b0a4-b317237dc471">
+<img width="498" alt="image" src="https://github.com/user-attachments/assets/00fc399a-27ac-46d9-9295-bca114981df3">
 
 사용자 상호작용의 즉각적인 시각화를 위해, 선택된 이미지들은 테두리를 주어 시각적 처리를 거칩니다.
 
@@ -703,7 +705,7 @@ if (selectedFiles.has(coord.img) {
 
 ### 2) 이미지 회전
 
-<img width="899" alt="image" src="https://github.com/user-attachments/assets/2cbeb062-8729-4bf0-b04e-8115058ac13e">
+<img width="899" alt="image" src="https://github.com/user-attachments/assets/3d8a21ee-b3c4-4832-b039-1b665ae29c67">
 <br><br>
 
 ### 2.1) 캔버스 크기도 회전한다?
@@ -825,7 +827,7 @@ return {
 
 ### 3) 이미지 좌우 반전
 
-<img width="541" alt="image" src="https://github.com/user-attachments/assets/b5303213-21ec-4d78-b929-07d41e089618">
+<img width="541" alt="image" src="https://github.com/user-attachments/assets/48e0323b-d5a3-4926-8358-c768df1c195c">
 
 ### 3.1) 좌우 반전의 원리
 
@@ -923,7 +925,7 @@ return {
 
 ### 4) 이미지 복제 기능
 
-<img width="636" alt="image" src="https://github.com/user-attachments/assets/7acef640-9994-4330-81f0-3f990bdb8ca9">
+<img width="636" alt="image" src="https://github.com/user-attachments/assets/e0b7f269-d2cf-430a-b4b6-9931ceafbed2">
 <br><br>
 
 ### 4.1) 복제 기능의 원리
@@ -995,7 +997,7 @@ sortAndSetCoordinates(recalculatedCoordinates, setCoordinates);
 
 ## 4. 이미지 크기를 자유자재로!
 
-<img width="577" alt="image" src="https://github.com/user-attachments/assets/d6422f06-1ebc-4fe3-b672-5f38c0bb4b20">
+<img width="577" alt="image" src="https://github.com/user-attachments/assets/98e518e2-0a90-4b8f-98a6-1d18e899f4a8">
 
 ### 1) 리사이즈 기능의 원리
 
@@ -1028,8 +1030,9 @@ Canvas API는 웹 브라우저에서 동적이고 스크립트 기반의 2D 그�
   이 메서드를 사용하여 캔버스에 이미지를 그리고 크기를 조절했습니다.<br>
   리사이징 시 이 함수를 실시간으로 호출하여 이미지 크기를 동적으로 업데이트했습니다.<br><br>
 
-  - 리사이즈 핸들(파란 점) 그리기
-    <img width="200" alt="image" src="https://github.com/user-attachments/assets/f4c4753c-2bc6-4753-86b6-1398892d7a0a">
+  - 리사이즈 핸들(파란 점) 그리기<br>
+
+    <img width="200" alt="image" src="https://github.com/user-attachments/assets/9f0b662d-0b9e-4363-a116-ad93b58f857e"><br>
 
   ```javascript
   ctx.beginPath();
@@ -1106,7 +1109,7 @@ Canvas API는 웹 브라우저에서 동적이고 스크립트 기반의 2D 그�
 
 ### 3) 이미지 선택 및 리사이즈 핸들 표시
 
-<img width="378" alt="image" src="https://github.com/user-attachments/assets/8feef8a2-c8ff-4503-97aa-208cbc484d45">
+<img width="378" alt="image" src="https://github.com/user-attachments/assets/9b998ec9-2d06-4316-9bb0-da10c0cb4fa0">
 
 Canvas API를 기반으로, 이미지 선택 및 리사이즈 핸들 표시 기능을 다음과 같이 구현했습니다.<br>
 
@@ -1173,7 +1176,7 @@ coordinates.forEach(coord => {
 
 ### 5) 실시간 리사이징
 
-![화면 기록 2024-08-07 오전 10 10 29](https://github.com/user-attachments/assets/30582119-2135-4396-a823-d02f0f9f6c25)
+![화면 기록 2024-08-07 오전 10 10 29](https://github.com/user-attachments/assets/acd09c57-95d9-4ae5-a429-0c74684acd9f)
 
 - 마우스 이벤트 추적
 
@@ -1215,7 +1218,7 @@ coordinates.forEach(coord => {
 
 ### 6) 비율 유지 리사이징 (Shift 키 사용)
 
-![화면 기록 2024-08-07 오전 10 10 29](https://github.com/user-attachments/assets/54a5722e-363e-4876-88f1-34c2737ce0c5)
+![화면 기록 2024-08-07 오전 10 10 29](https://github.com/user-attachments/assets/5cb7ac9a-db98-4557-895a-fabdb639c417)
 
 - Shift 키를 누른 상태에서 드래그하면 이미지의 원본 비율을 유지합니다.
 - Shift 키 상태 감지
@@ -1311,7 +1314,7 @@ const calculateCoordinates = (images, padding, alignElement) => {
 원리: 이중 좌표 시스템<br>
 SPWRITER는 사실상 두 개의 좌표 시스템을 동시에 운영합니다.
 <br>
-<img width="550" alt="image" src="https://github.com/user-attachments/assets/0b1b2601-0318-476f-ab95-ab97a1c6afed">
+<img width="550" alt="image" src="https://github.com/user-attachments/assets/a6d4db85-eddd-4758-9597-119281f2a120">
 
 캔버스 좌표: 패딩을 포함한 좌표<br>
 CSS 좌표: 패딩을 제외한 순수 이미지 위치
@@ -1370,8 +1373,8 @@ const generateCSS = (image, index) => `
 
 <table>
   <tr>
-    <td><img width="252" alt="image" src="https://github.com/user-attachments/assets/9ef49e0c-06f3-40f0-8c9c-8a17c03146cd"></td>
-    <td><img width="824" alt="image" src="https://github.com/user-attachments/assets/ed8f216e-5d75-4156-bf39-a4ce6f10ded8"></td>
+    <td><img width="252" alt="image" src="https://github.com/user-attachments/assets/790ebf86-5c99-496c-9e8c-ff4d43ead3b5"></td>
+    <td><img width="824" alt="image" src="https://github.com/user-attachments/assets/b53ab5fb-94a4-4bb3-9c38-a14352d73867"></td>
   </tr>
 </table>
 <br>
@@ -1379,8 +1382,8 @@ const generateCSS = (image, index) => `
 
 <table>
   <tr>
-    <td><img width="300" alt="image" src="https://github.com/user-attachments/assets/845da8d2-12f2-42a5-b028-77f1762dcdc7"></td>
-    <td><img width="823" alt="image" src="https://github.com/user-attachments/assets/15de2e05-0a59-4f21-88cf-e8146a549900"></td>
+    <td><img width="300" alt="image" src="https://github.com/user-attachments/assets/a5bf52ef-81db-484b-badd-2c4e37bb4c61"></td>
+    <td><img width="823" alt="image" src="https://github.com/user-attachments/assets/51f6f63f-6ef1-4d7b-8c39-e08e75a488aa"></td>
   </tr>
 </table>
 <br><br>
@@ -1473,7 +1476,7 @@ export function analyzeSpritesSheet(imageData, width, height) {
 
 #### 참고 이미지
 
-<img width="615" alt="image" src="https://github.com/user-attachments/assets/7c5937cc-d893-4636-878d-b7a27a699ef6">
+<img width="615" alt="image" src="https://github.com/user-attachments/assets/968799d0-1645-4ed6-8592-638c7afbf7ca">
 <br><br>
 
 ```jsx
@@ -1500,7 +1503,7 @@ function floodFill(imageData, width, height, startX, startY, label, labels) {
 
 #### 참고 이미지
 
-<img width="381" alt="image" src="https://github.com/user-attachments/assets/7048f9ba-ed0b-4220-8844-e874d3529bb1">
+<img width="381" alt="image" src="https://github.com/user-attachments/assets/52c22c55-dd95-43ae-87e5-f7c121d5a365">
 
 <br><br>
 
@@ -1541,14 +1544,14 @@ mergeBoundingBoxes 함수의 동작
 
 ### 스프라이트 분석 전 하나의 이미지
 
-<img width="400" alt="First Image" src="https://github.com/user-attachments/assets/3a259135-f30d-4de7-a3e0-2a29e7133276"><br>
-<img height="100" alt="Second Image" src="https://github.com/user-attachments/assets/0924103f-f73e-43c4-aed5-47add2cf6056">
+<img width="400" alt="First Image" src="https://github.com/user-attachments/assets/1f485da8-07f7-4230-89f5-7c03cc13be50"><br>
+<img height="100" alt="Second Image" src="https://github.com/user-attachments/assets/44b1f7d0-ea53-4121-903f-30654937bc1a">
 <br><br>
 
 ### 스프라이트 분석 후 각각 나눠진 이미지
 
-<img width="400" alt="image" src="https://github.com/user-attachments/assets/8e295755-7ce2-4d6e-a830-5c35a12c1c38"><br>
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/54b3f67d-5a83-4ef3-98bf-847844b72f89">
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/31d68152-8392-49bc-b30c-6c43ecf418bc"><br>
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/1a8d4164-2f4e-42b6-a7f8-923285b04913">
 
 병합된 경계 상자들을 기반으로 각 스프라이트의 위치(x, y)와 크기(width, height)를 계산합니다.<br>
 이러한 전체 과정을 통해 스프라이트 시트에서 개별 스프라이트들을 식별하고 추출할 수 있습니다.<br>
