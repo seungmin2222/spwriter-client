@@ -1,7 +1,7 @@
 # Spwriter
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/5fe0350d-d224-4c27-8cd7-2a2fc6abe0c5" alt="spwriterFull">
+  <img src="./src/assets/images/spwriterFull.png">
 
 SPWRITER는 개발자와 디자이너를 위한 고급 이미지 스프라이트 툴로,<br>
 'Sprite'와 'Writer'를 결합한 이름에서 알 수 있듯이 단순한 스프라이트 생성을 넘어섭니다.<br>
@@ -160,7 +160,7 @@ SPWRITER의 탄생은 제 개인적인 학습 여정과 실용적인 도구 개�
 <details>
 <summary>📸 Preview</summary>
 
-![Untitled](https://github.com/user-attachments/assets/514c2dac-2e2a-4695-a4db-226aa7d632ec)
+![Features1](./src/assets/images/readmeImages/Features1.gif)
 
 </details>
 
@@ -172,7 +172,7 @@ SPWRITER의 탄생은 제 개인적인 학습 여정과 실용적인 도구 개�
 <details>
 <summary>📸 Preview</summary>
 
-![Untitled 1](https://github.com/user-attachments/assets/679340df-9d91-44e4-a52d-f7f59d83db5e)
+![Features2](./src/assets/images/readmeImages/Features2.gif)
 
 </details>
 
@@ -184,7 +184,7 @@ SPWRITER의 탄생은 제 개인적인 학습 여정과 실용적인 도구 개�
 <details>
 <summary>📸 Preview</summary>
 
-![Untitled 2](https://github.com/user-attachments/assets/4ab12d0e-79bd-4759-b8c4-4dae5ad1eead)
+![Features3](./src/assets/images/readmeImages/Features3.gif)
 
 </details>
 
@@ -196,8 +196,8 @@ SPWRITER의 탄생은 제 개인적인 학습 여정과 실용적인 도구 개�
 <details>
 <summary>📸 Preview</summary>
 
-![Untitled 4](https://github.com/user-attachments/assets/49e44972-4a10-469d-8e51-9f03a0813761)
-![Untitled 5](https://github.com/user-attachments/assets/62d0c13b-a04c-4b43-8219-8ed46c12b175)
+![Features4-1](./src/assets/images/readmeImages/Features4-1.gif)
+![Features4-2](./src/assets/images/readmeImages/Features4-2.gif)
 
 </details>
 
@@ -209,7 +209,7 @@ SPWRITER의 탄생은 제 개인적인 학습 여정과 실용적인 도구 개�
 <details>
 <summary>📸 Preview</summary>
 
-![Untitled 6](https://github.com/user-attachments/assets/65928aa0-78aa-4896-83fb-4d33a1ece11d)
+![Features5](./src/assets/images/readmeImages/Features5.gif)
 
 </details>
 
@@ -222,8 +222,8 @@ SPWRITER의 탄생은 제 개인적인 학습 여정과 실용적인 도구 개�
 <details>
 <summary>📸 Preview</summary>
 
-![Untitled 7](https://github.com/user-attachments/assets/59b9b164-3be1-455a-b626-d82f92230741)
-![Untitled 8](https://github.com/user-attachments/assets/39b049ad-60b0-45ab-9c76-3d5e6a3b1e09)
+![Features6-1](./src/assets/images/readmeImages/Features6-1.gif)
+![Features6-2](./src/assets/images/readmeImages/Features6-2.gif)
 
 </details>
 
@@ -236,7 +236,7 @@ SPWRITER의 탄생은 제 개인적인 학습 여정과 실용적인 도구 개�
 <details>
 <summary>📸 Preview</summary>
 
-![Untitled 3](https://github.com/user-attachments/assets/a9605038-222c-4c59-ae45-93e0e3a4387d)
+![Features7](./src/assets/images/readmeImages/Features7.gif)
 
 </details>
 
@@ -247,7 +247,7 @@ SPWRITER의 탄생은 제 개인적인 학습 여정과 실용적인 도구 개�
 <details>
 <summary>📸 Preview</summary>
 
-![Untitled 9](https://github.com/user-attachments/assets/9129577d-7361-4fed-ab19-7c7f3a4d599a)
+![Features8](./src/assets/images/readmeImages/Features8.gif)
 
 </details>
 
@@ -259,7 +259,7 @@ SPWRITER의 탄생은 제 개인적인 학습 여정과 실용적인 도구 개�
 <details>
 <summary>📸 Preview</summary>
 
-![Untitled 10](https://github.com/user-attachments/assets/8676b86d-b654-4f59-a6d6-7635b255bbc3)
+![Features9](./src/assets/images/readmeImages/Features9.gif)
 
 </details>
 
@@ -274,7 +274,7 @@ SPWRITER의 탄생은 제 개인적인 학습 여정과 실용적인 도구 개�
 <details>
 <summary>📸 Preview</summary>
 
-![Untitled 11](https://github.com/user-attachments/assets/cd6e34ab-80cb-48bd-bb1c-c0a15cdfaf09)
+![Features11](./src/assets/images/readmeImages/Features11.gif)
 
 </details>
 
@@ -334,10 +334,10 @@ const newImages = await Promise.all(
   </tr>
   <tr>
     <td align="center">
-    <img width="400" height="75" alt="image" src="https://github.com/user-attachments/assets/4886ec09-5e92-4be9-a938-b778dc0db454">
+    <img width="400" height="75" alt="beforeImage" src="./src/assets/images/readmeImages/beforeImage.png">
     </td>
     <td align="center">
-    <img width="400" height="75" alt="image" src="https://github.com/user-attachments/assets/7b14c8aa-79fc-49b4-8d21-cf306befec1a">
+    <img width="400" height="75" alt="afterImage" src="./src/assets/images/readmeImages/afterImage.png">
     </td>
   </tr>
 </table>
@@ -358,7 +358,7 @@ const newImages = await Promise.all(
 
 ### 3) 캔버스의 여백 제거
 
-<img width="336" alt="image" src="https://github.com/user-attachments/assets/61f1f5d2-8d91-43ed-abf9-e23d3dfc2b37">
+<img width="336" alt="deleteBinImage" src="./src/assets/images/readmeImages/deleteBinImage.png">
 
 이미지 요소 주변의 불필요한 여백을 정밀하게 제거함으로써, 스프라이트 파일의 용량을 최적화하고 리소스 효율성을 극대화합니다.<br>
 (참고: 배경의 격자 패턴은 실제 활용되는 캔버스 영역을 나타내며, 주변의 회색 공간은 미사용 영역을 시각화한 것입니다.)<br><br>
@@ -406,7 +406,7 @@ const coord = {
 
 ### 5) CSS 생성 및 렌더링
 
-![Untitled 3](https://github.com/user-attachments/assets/5a79d854-d49d-4c3e-9996-fe1d422a3c97)
+![imageListUnit](./src/assets/images/readmeImages/imageListUnit.png)
 
 ```jsx
 const generateCSS = (image, index) =>
@@ -568,7 +568,7 @@ packedImages.length = 0;
 
   ### ❗️여기서 잠시❗️ 그리디(greedy) 접근 방식이란?
 
-  <img width="650" alt="image" src="https://github.com/user-attachments/assets/20e645b8-4027-43e5-b4c1-1499b0877e10">
+  <img width="650" alt="greedImage" src="./src/assets/images/readmeImages/greedImage.png">
 
 - 정의
   - 각 단계에서 그 순간에 최적이라고 생각되는 선택을 합니다.
@@ -619,13 +619,13 @@ let binHeight = Math.ceil(Math.sqrt(totalArea / fixedAspectRatio));
   </tr>
   <tr>
     <td style="text-align: center; border: 1px solid black;">
-      <img width="300" alt="image" src="https://github.com/user-attachments/assets/1687f31f-7b77-47bb-b754-c9a84baa6540">
+      <img width="300" alt="binPacking1" src="./src/assets/images/readmeImages/binPacking1.png">
     </td>
     <td style="text-align: center; border: 1px solid black;">
-      <img width="379" alt="image" src="https://github.com/user-attachments/assets/c152d0a0-aa37-447e-a1a2-f5d26cd6ae87">
+      <img width="379" alt="binPacking2" src="./src/assets/images/readmeImages/binPacking2.png">
     </td>
     <td style="text-align: center; border: 1px solid black;">
-      <img width="460" alt="image" src="https://github.com/user-attachments/assets/beb8ce7b-ee51-4396-857c-c9a0c7c8aec8">
+      <img width="460" alt="binPacking3" src="./src/assets/images/readmeImages/binPacking3.png">
     </td>
   </tr>
 </table>
@@ -723,7 +723,7 @@ if (selectedFiles.has(coord.img) {
 }
 ```
 
-<img width="498" alt="image" src="https://github.com/user-attachments/assets/00fc399a-27ac-46d9-9295-bca114981df3">
+<img width="498" alt="chooseImage" src="./src/assets/images/readmeImages/chooseImage.png">
 
 사용자 상호작용의 즉각적인 시각화를 위해, 선택된 이미지들은 테두리를 주어 시각적 처리를 거칩니다.
 
@@ -739,7 +739,7 @@ if (selectedFiles.has(coord.img) {
 
 ### 2) 이미지 회전
 
-<img width="899" alt="image" src="https://github.com/user-attachments/assets/3d8a21ee-b3c4-4832-b039-1b665ae29c67">
+<img width="899" alt="rotateImage" src="./src/assets/images/readmeImages/rotateImage.png">
 <br><br>
 
 ### 2.1) 캔버스 크기도 회전한다?
@@ -861,7 +861,7 @@ return {
 
 ### 3) 이미지 좌우 반전
 
-<img width="541" alt="image" src="https://github.com/user-attachments/assets/48e0323b-d5a3-4926-8358-c768df1c195c">
+<img width="541" alt="InversionImage" src="./src/assets/images/readmeImages/InversionImage.png">
 
 ### 3.1) 좌우 반전의 원리
 
@@ -959,7 +959,7 @@ return {
 
 ### 4) 이미지 복제 기능
 
-<img width="636" alt="image" src="https://github.com/user-attachments/assets/e0b7f269-d2cf-430a-b4b6-9931ceafbed2">
+<img width="636" alt="cloneImage" src="./src/assets/images/readmeImages/cloneImage.png">
 <br><br>
 
 ### 4.1) 복제 기능의 원리
@@ -1031,7 +1031,7 @@ sortAndSetCoordinates(recalculatedCoordinates, setCoordinates);
 
 ## 4. 이미지 크기를 자유자재로!
 
-<img width="577" alt="image" src="https://github.com/user-attachments/assets/98e518e2-0a90-4b8f-98a6-1d18e899f4a8">
+<img width="577" alt="resizeImage" src="./src/assets/images/readmeImages/resizeImage.png">
 
 ### 1) 리사이즈 기능의 원리
 
@@ -1066,7 +1066,7 @@ Canvas API는 웹 브라우저에서 동적이고 스크립트 기반의 2D 그�
 
   - 리사이즈 핸들(파란 점) 그리기<br>
 
-    <img width="200" alt="image" src="https://github.com/user-attachments/assets/9f0b662d-0b9e-4363-a116-ad93b58f857e"><br>
+    <img width="200" alt="selectImagePoint" src="./src/assets/images/readmeImages/selectImagePoint.png"><br>
 
   ```javascript
   ctx.beginPath();
@@ -1143,7 +1143,7 @@ Canvas API는 웹 브라우저에서 동적이고 스크립트 기반의 2D 그�
 
 ### 3) 이미지 선택 및 리사이즈 핸들 표시
 
-<img width="378" alt="image" src="https://github.com/user-attachments/assets/9b998ec9-2d06-4316-9bb0-da10c0cb4fa0">
+<img width="378" alt="selectImagePoint" src="./src/assets/images/readmeImages/selectImagePoint.png">
 
 Canvas API를 기반으로, 이미지 선택 및 리사이즈 핸들 표시 기능을 다음과 같이 구현했습니다.<br>
 
@@ -1210,7 +1210,7 @@ coordinates.forEach(coord => {
 
 ### 5) 실시간 리사이징
 
-![화면 기록 2024-08-07 오전 10 10 29](https://github.com/user-attachments/assets/8e9007ab-6574-4c59-9df1-8fee44749e5a)
+![liveResizingImage](./src/assets/images/readmeImages/liveResizingImage.gif)
 
 - 마우스 이벤트 추적
 
@@ -1252,7 +1252,7 @@ coordinates.forEach(coord => {
 
 ### 6) 비율 유지 리사이징 (Shift 키 사용)
 
-![화면 기록 2024-08-07 오전 10 10 29](https://github.com/user-attachments/assets/ee338deb-b97a-4c60-95c5-77731e849b6b)
+![liveResizingImage2](./src/assets/images/readmeImages/liveResizingImage2.gif)
 
 - Shift 키를 누른 상태에서 드래그하면 이미지의 원본 비율을 유지합니다.
 - Shift 키 상태 감지
@@ -1348,7 +1348,7 @@ const calculateCoordinates = (images, padding, alignElement) => {
 원리: 이중 좌표 시스템<br>
 SPWRITER는 사실상 두 개의 좌표 시스템을 동시에 운영합니다.
 <br>
-<img width="550" alt="image" src="https://github.com/user-attachments/assets/a6d4db85-eddd-4758-9597-119281f2a120">
+<img width="550" alt="doubleCoordinates" src="./src/assets/images/readmeImages/doubleCoordinates.png">
 
 캔버스 좌표: 패딩을 포함한 좌표<br>
 CSS 좌표: 패딩을 제외한 순수 이미지 위치
@@ -1407,8 +1407,8 @@ const generateCSS = (image, index) => `
 
 <table>
   <tr>
-    <td><img width="252" alt="image" src="https://github.com/user-attachments/assets/790ebf86-5c99-496c-9e8c-ff4d43ead3b5"></td>
-    <td><img width="824" alt="image" src="https://github.com/user-attachments/assets/b53ab5fb-94a4-4bb3-9c38-a14352d73867"></td>
+    <td><img width="252" alt="paddingImage1" src="./src/assets/images/readmeImages/paddingImage1.png"></td>
+    <td><img width="824" alt="paddingImage2" src="./src/assets/images/readmeImages/paddingImage2.png"></td>
   </tr>
 </table>
 <br>
@@ -1416,8 +1416,8 @@ const generateCSS = (image, index) => `
 
 <table>
   <tr>
-    <td><img width="300" alt="image" src="https://github.com/user-attachments/assets/a5bf52ef-81db-484b-badd-2c4e37bb4c61"></td>
-    <td><img width="823" alt="image" src="https://github.com/user-attachments/assets/51f6f63f-6ef1-4d7b-8c39-e08e75a488aa"></td>
+    <td><img width="300" alt="paddingImage3" src="./src/assets/images/readmeImages/paddingImage3.png"></td>
+    <td><img width="823" alt="paddingImage4" src="./src/assets/images/readmeImages/paddingImage4.png"></td>
   </tr>
 </table>
 <br><br>
@@ -1510,8 +1510,9 @@ export function analyzeSpritesSheet(imageData, width, height) {
 
 #### 참고 이미지
 
-<img width="615" alt="image" src="https://github.com/user-attachments/assets/968799d0-1645-4ed6-8592-638c7afbf7ca">
-<br><br>
+<img width="615" alt="floodFillImage" src="./src/assets/images/readmeImages/floodFillImage.png">
+
+<br>
 
 ```jsx
 function floodFill(imageData, width, height, startX, startY, label, labels) {
@@ -1537,9 +1538,9 @@ function floodFill(imageData, width, height, startX, startY, label, labels) {
 
 #### 참고 이미지
 
-<img width="381" alt="image" src="https://github.com/user-attachments/assets/52c22c55-dd95-43ae-87e5-f7c121d5a365">
+<img width="381" alt="boundingBoxImage" src="./src/assets/images/readmeImages/boundingBoxImage.png">
 
-<br><br>
+<br>
 
 ```jsx
 const boundingBoxes = new Map();
@@ -1578,14 +1579,14 @@ mergeBoundingBoxes 함수의 동작
 
 ### 스프라이트 분석 전 하나의 이미지
 
-<img width="400" alt="First Image" src="https://github.com/user-attachments/assets/1f485da8-07f7-4230-89f5-7c03cc13be50"><br>
-<img height="100" alt="Second Image" src="https://github.com/user-attachments/assets/44b1f7d0-ea53-4121-903f-30654937bc1a">
+<img width="400" alt="First analyzeImage1" src="./src/assets/images/readmeImages/analyzeImage1.png"><br>
+<img height="100" alt="Second analyzeImage2" src="./src/assets/images/readmeImages/analyzeImage2.png">
 <br><br>
 
 ### 스프라이트 분석 후 각각 나눠진 이미지
 
-<img width="400" alt="image" src="https://github.com/user-attachments/assets/31d68152-8392-49bc-b30c-6c43ecf418bc"><br>
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/1a8d4164-2f4e-42b6-a7f8-923285b04913">
+<img width="400" alt="analyzeImage3" src="./src/assets/images/readmeImages/analyzeImage3.png"><br>
+<img width="600" alt="analyzeImage4" src="./src/assets/images/readmeImages/analyzeImage4.png">
 
 병합된 경계 상자들을 기반으로 각 스프라이트의 위치(x, y)와 크기(width, height)를 계산합니다.<br>
 이러한 전체 과정을 통해 스프라이트 시트에서 개별 스프라이트들을 식별하고 추출할 수 있습니다.<br>
