@@ -406,7 +406,7 @@ const coord = {
 
 ### 5) CSS 생성 및 렌더링
 
-![imageListUnit](./src/assets/images/readmeImages/imageListUnit.png)
+![imageListUnitImage](./src/assets/images/readmeImages/imageListUnitImage.png)
 
 ```jsx
 const generateCSS = (image, index) =>
@@ -485,7 +485,8 @@ const generateCSS = (image, index) =>
        <br><br>
 3. 메모리 효율성
    - Maximal Rectangles 방식에 비해 메모리 사용량이 적어, 대량의 이미지를 처리할 때 유리합니다.
-     - Skyline 클래스에서 segments 배열만으로 전체 상태를 관리할 수 있어 메모리 효율적입니다.<br><br>
+     - Skyline 클래스에서 segments 배열만으로 전체 상태를 관리할 수 있어 메모리 효율적입니다.
+       <br><br>
 4. 동적 환경에 적합
    - 사용자가 실시간으로 이미지를 추가하거나 제거할 수 있는 시스템 특성에 적합합니다.
    - calculateCoordinates 함수가 새로운 이미지 세트에 대해 빠르게 새로운 레이아웃을 계산할 수 있습니다.
