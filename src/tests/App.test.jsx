@@ -8,10 +8,12 @@ describe('App component', () => {
     render(<App />);
     expect(screen.getByTestId('app')).toBeInTheDocument();
   });
+
   it('contains the ImageList component', () => {
     render(<App />);
     expect(screen.getByTestId('image-list')).toBeInTheDocument();
   });
+
   it('contains the SpriteMain component', () => {
     render(<App />);
     expect(screen.getByTestId('sprite-main')).toBeInTheDocument();
