@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 
-function Modal({ showModal, handleClose, handleConfirm, message }) {
-  const modalRef = useRef(null);
-  const confirmButtonRef = useRef(null);
-
+export function useModalEventListener(
+  ref,
+  handleConfirm,
+  handleClose,
+  showModal
+) {
   useEffect(() => {
     const handleKeyDown = e => {
       if (e.key === 'Enter') {
@@ -13,16 +15,23 @@ function Modal({ showModal, handleClose, handleConfirm, message }) {
       }
     };
 
-    if (showModal && modalRef.current) {
-      modalRef.current.focus();
+    if (showModal && ref.current) {
+      ref.current.focus();
+      ref.current.addEventListener('keydown', handleKeyDown);
     }
 
-    modalRef.current?.addEventListener('keydown', handleKeyDown);
-
     return () => {
-      modalRef.current?.removeEventListener('keydown', handleKeyDown);
+      if (ref.current) {
+        ref.current.removeEventListener('keydown', handleKeyDown);
+      }
     };
-  }, [showModal, handleConfirm, handleClose]);
+  }, [showModal, handleConfirm, handleClose, ref]);
+}
+
+function Modal({ showModal, handleClose, handleConfirm, message }) {
+  const modalRef = useRef(null);
+
+  useModalEventListener(modalRef, handleConfirm, handleClose, showModal);
 
   if (!showModal) return null;
 
@@ -43,16 +52,13 @@ function Modal({ showModal, handleClose, handleConfirm, message }) {
           <h3 className="text-xl leading-6 text-gray-900 mb-6">{message}</h3>
           <div>
             <button
-              ref={confirmButtonRef}
               onClick={handleConfirm}
-              onKeyDown={e => e.key === 'Enter' && handleConfirm()}
               className="px-4 py-2 bg-[#241f3a] text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-[#565465] duration-300 mb-3"
             >
               확인
             </button>
             <button
               onClick={handleClose}
-              onKeyDown={e => e.key === 'Enter' && handleClose()}
               className="px-4 py-2 bg-[#f0f0f2] text-gray-700 text-base font-medium rounded-md w-full shadow-sm hover:bg-[#c9c7d2] duration-300"
             >
               취소

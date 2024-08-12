@@ -34,7 +34,7 @@ describe('Modal component', () => {
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
   });
 
-  it('calls handleClose when background is clicked', () => {
+  it('handles Enter key press', () => {
     render(
       <Modal
         showModal
@@ -42,7 +42,21 @@ describe('Modal component', () => {
         handleConfirm={handleConfirm}
       />
     );
-    fireEvent.click(screen.getByTestId('modal'));
-    expect(handleClose).toHaveBeenCalled();
+    const modal = screen.getByTestId('modal');
+    fireEvent.keyDown(modal, { key: 'Enter' });
+    expect(handleConfirm).toHaveBeenCalledTimes(1);
+  });
+
+  it('handles Escape key press', () => {
+    render(
+      <Modal
+        showModal
+        handleClose={handleClose}
+        handleConfirm={handleConfirm}
+      />
+    );
+    const modal = screen.getByTestId('modal');
+    fireEvent.keyDown(modal, { key: 'Escape' });
+    expect(handleClose).toHaveBeenCalledTimes(1);
   });
 });
