@@ -59,4 +59,81 @@ describe('useFileStore', () => {
     });
     expect(newState.toast.id).toBeDefined();
   });
+  it('should set selected files', () => {
+    const newSelectedFiles = new Set(['file1', 'file2']);
+    act(() => {
+      store.setSelectedFiles(newSelectedFiles);
+    });
+    const newState = useFileStore.getState();
+    expect(newState.selectedFiles).toEqual(newSelectedFiles);
+  });
+
+  it('should set file name', () => {
+    act(() => {
+      store.setFileName('test.jpg');
+    });
+    const newState = useFileStore.getState();
+    expect(newState.fileName).toBe('test.jpg');
+  });
+
+  it('should set resized image', () => {
+    const mockImage = new Blob([''], { type: 'image/jpeg' });
+    act(() => {
+      store.setResizedImage(mockImage);
+    });
+    const newState = useFileStore.getState();
+    expect(newState.resizedImage).toBe(mockImage);
+  });
+
+  it('should set align element', () => {
+    act(() => {
+      store.setAlignElement('grid');
+    });
+    const newState = useFileStore.getState();
+    expect(newState.alignElement).toBe('grid');
+  });
+
+  it('should add to history', () => {
+    const prevCoordinates = [{ x: 0, y: 0 }];
+    act(() => {
+      store.addHistory(prevCoordinates);
+    });
+    const newState = useFileStore.getState();
+    expect(newState.history).toContain(prevCoordinates);
+    expect(newState.redoHistory).toEqual([]);
+  });
+
+  it('should pop history', () => {
+    const initialCoordinates = [{ x: 0, y: 0 }];
+    const newCoordinates = [{ x: 1, y: 1 }];
+    act(() => {
+      store.setCoordinates(initialCoordinates);
+      store.addHistory(initialCoordinates);
+      store.setCoordinates(newCoordinates);
+    });
+    act(() => {
+      store.popHistory();
+    });
+    const newState = useFileStore.getState();
+    expect(newState.coordinates).toEqual(initialCoordinates);
+    expect(newState.redoHistory).toContain(newCoordinates);
+  });
+
+  it('should push history', () => {
+    const initialCoordinates = [{ x: 0, y: 0 }];
+    const newCoordinates = [{ x: 1, y: 1 }];
+    act(() => {
+      store.setCoordinates(initialCoordinates);
+      store.addHistory(initialCoordinates);
+      store.setCoordinates(newCoordinates);
+      store.popHistory();
+    });
+    act(() => {
+      store.pushHistory();
+    });
+    const newState = useFileStore.getState();
+    expect(newState.coordinates).toEqual(newCoordinates);
+    expect(newState.history).toContain(initialCoordinates);
+    expect(newState.redoHistory).toEqual([]);
+  });
 });

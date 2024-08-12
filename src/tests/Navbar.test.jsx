@@ -1,8 +1,15 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Navbar from '../components/Navbar';
 import useFileStore from '../../store';
+import { handleFiles } from '../utils/utils';
 
 vi.mock('../utils/utils', () => ({
   handleFiles: vi.fn(),
@@ -114,9 +121,9 @@ describe('Navbar', () => {
     render(<Navbar />);
 
     const selectElement = screen.getByLabelText('정렬 옵션 :');
-    fireEvent.change(selectElement, { target: { value: 'top-bottom' } });
+    fireEvent.change(selectElement, { target: { value: 'bin-packing' } });
 
-    expect(selectElement.value).toBe('top-bottom');
+    expect(selectElement.value).toBe('bin-packing');
   });
 
   it('handles file download with coordinates', async () => {
@@ -148,16 +155,147 @@ describe('Navbar', () => {
     });
   });
 
-  it('handles toast close', () => {
+  it('handles toast disappearance', async () => {
+    vi.useFakeTimers();
     const setToast = vi.fn();
     const toast = { id: 1, message: 'Test toast' };
     useFileStore.setState({ toast, setToast });
 
     render(<Navbar />);
 
-    const toastCloseButton = screen.getByRole('button', { name: /close/i });
-    fireEvent.click(toastCloseButton);
+    expect(screen.getByText('Test toast')).toBeInTheDocument();
+
+    await act(async () => {
+      vi.advanceTimersByTime(3000);
+    });
 
     expect(setToast).toHaveBeenCalledWith(null);
+
+    vi.useRealTimers();
+  });
+
+  it('shows toast when canvas context cannot be created', async () => {
+    const addToast = vi.fn();
+    useFileStore.setState({
+      coordinates: [{ img: new Image(), width: 50, height: 50, x: 0, y: 0 }],
+      addToast,
+    });
+
+    document.createElement = element => {
+      if (element === 'canvas') {
+        const canvas = originalCreateElement.call(document, element);
+        canvas.getContext = vi.fn().mockReturnValue(null);
+        return canvas;
+      }
+      return originalCreateElement.call(document, element);
+    };
+
+    render(<Navbar />);
+
+    const downloadButton = screen.getByRole('button', { name: /download/i });
+    fireEvent.click(downloadButton);
+
+    await waitFor(() => {
+      expect(addToast).toHaveBeenCalledWith(
+        'Canvas context를 생성할 수 없습니다.'
+      );
+    });
+  });
+
+  it('calculates correct dimensions for left-right alignment', async () => {
+    const coordinates = [
+      { img: new Image(), width: 100, height: 150, x: 0, y: 0 },
+      { img: new Image(), width: 200, height: 100, x: 0, y: 0 },
+      { img: new Image(), width: 150, height: 200, x: 0, y: 0 },
+    ];
+    const padding = 10;
+    useFileStore.setState({
+      coordinates,
+      padding,
+      alignElement: 'left-right',
+    });
+
+    let canvasWidth;
+    let canvasHeight;
+    document.createElement = element => {
+      if (element === 'canvas') {
+        const canvas = originalCreateElement.call(document, element);
+        canvas.getContext = vi.fn().mockReturnValue({
+          clearRect: vi.fn(),
+          drawImage: vi.fn(),
+        });
+        canvas.toDataURL = vi
+          .fn()
+          .mockReturnValue('data:image/png;base64,test');
+        Object.defineProperty(canvas, 'width', {
+          set(value) {
+            canvasWidth = value;
+          },
+          get() {
+            return canvasWidth;
+          },
+        });
+        Object.defineProperty(canvas, 'height', {
+          set(value) {
+            canvasHeight = value;
+          },
+          get() {
+            return canvasHeight;
+          },
+        });
+        return canvas;
+      }
+      return originalCreateElement.call(document, element);
+    };
+
+    render(<Navbar />);
+
+    const downloadButton = screen.getByRole('button', { name: /download/i });
+    fireEvent.click(downloadButton);
+
+    await waitFor(() => {
+      expect(canvasWidth).toBe(490);
+      expect(canvasHeight).toBe(220);
+    });
+  });
+
+  it('handles file input changes correctly', async () => {
+    const setFiles = vi.fn();
+    const setCoordinates = vi.fn();
+    const coordinates = [];
+    const paddingValue = 10;
+    const alignElement = 'bin-packing';
+
+    useFileStore.setState({
+      setFiles,
+      setCoordinates,
+      coordinates,
+      padding: paddingValue,
+      alignElement,
+    });
+
+    render(<Navbar />);
+
+    const fileInput = screen.getByLabelText('Open files');
+    const files = [
+      new File(['sprite'], 'chucknorris.png', { type: 'image/png' }),
+    ];
+
+    Object.defineProperty(fileInput, 'files', {
+      value: files,
+    });
+
+    fireEvent.change(fileInput);
+
+    await waitFor(() => {
+      expect(handleFiles).toHaveBeenCalledWith(
+        files,
+        setFiles,
+        setCoordinates,
+        coordinates,
+        paddingValue,
+        alignElement
+      );
+    });
   });
 });

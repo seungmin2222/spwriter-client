@@ -34,6 +34,7 @@ const useFileStore = create(set => ({
       history: [...state.history, prevCoordinates],
       redoHistory: [],
     })),
+
   popHistory: () =>
     set(state => {
       const history = [...state.history];
@@ -47,6 +48,7 @@ const useFileStore = create(set => ({
       }
       return { history, redoHistory: state.redoHistory };
     }),
+
   pushHistory: () =>
     set(state => {
       const redoHistory = [...state.redoHistory];
