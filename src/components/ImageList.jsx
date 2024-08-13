@@ -14,7 +14,7 @@ function ImageList() {
   const [currentImage, setCurrentImage] = useState(null);
   const [deletingImages, setDeletingImages] = useState(new Set());
 
-  const coordinates = useFileStore(state => state.coordinates);
+  const coordinates = useFileStore(state => state.coordinates) || [];
   const setCoordinates = useFileStore(state => state.setCoordinates);
   const selectedFiles = useFileStore(state => state.selectedFiles) || new Set();
   const setSelectedFiles = useFileStore(state => state.setSelectedFiles);
@@ -110,7 +110,7 @@ function ImageList() {
   const prevCoordinatesRef = useRef(coordinates);
 
   useEffect(() => {
-    if (coordinates.length > 0) {
+    if (Array.isArray(coordinates) && coordinates.length > 0) {
       const newCoordinates = calculateCoordinates(
         coordinates.map(coord => coord.img),
         padding,
@@ -201,7 +201,9 @@ function ImageList() {
   };
 
   const handleSelectAll = () => {
-    setSelectedFiles(new Set(coordinates.map(coord => coord.img)));
+    if (Array.isArray(coordinates)) {
+      setSelectedFiles(new Set(coordinates.map(coord => coord.img)));
+    }
   };
 
   const handleDeselectAll = () => {
@@ -374,10 +376,12 @@ function ImageList() {
       )}
       <section
         className={`flex flex-col w-full h-[80%] px-[20px] pb-[20px] text-lg font-light space-y-3 overflow-y-auto ${
-          coordinates.length > 0 ? '' : 'justify-center'
+          Array.isArray(coordinates) && coordinates.length > 0
+            ? ''
+            : 'justify-center'
         }`}
       >
-        {coordinates.length > 0 ? (
+        {Array.isArray(coordinates) && coordinates.length > 0 ? (
           coordinates.map((image, index) => renderImageList(image, index))
         ) : (
           <div className="flex w-full justify-center border-[#e2e8f0] transition-opacity duration-500">

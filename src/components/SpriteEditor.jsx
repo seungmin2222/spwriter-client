@@ -11,7 +11,7 @@ import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 function SpriteEditor() {
   const canvasRef = useRef(null);
-  const coordinates = useFileStore(state => state.coordinates);
+  const coordinates = useFileStore(state => state.coordinates) || [];
   const setCoordinates = useFileStore(state => state.setCoordinates);
   const padding = useFileStore(state => state.padding);
   const selectedFiles = useFileStore(state => state.selectedFiles) || new Set();
@@ -134,6 +134,11 @@ function SpriteEditor() {
       coord.circle = { x: circleX, y: circleY, radius: circleRadius };
     };
 
+    if (!Array.isArray(coordinates) || coordinates.length === 0) {
+      setupCanvas(canvas.width, canvas.height);
+      return;
+    }
+
     if (alignElement === 'left-right') {
       const totalWidth = coordinates.reduce(
         (acc, coord) => acc + coord.width + padding,
@@ -190,22 +195,24 @@ function SpriteEditor() {
     const y = e.clientY - rect.top - scrollTop;
 
     let clickedOnResizeHandle = false;
-    coordinates.forEach(coord => {
-      if (coord.circle) {
-        const dist = Math.sqrt(
-          (x - coord.circle.x) ** 2 + (y - coord.circle.y) ** 2
-        );
+    if (Array.isArray(coordinates)) {
+      coordinates.forEach(coord => {
+        if (coord && coord.circle) {
+          const dist = Math.sqrt(
+            (x - coord.circle.x) ** 2 + (y - coord.circle.y) ** 2
+          );
 
-        if (dist <= coord.circle.radius) {
-          clickedOnResizeHandle = true;
-          setResizing(coord);
-          setStartPos({ x, y });
-          setOriginalSize({ width: coord.width, height: coord.height });
-          setIsResizing(true);
-          setIsDragging(false);
+          if (dist <= coord.circle.radius) {
+            clickedOnResizeHandle = true;
+            setResizing(coord);
+            setStartPos({ x, y });
+            setOriginalSize({ width: coord.width, height: coord.height });
+            setIsResizing(true);
+            setIsDragging(false);
+          }
         }
-      }
-    });
+      });
+    }
 
     if (!clickedOnResizeHandle) {
       setIsResizing(false);
@@ -270,19 +277,21 @@ function SpriteEditor() {
     let tooltipX = 0;
     let tooltipY = 0;
 
-    coordinates.forEach(coord => {
-      if (coord.circle) {
-        const dist = Math.sqrt(
-          (x - coord.circle.x) ** 2 + (y - coord.circle.y) ** 2
-        );
-        if (dist <= coord.circle.radius) {
-          cursorStyle = 'nwse-resize';
-          showTooltip = true;
-          tooltipX = x;
-          tooltipY = y;
+    if (Array.isArray(coordinates)) {
+      coordinates.forEach(coord => {
+        if (coord && coord.circle) {
+          const dist = Math.sqrt(
+            (x - coord.circle.x) ** 2 + (y - coord.circle.y) ** 2
+          );
+          if (dist <= coord.circle.radius) {
+            cursorStyle = 'nwse-resize';
+            showTooltip = true;
+            tooltipX = x;
+            tooltipY = y;
+          }
         }
-      }
-    });
+      });
+    }
 
     canvas.style.cursor = cursorStyle;
     setTooltip({ show: showTooltip, x: tooltipX, y: tooltipY });

@@ -133,7 +133,6 @@ function Navbar() {
               value={paddingValue}
               onChange={handlePaddingChange}
               className="w-16 p-1 border rounded-[0.5rem] text-center"
-              min="1"
             />
             <span>px</span>
           </div>

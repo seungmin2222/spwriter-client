@@ -1,52 +1,159 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleFiles } from '../utils/utils';
+import { act } from 'react';
+import {
+  calculateCoordinates,
+  sortAndSetCoordinates,
+  trimImage,
+  handleFiles,
+  resizeSelectedImages,
+} from '../utils/utils';
 
-beforeEach(() => {
-  vi.useFakeTimers();
+const mockCtx = {
+  drawImage: vi.fn(),
+  getImageData: vi.fn(() => ({
+    data: new Uint8ClampedArray(100 * 100 * 4).fill(255),
+  })),
+  translate: vi.fn(),
+  scale: vi.fn(),
+  rotate: vi.fn(),
+  putImageData: vi.fn(),
+};
 
-  global.HTMLCanvasElement.prototype.getContext = () => ({
-    drawImage: vi.fn(),
-    getImageData: vi.fn(() => ({
-      data: new Uint8ClampedArray([255, 255, 255, 255]),
-      width: 1,
-      height: 1,
-    })),
-    fillRect: vi.fn(),
-  });
+const mockCanvas = {
+  getContext: vi.fn(() => mockCtx),
+  toDataURL: vi.fn(() => 'data:image/png;base64,mockDataUrl'),
+  width: 100,
+  height: 100,
+};
 
-  global.FileReader = vi.fn(function FileReaderMock() {
-    this.readAsDataURL = vi.fn(() => {
-      setTimeout(() => this.onload && this.onload(), 0);
-    });
-    this.result =
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wcAAgAB/ur6TYQAAAAASUVORK5CYII=';
-    this.onload = null;
-  });
-
-  global.Image = vi.fn(function ImageMock() {
-    this.onload = null;
-    this.src = '';
-    setTimeout(() => this.onload && this.onload(), 0);
-  });
+global.document.createElement = vi.fn(tagName => {
+  if (tagName === 'canvas') return mockCanvas;
+  return document.createElement(tagName);
 });
 
-describe('handleFiles', () => {
-  it('should process files correctly', async () => {
-    const files = [new File([''], 'test.png', { type: 'image/png' })];
-    const setFiles = vi.fn();
-    const setCoordinates = vi.fn();
-    const coordinates = [];
-    const padding = 10;
+global.Image = class {
+  constructor() {
+    this.width = 100;
+    this.height = 100;
+    setTimeout(() => this.onload?.(), 0);
+  }
 
-    vi.spyOn(global, 'FileReader');
-    vi.spyOn(global, 'Image');
+  src = '';
+};
 
-    handleFiles(files, setFiles, setCoordinates, coordinates, padding);
+global.window.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+global.window.URL.revokeObjectURL = vi.fn();
 
-    await vi.runAllTimersAsync();
+global.HTMLAnchorElement.prototype.click = vi.fn();
 
-    expect(setFiles).toHaveBeenCalled();
-    expect(FileReader).toHaveBeenCalled();
-    expect(Image).toHaveBeenCalled();
+describe('Image Processing Functions', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('calculateCoordinates', () => {
+    it('should calculate coordinates for bin-packing alignment', () => {
+      const images = [
+        { width: 100, height: 100 },
+        { width: 50, height: 50 },
+        { width: 75, height: 75 },
+      ];
+      const result = calculateCoordinates(images, 10, 'bin-packing');
+      expect(result).toHaveLength(3);
+      expect(result[0].x).toBeDefined();
+      expect(result[0].y).toBeDefined();
+    });
+
+    it('should calculate coordinates for top-bottom alignment', () => {
+      const images = [
+        { width: 100, height: 100 },
+        { width: 50, height: 50 },
+      ];
+      const result = calculateCoordinates(images, 10, 'top-bottom');
+      expect(result).toHaveLength(2);
+      expect(result[1].y).toBeGreaterThan(result[0].y);
+    });
+
+    it('should calculate coordinates for left-right alignment', () => {
+      const images = [
+        { width: 100, height: 100 },
+        { width: 50, height: 50 },
+      ];
+      const result = calculateCoordinates(images, 10, 'left-right');
+      expect(result).toHaveLength(2);
+      expect(result[1].x).toBeGreaterThan(result[0].x);
+    });
+  });
+
+  describe('sortAndSetCoordinates', () => {
+    it('should sort coordinates by area and set them', () => {
+      const coords = [
+        { width: 50, height: 50 },
+        { width: 100, height: 100 },
+        { width: 75, height: 75 },
+      ];
+      const setCoordinates = vi.fn();
+      sortAndSetCoordinates(coords, setCoordinates);
+      expect(setCoordinates).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ width: 100, height: 100 }),
+          expect.objectContaining({ width: 75, height: 75 }),
+          expect.objectContaining({ width: 50, height: 50 }),
+        ])
+      );
+    });
+  });
+
+  describe('trimImage', () => {
+    it('should trim the image', async () => {
+      const img = new Image();
+      const result = await trimImage(img);
+      expect(result).toBeInstanceOf(Image);
+      expect(result.src).toBe('data:image/png;base64,mockDataUrl');
+    });
+  });
+
+  describe('handleFiles', () => {
+    it('should handle file uploads', async () => {
+      const files = [new File([''], 'test.png', { type: 'image/png' })];
+      const setFiles = vi.fn();
+      const setCoordinates = vi.fn();
+      const coordinates = [];
+      await act(async () => {
+        await handleFiles(
+          files,
+          setFiles,
+          setCoordinates,
+          coordinates,
+          10,
+          'bin-packing'
+        );
+      });
+      expect(setFiles).toHaveBeenCalled();
+      expect(setCoordinates).toHaveBeenCalled();
+    });
+  });
+
+  describe('resizeSelectedImages', () => {
+    it('should resize selected images', async () => {
+      const coordinates = [
+        { img: new Image(), width: 100, height: 100, x: 0, y: 0 },
+      ];
+      const selectedFiles = new Set([coordinates[0].img]);
+      const setCoordinates = vi.fn();
+      const setSelectedFiles = vi.fn();
+      await act(async () => {
+        const result = await resizeSelectedImages(
+          coordinates,
+          selectedFiles,
+          setCoordinates,
+          setSelectedFiles
+        );
+        expect(setCoordinates).toHaveBeenCalled();
+        expect(setSelectedFiles).toHaveBeenCalled();
+        expect(result).toHaveProperty('newCoordinates');
+        expect(result).toHaveProperty('resizedImage');
+      });
+    });
   });
 });
