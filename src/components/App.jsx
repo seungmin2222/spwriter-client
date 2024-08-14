@@ -9,11 +9,36 @@ function App() {
 
   useEffect(() => {
     const checkMobile = () => {
-      const mobile =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        );
-      setIsMobile(mobile);
+      const devicePatterns = [
+        'iPhone',
+        'iPad',
+        'iPod',
+        'iPad Air',
+        'iPad Pro',
+        'Android',
+        'Windows Phone',
+        'BlackBerry',
+        'webOS',
+        'Opera Mini',
+        'IEMobile',
+        'Kindle',
+        'Silk',
+        'Nintendo',
+        'PlayStation Vita',
+        'Asus',
+        'Nest Hub',
+        'Nest Hub Max',
+        'Mobile',
+      ];
+
+      const regex = new RegExp(devicePatterns.join('|'), 'i');
+      const mobile = regex.test(navigator.userAgent);
+
+      const isIPad =
+        /iPad|MacIntel/.test(navigator.maxTouchPoints) &&
+        'ontouchend' in document;
+
+      setIsMobile(mobile || isIPad);
     };
 
     checkMobile();
