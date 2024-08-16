@@ -326,6 +326,24 @@ function ImageList() {
     );
   };
 
+  const fileInputRef = useRef(null);
+
+  const handleClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileInputChange = e => {
+    const newSelectFiles = Array.from(e.target.files);
+    handleFiles(
+      newSelectFiles,
+      setFiles,
+      setCoordinates,
+      coordinates,
+      padding,
+      alignElement
+    );
+  };
+
   return (
     <aside
       className="flex flex-col w-[26%] h-full min-w-[370px] mr-[2%] text-gray-700 bg-[#f7f7f7] rounded-[2.375rem] shadow-md"
@@ -385,10 +403,21 @@ function ImageList() {
           coordinates.map((image, index) => renderImageList(image, index))
         ) : (
           <div className="flex w-full justify-center border-[#e2e8f0] transition-opacity duration-500">
-            <span className="flex items-center bg-[#f8f8fd] text-[#6b7280] text-[15px] border rounded-[1rem] p-2 animate-fadeIn select-none">
-              이미지 파일을 드래그하여 놓으세요.
+            <span
+              className="flex bg-[#f8f8fd] text-[#6b7280] text-[15px] border rounded-[1rem] p-2 animate-fadeIn select-none cursor-pointer"
+              onClick={handleClick}
+            >
+              이미지 파일을 드래그하여 놓거나 클릭하여 선택하세요.
               <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
             </span>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={handleFileInputChange}
+              multiple
+              accept="image/*"
+            />
           </div>
         )}
       </section>

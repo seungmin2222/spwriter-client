@@ -535,6 +535,24 @@ function SpriteEditor() {
     });
   };
 
+  const fileInputRef = useRef(null);
+
+  const handleClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileInputChange = e => {
+    const newSelectFiles = Array.from(e.target.files);
+    handleFiles(
+      newSelectFiles,
+      setFiles,
+      setCoordinates,
+      coordinates,
+      padding,
+      alignElement
+    );
+  };
+
   return (
     <div
       className="relative w-full h-[84%] overflow-auto sprite-editor"
@@ -550,10 +568,21 @@ function SpriteEditor() {
     >
       {coordinates.length === 0 ? (
         <div className="flex items-center justify-center h-full">
-          <span className="flex bg-[#f8f8fd] text-[#6b7280] text-xl border rounded-[1rem] p-3 animate-fadeIn select-none">
-            이미지 파일을 드래그하여 놓으세요.
+          <span
+            className="flex bg-[#f8f8fd] text-[#6b7280] text-xl border rounded-[1rem] p-3 animate-fadeIn select-none cursor-pointer"
+            onClick={handleClick}
+          >
+            이미지 파일을 드래그하여 놓거나 클릭하여 선택하세요.
             <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
           </span>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileInputChange}
+            multiple
+            accept="image/*"
+          />
         </div>
       ) : (
         <>
