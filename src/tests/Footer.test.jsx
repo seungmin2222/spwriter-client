@@ -40,32 +40,42 @@ describe('Footer component', () => {
     useFileStore.mockImplementation(selector => selector(mockStore));
   });
 
-  it('contains four buttons with appropriate icons', () => {
+  it('contains five buttons with appropriate icons and tooltips', () => {
     render(<Footer />);
 
     const buttons = screen.getAllByRole('button');
     expect(buttons).toHaveLength(5);
 
-    const rotateIcon = screen.getByAltText('Rotate Icon');
-    expect(rotateIcon).toBeInTheDocument();
+    expect(screen.getByTitle('회전')).toBeInTheDocument();
+    expect(screen.getByTitle('반전')).toBeInTheDocument();
+    expect(screen.getByTitle('복제')).toBeInTheDocument();
+    expect(screen.getByTitle('실행 취소')).toBeInTheDocument();
+    expect(screen.getByTitle('다시 실행')).toBeInTheDocument();
+  });
 
-    const inversion = screen.getByAltText('Inversion Icon');
-    expect(inversion).toBeInTheDocument();
+  it('renders tooltips for each button', () => {
+    render(<Footer />);
 
-    const cloneIcon = screen.getByAltText('Clone Icon');
-    expect(cloneIcon).toBeInTheDocument();
+    expect(screen.getByTitle('회전')).toHaveTextContent('90° 회전');
+    expect(screen.getByTitle('반전')).toHaveTextContent('좌우 반전');
+    expect(screen.getByTitle('복제')).toHaveTextContent('이미지 복제');
+    expect(screen.getByTitle('실행 취소')).toHaveTextContent('실행 취소');
+    expect(screen.getByTitle('다시 실행')).toHaveTextContent('다시 실행');
+  });
 
-    const leftIcon = screen.getByAltText('Left Icon');
-    expect(leftIcon).toBeInTheDocument();
-
-    const rightIcon = screen.getByAltText('Right Icon');
-    expect(rightIcon).toBeInTheDocument();
+  it('applies correct styles to buttons', () => {
+    render(<Footer />);
+    const buttons = screen.getAllByRole('button');
+    buttons.forEach(button => {
+      expect(button).toHaveClass('relative');
+      expect(button).toHaveClass('group');
+    });
   });
 
   it('handles undo action when history exists', () => {
     mockStore.history = ['previousState'];
     render(<Footer />);
-    const undoButton = screen.getByAltText('Left Icon');
+    const undoButton = screen.getByTitle('실행 취소');
     fireEvent.click(undoButton);
 
     expect(mockStore.popHistory).toHaveBeenCalled();
@@ -74,7 +84,7 @@ describe('Footer component', () => {
   it('handles redo action when redo history exists', () => {
     mockStore.redoHistory = ['nextState'];
     render(<Footer />);
-    const redoButton = screen.getByAltText('Right Icon');
+    const redoButton = screen.getByTitle('다시 실행');
     fireEvent.click(redoButton);
 
     expect(mockStore.pushHistory).toHaveBeenCalled();
@@ -82,7 +92,7 @@ describe('Footer component', () => {
 
   it('shows toast when no files are selected for actions', () => {
     render(<Footer />);
-    const cloneButton = screen.getByAltText('Clone Icon');
+    const cloneButton = screen.getByTitle('복제');
     fireEvent.click(cloneButton);
 
     expect(mockStore.addToast).toHaveBeenCalledWith(
@@ -92,7 +102,7 @@ describe('Footer component', () => {
 
   it('shows toast when no history for undo', () => {
     render(<Footer />);
-    const undoButton = screen.getByAltText('Left Icon');
+    const undoButton = screen.getByTitle('실행 취소');
     fireEvent.click(undoButton);
 
     expect(mockStore.addToast).toHaveBeenCalledWith(
@@ -102,7 +112,7 @@ describe('Footer component', () => {
 
   it('shows toast when no redo history', () => {
     render(<Footer />);
-    const redoButton = screen.getByAltText('Right Icon');
+    const redoButton = screen.getByTitle('다시 실행');
     fireEvent.click(redoButton);
 
     expect(mockStore.addToast).toHaveBeenCalledWith(
@@ -113,7 +123,7 @@ describe('Footer component', () => {
   it('handles clone action when files are selected', () => {
     mockStore.selectedFiles = new Set(['file1', 'file2']);
     render(<Footer />);
-    const cloneButton = screen.getByAltText('Clone Icon');
+    const cloneButton = screen.getByTitle('복제');
     fireEvent.click(cloneButton);
 
     expect(mockStore.addHistory).toHaveBeenCalledWith(mockStore.coordinates);
@@ -129,7 +139,7 @@ describe('Footer component', () => {
   it('handles rotate action when files are selected', () => {
     mockStore.selectedFiles = new Set(['file1', 'file2']);
     render(<Footer />);
-    const rotateButton = screen.getByAltText('Rotate Icon');
+    const rotateButton = screen.getByTitle('회전');
     fireEvent.click(rotateButton);
 
     expect(mockStore.addHistory).toHaveBeenCalledWith(mockStore.coordinates);
@@ -143,7 +153,7 @@ describe('Footer component', () => {
   it('handles inversion action when files are selected', () => {
     mockStore.selectedFiles = new Set(['file1', 'file2']);
     render(<Footer />);
-    const inversionButton = screen.getByAltText('Inversion Icon');
+    const inversionButton = screen.getByTitle('반전');
     fireEvent.click(inversionButton);
 
     expect(mockStore.addHistory).toHaveBeenCalledWith(mockStore.coordinates);
