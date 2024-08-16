@@ -147,7 +147,7 @@ describe('ImageList component', () => {
     render(<ImageList />);
 
     expect(
-      screen.getByText('이미지 파일을 드래그하여 놓으세요.')
+      screen.getByText('이미지 파일을 드래그하여 놓거나 클릭하여 선택하세요.')
     ).toBeInTheDocument();
   });
 
