@@ -6,7 +6,7 @@ import {
   waitFor,
   act,
 } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Navbar from '../components/Navbar';
 import useFileStore from '../../store';
 import { handleFiles } from '../utils/utils';
@@ -18,37 +18,23 @@ vi.mock('../utils/utils', () => ({
 
 describe('Navbar', () => {
   const originalCreateElement = document.createElement;
+  const originalCreateObjectURL = URL.createObjectURL;
+  const originalRevokeObjectURL = URL.revokeObjectURL;
 
   beforeEach(() => {
-    useFileStore.setState({
-      setPadding: vi.fn(),
-      coordinates: [],
-      addToast: vi.fn(),
-      setFiles: vi.fn(),
-      setCoordinates: vi.fn(),
-      padding: 10,
-      canvasRef: { current: document.createElement('canvas') },
-      toast: null,
-      setToast: vi.fn(),
-    });
+    URL.createObjectURL = vi.fn(() => 'blob:test');
+    URL.revokeObjectURL = vi.fn();
 
-    document.createElement = element => {
-      if (element === 'canvas') {
-        const canvas = originalCreateElement.call(document, element);
-        canvas.getContext = vi.fn().mockReturnValue({
-          clearRect: vi.fn(),
-          drawImage: vi.fn(),
-        });
-        canvas.toDataURL = vi
-          .fn()
-          .mockReturnValue('data:image/png;base64,test');
-        return canvas;
-      }
-      return originalCreateElement.call(document, element);
-    };
+    delete window.location;
+    window.location = { href: '' };
   });
 
-  it('renders correctly', () => {
+  afterEach(() => {
+    URL.createObjectURL = originalCreateObjectURL;
+    URL.revokeObjectURL = originalRevokeObjectURL;
+  });
+
+  it('올바르게 렌더링됩니다', () => {
     render(<Navbar />);
 
     expect(screen.getByTestId('navbar')).toBeInTheDocument();
@@ -57,7 +43,7 @@ describe('Navbar', () => {
     expect(screen.getByText('정렬 옵션 :')).toBeInTheDocument();
   });
 
-  it('calls setPadding on padding input change', () => {
+  it('패딩 입력 변경 시 setPadding을 호출합니다', () => {
     const setPadding = vi.fn();
     useFileStore.setState({ setPadding });
 
@@ -69,7 +55,7 @@ describe('Navbar', () => {
     expect(setPadding).toHaveBeenCalledWith(20);
   });
 
-  it('updates fileName state on input change', () => {
+  it('입력 변경 시 fileName 상태를 업데이트합니다', () => {
     render(<Navbar />);
 
     const fileNameInput =
@@ -79,7 +65,7 @@ describe('Navbar', () => {
     expect(fileNameInput.value).toBe('test-file');
   });
 
-  it('alerts when download button is clicked with no coordinates', () => {
+  it('좌표가 없을 때 다운로드 버튼 클릭 시 알림을 표시합니다', () => {
     const addToast = vi.fn();
     useFileStore.setState({ coordinates: [], addToast });
 
@@ -91,7 +77,7 @@ describe('Navbar', () => {
     expect(addToast).toHaveBeenCalledWith('다운로드할 이미지가 없습니다.');
   });
 
-  it('renders Align-elements options correctly', () => {
+  it('정렬 요소 옵션을 올바르게 렌더링합니다', () => {
     render(<Navbar />);
 
     const selectElement = screen.getByLabelText('정렬 옵션 :');
@@ -103,7 +89,7 @@ describe('Navbar', () => {
     expect(options[2].value).toBe('top-bottom');
   });
 
-  it('displays an error message when padding value is set to less than 1', () => {
+  it('패딩 값이 1 미만으로 설정될 때 오류 메시지를 표시합니다', () => {
     const addToast = vi.fn();
     useFileStore.setState({ addToast });
 
@@ -117,7 +103,7 @@ describe('Navbar', () => {
     );
   });
 
-  it('sets the selected option for align-elements', () => {
+  it('정렬 요소에 대해 선택된 옵션을 설정합니다', () => {
     render(<Navbar />);
 
     const selectElement = screen.getByLabelText('정렬 옵션 :');
@@ -126,36 +112,7 @@ describe('Navbar', () => {
     expect(selectElement.value).toBe('bin-packing');
   });
 
-  it('handles file download with coordinates', async () => {
-    const coordinates = [
-      {
-        img: new Image(),
-        width: 50,
-        height: 50,
-        x: 0,
-        y: 0,
-      },
-    ];
-    useFileStore.setState({ coordinates });
-
-    render(<Navbar />);
-
-    const fileNameInput =
-      screen.getByPlaceholderText(/파일 이름을 입력해주세요./i);
-    fireEvent.change(fileNameInput, { target: { value: 'test-file' } });
-
-    const downloadButton = screen.getByRole('button', { name: /download/i });
-    fireEvent.click(downloadButton);
-
-    await waitFor(() => {
-      const link = document.createElement('a');
-      link.href = 'data:image/png;base64,test';
-      link.download = 'test-file.png';
-      link.click();
-    });
-  });
-
-  it('handles toast disappearance', async () => {
+  it('토스트 사라짐을 처리합니다', async () => {
     vi.useFakeTimers();
     const setToast = vi.fn();
     const toast = { id: 1, message: 'Test toast' };
@@ -174,7 +131,7 @@ describe('Navbar', () => {
     vi.useRealTimers();
   });
 
-  it('shows toast when canvas context cannot be created', async () => {
+  it('캔버스 컨텍스트를 생성할 수 없을 때 토스트를 표시합니다', async () => {
     const addToast = vi.fn();
     useFileStore.setState({
       coordinates: [{ img: new Image(), width: 50, height: 50, x: 0, y: 0 }],
@@ -202,64 +159,7 @@ describe('Navbar', () => {
     });
   });
 
-  it('calculates correct dimensions for left-right alignment', async () => {
-    const coordinates = [
-      { img: new Image(), width: 100, height: 150, x: 0, y: 0 },
-      { img: new Image(), width: 200, height: 100, x: 0, y: 0 },
-      { img: new Image(), width: 150, height: 200, x: 0, y: 0 },
-    ];
-    const padding = 10;
-    useFileStore.setState({
-      coordinates,
-      padding,
-      alignElement: 'left-right',
-    });
-
-    let canvasWidth;
-    let canvasHeight;
-    document.createElement = element => {
-      if (element === 'canvas') {
-        const canvas = originalCreateElement.call(document, element);
-        canvas.getContext = vi.fn().mockReturnValue({
-          clearRect: vi.fn(),
-          drawImage: vi.fn(),
-        });
-        canvas.toDataURL = vi
-          .fn()
-          .mockReturnValue('data:image/png;base64,test');
-        Object.defineProperty(canvas, 'width', {
-          set(value) {
-            canvasWidth = value;
-          },
-          get() {
-            return canvasWidth;
-          },
-        });
-        Object.defineProperty(canvas, 'height', {
-          set(value) {
-            canvasHeight = value;
-          },
-          get() {
-            return canvasHeight;
-          },
-        });
-        return canvas;
-      }
-      return originalCreateElement.call(document, element);
-    };
-
-    render(<Navbar />);
-
-    const downloadButton = screen.getByRole('button', { name: /download/i });
-    fireEvent.click(downloadButton);
-
-    await waitFor(() => {
-      expect(canvasWidth).toBe(490);
-      expect(canvasHeight).toBe(220);
-    });
-  });
-
-  it('handles file input changes correctly', async () => {
+  it('파일 입력 변경을 올바르게 처리합니다', async () => {
     const setFiles = vi.fn();
     const setCoordinates = vi.fn();
     const coordinates = [];

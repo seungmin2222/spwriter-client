@@ -80,7 +80,7 @@ describe('SpriteEditor', () => {
     queryByText = rendered.queryByText;
   });
 
-  it('Selected images are visually indicated', () => {
+  it('선택된 이미지가 시각적으로 표시됩니다', () => {
     const canvas = getByTestId('canvas');
 
     fireEvent.mouseDown(canvas, { clientX: 50, clientY: 50 });
@@ -89,35 +89,35 @@ describe('SpriteEditor', () => {
     expect(mockStore.setSelectedFiles).toHaveBeenCalledWith(expect.any(Set));
   });
 
-  it('handles canvas mouse down', () => {
+  it('캔버스 마우스 다운을 처리합니다', () => {
     const canvas = getByTestId('canvas');
     fireEvent.mouseDown(canvas, { clientX: 100, clientY: 100 });
   });
 
-  it('handles canvas mouse move', () => {
+  it('캔버스 마우스 이동을 처리합니다', () => {
     const canvas = getByTestId('canvas');
     fireEvent.mouseMove(canvas, { clientX: 150, clientY: 150 });
   });
 
-  it('handles canvas mouse up', () => {
+  it('캔버스 마우스 업을 처리합니다', () => {
     const canvas = getByTestId('canvas');
     fireEvent.mouseUp(canvas, { clientX: 150, clientY: 150 });
   });
 
-  it('handles file drop', () => {
+  it('파일 드롭을 처리합니다', () => {
     const editor = getByTestId('sprite-editor');
     const file = new File([''], 'test.png', { type: 'image/png' });
     fireEvent.drop(editor, { dataTransfer: { files: [file] } });
     expect(utils.handleFiles).toHaveBeenCalled();
   });
 
-  it('handles keyboard events', () => {
+  it('키보드 이벤트를 처리합니다', () => {
     const editor = getByTestId('sprite-editor');
     fireEvent.keyDown(editor, { key: 'Shift' });
     fireEvent.keyUp(editor, { key: 'Shift' });
   });
 
-  it('updates tooltip visibility on mouse move', () => {
+  it('마우스 이동 시 툴팁 가시성을 업데이트합니다', () => {
     const canvas = getByTestId('canvas');
     fireEvent.mouseMove(canvas, { clientX: 100, clientY: 100 });
     const tooltip = queryByText(
@@ -126,7 +126,7 @@ describe('SpriteEditor', () => {
     expect(tooltip).toBeTruthy();
   });
 
-  it('updates coordinates on resizing', () => {
+  it('리사이징 시 좌표를 업데이트합니다', () => {
     mockStore.coordinates[0].circle = { x: 110, y: 110, radius: 8 };
     const canvas = getByTestId('canvas');
 
@@ -137,7 +137,7 @@ describe('SpriteEditor', () => {
     expect(mockStore.setCoordinates).toHaveBeenCalled();
   });
 
-  it('properly selects images using selection box', () => {
+  it('선택 상자를 사용하여 이미지를 적절히 선택합니다', () => {
     mockStore.coordinates.push({
       img: { complete: true, src: 'test2.png', width: 100, height: 100 },
       x: 120,
@@ -155,7 +155,7 @@ describe('SpriteEditor', () => {
     expect(mockStore.setSelectedFiles).toHaveBeenCalled();
   });
 
-  it('handles shift key press for aspect ratio preservation', () => {
+  it('Shift 키 누름을 처리하여 종횡비를 유지합니다', () => {
     const canvas = getByTestId('canvas');
 
     fireEvent.mouseDown(canvas, { clientX: 100, clientY: 100 });

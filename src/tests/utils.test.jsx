@@ -52,7 +52,7 @@ describe('Image Processing Functions', () => {
   });
 
   describe('calculateCoordinates', () => {
-    it('should calculate coordinates for bin-packing alignment', () => {
+    it('bin-packing 정렬을 위한 좌표를 계산해야 합니다', () => {
       const images = [
         { width: 100, height: 100 },
         { width: 50, height: 50 },
@@ -64,7 +64,7 @@ describe('Image Processing Functions', () => {
       expect(result[0].y).toBeDefined();
     });
 
-    it('should calculate coordinates for top-bottom alignment', () => {
+    it('top-bottom 정렬을 위한 좌표를 계산해야 합니다', () => {
       const images = [
         { width: 100, height: 100 },
         { width: 50, height: 50 },
@@ -74,7 +74,7 @@ describe('Image Processing Functions', () => {
       expect(result[1].y).toBeGreaterThan(result[0].y);
     });
 
-    it('should calculate coordinates for left-right alignment', () => {
+    it('left-right 정렬을 위한 좌표를 계산해야 합니다', () => {
       const images = [
         { width: 100, height: 100 },
         { width: 50, height: 50 },
@@ -86,7 +86,7 @@ describe('Image Processing Functions', () => {
   });
 
   describe('sortAndSetCoordinates', () => {
-    it('should sort coordinates by area and set them', () => {
+    it('좌표를 면적별로 정렬하고 설정해야 합니다', () => {
       const coords = [
         { width: 50, height: 50 },
         { width: 100, height: 100 },
@@ -105,7 +105,7 @@ describe('Image Processing Functions', () => {
   });
 
   describe('trimImage', () => {
-    it('should trim the image', async () => {
+    it('이미지를 트리밍해야 합니다', async () => {
       const img = new Image();
       const result = await trimImage(img);
       expect(result).toBeInstanceOf(Image);
@@ -114,7 +114,7 @@ describe('Image Processing Functions', () => {
   });
 
   describe('handleFiles', () => {
-    it('should handle file uploads', async () => {
+    it('파일 업로드를 처리해야 합니다', async () => {
       const files = [new File([''], 'test.png', { type: 'image/png' })];
       const setFiles = vi.fn();
       const setCoordinates = vi.fn();
@@ -135,7 +135,7 @@ describe('Image Processing Functions', () => {
   });
 
   describe('resizeSelectedImages', () => {
-    it('should resize selected images', async () => {
+    it('선택된 이미지의 크기를 조정해야 합니다', async () => {
       const coordinates = [
         { img: new Image(), width: 100, height: 100, x: 0, y: 0 },
       ];

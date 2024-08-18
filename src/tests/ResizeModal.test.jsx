@@ -17,7 +17,7 @@ describe('ResizeModal component', () => {
     cleanup();
   });
 
-  it('renders correctly when isOpen is true', () => {
+  it('isOpen이 true일 때 올바르게 렌더링됩니다', () => {
     render(
       <ResizeModal
         isOpen
@@ -32,7 +32,7 @@ describe('ResizeModal component', () => {
     ).toBeInTheDocument();
   });
 
-  it('does not render when isOpen is false', () => {
+  it('isOpen이 false일 때 렌더링되지 않습니다', () => {
     render(
       <ResizeModal
         isOpen={false}
@@ -47,7 +47,7 @@ describe('ResizeModal component', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('calls onConfirm when confirm button is clicked', () => {
+  it('확인 버튼 클릭 시 onConfirm을 호출합니다', () => {
     render(
       <ResizeModal
         isOpen
@@ -61,7 +61,7 @@ describe('ResizeModal component', () => {
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onClose when cancel button is clicked', () => {
+  it('취소 버튼 클릭 시 onClose를 호출합니다', () => {
     render(
       <ResizeModal
         isOpen
@@ -75,7 +75,7 @@ describe('ResizeModal component', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('calls setWidth when width input changes', () => {
+  it('너비 입력 변경 시 setWidth를 호출합니다', () => {
     render(
       <ResizeModal
         isOpen
@@ -91,7 +91,7 @@ describe('ResizeModal component', () => {
     expect(setWidth).toHaveBeenCalledWith('100');
   });
 
-  it('calls setHeight when height input changes', () => {
+  it('높이 입력 변경 시 setHeight를 호출합니다', () => {
     render(
       <ResizeModal
         isOpen
@@ -107,7 +107,7 @@ describe('ResizeModal component', () => {
     expect(setHeight).toHaveBeenCalledWith('200');
   });
 
-  it('calls onConfirm when Enter key is pressed', () => {
+  it('Enter 키 입력 시 onConfirm을 호출합니다', () => {
     render(
       <ResizeModal
         isOpen
@@ -121,7 +121,7 @@ describe('ResizeModal component', () => {
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onClose when Escape key is pressed', () => {
+  it('Escape 키 입력 시 onClose를 호출합니다', () => {
     render(
       <ResizeModal
         isOpen

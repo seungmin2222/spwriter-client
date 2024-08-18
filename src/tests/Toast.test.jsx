@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import Toast from '../components/Toast';
 
 describe('Toast component', () => {
-  it('renders the Toast component with the correct message', () => {
+  it('올바른 메시지로 Toast 컴포넌트를 렌더링합니다', () => {
     const testId = 1;
     const testMessage = 'This is a test message';
 
@@ -16,7 +16,7 @@ describe('Toast component', () => {
     );
   });
 
-  it('disappears after a certain time', async () => {
+  it('일정 시간 후에 사라집니다', async () => {
     vi.useFakeTimers();
 
     const testId = 1;

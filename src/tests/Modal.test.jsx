@@ -12,7 +12,7 @@ describe('Modal component', () => {
     handleConfirm.mockClear();
   });
 
-  it('renders correctly when showModal is true', () => {
+  it('showModal이 true일 때 올바르게 렌더링됩니다', () => {
     render(
       <Modal
         showModal
@@ -23,7 +23,7 @@ describe('Modal component', () => {
     expect(screen.getByTestId('modal')).toBeInTheDocument();
   });
 
-  it('does not render when showModal is false', () => {
+  it('showModal이 false일 때 렌더링되지 않습니다', () => {
     render(
       <Modal
         showModal={false}
@@ -34,7 +34,7 @@ describe('Modal component', () => {
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
   });
 
-  it('handles Enter key press', () => {
+  it('Enter 키 입력을 처리합니다', () => {
     render(
       <Modal
         showModal
@@ -47,7 +47,7 @@ describe('Modal component', () => {
     expect(handleConfirm).toHaveBeenCalledTimes(1);
   });
 
-  it('handles Escape key press', () => {
+  it('Escape 키 입력을 처리합니다', () => {
     render(
       <Modal
         showModal

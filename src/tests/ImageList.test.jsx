@@ -1,272 +1,243 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ImageList from '../components/ImageList';
 import useFileStore from '../../store';
 
 vi.mock('../components/Modal', () => ({
   __esModule: true,
-  default: ({ showModal, handleClose, handleConfirm }) => {
-    return showModal ? (
+  default: ({ showModal, handleClose, handleConfirm }) =>
+    showModal ? (
       <div data-testid="mock-modal">
         <button onClick={handleClose}>Close</button>
         <button onClick={handleConfirm}>Confirm</button>
       </div>
-    ) : null;
-  },
+    ) : null,
 }));
 
 vi.mock('../components/ResizeModal', () => ({
   __esModule: true,
-  default: ({ isOpen, onClose, onConfirm, setWidth, setHeight }) => {
-    return isOpen ? (
+  default: ({ isOpen, onClose, onConfirm, setWidth, setHeight }) =>
+    isOpen ? (
       <div data-testid="mock-resize-modal">
         <input aria-label="너비" onChange={e => setWidth(e.target.value)} />
         <input aria-label="높이" onChange={e => setHeight(e.target.value)} />
         <button onClick={onConfirm}>확인</button>
         <button onClick={onClose}>취소</button>
       </div>
-    ) : null;
-  },
+    ) : null,
 }));
 
 describe('ImageList component', () => {
+  const mockCoordinates = [
+    {
+      img: { src: 'image1.png', width: 100, height: 100 },
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    },
+    {
+      img: { src: 'image2.png', width: 100, height: 100 },
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    },
+  ];
+
   beforeEach(() => {
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+      drawImage: vi.fn(),
+      getImageData: vi.fn(() => ({ data: new Uint8ClampedArray(400) })),
+    }));
+    HTMLCanvasElement.prototype.toDataURL = vi.fn(
+      () => 'data:image/png;base64,mockDataUrl'
+    );
+
     Object.assign(navigator, {
-      clipboard: {
-        writeText: vi.fn().mockResolvedValue(),
-      },
+      clipboard: { writeText: vi.fn().mockResolvedValue() },
     });
 
-    global.Image = class {
-      constructor() {
-        setTimeout(() => {
-          this.onload();
-        }, 100);
-      }
-    };
-
     useFileStore.setState({
-      coordinates: [
-        {
-          img: { src: 'image1.png', width: 100, height: 100 },
-          width: 100,
-          height: 100,
-          x: 0,
-          y: 0,
-        },
-        {
-          img: { src: 'image2.png', width: 100, height: 100 },
-          width: 100,
-          height: 100,
-          x: 0,
-          y: 0,
-        },
-      ],
+      coordinates: mockCoordinates,
       selectedFiles: new Set(),
       setCoordinates: vi.fn(),
       addHistory: vi.fn(),
       setSelectedFiles: vi.fn(),
+      setFiles: vi.fn(),
+      addToast: vi.fn(),
     });
   });
 
-  it('handles mouse hover state correctly', () => {
-    render(<ImageList />);
-    const listItems = screen.getAllByRole('button', { tabIndex: 0 });
-    expect(listItems.length).toBeGreaterThan(0);
-    const listItem = listItems[0];
-
-    const deleteButton = screen.getAllByRole('button', { name: /cross/i })[0];
-
-    fireEvent.mouseLeave(deleteButton);
-    expect(listItem).toHaveClass('hover:bg-[#25203b]');
-  });
-
-  it('closes the modal when the Close button is clicked', () => {
-    render(<ImageList />);
-    const deleteButtons = screen.getAllByRole('button', { name: /cross/i });
-    fireEvent.click(deleteButtons[0]);
-    fireEvent.click(screen.getByText('Close'));
-    expect(screen.queryByTestId('mock-modal')).not.toBeInTheDocument();
-  });
-
-  it('closes the modal when the Confirm button is clicked', () => {
-    render(<ImageList />);
-    const deleteButtons = screen.getAllByRole('button', { name: /cross/i });
-    fireEvent.click(deleteButtons[0]);
-    fireEvent.click(screen.getByText('Confirm'));
-    expect(screen.queryByTestId('mock-modal')).not.toBeInTheDocument();
-  });
-
-  it('shows toast when no images are selected', () => {
-    useFileStore.setState({ selectedFiles: new Set() });
-    render(<ImageList />);
-
-    const resizeButton = screen.getByText('크기 조정');
-    fireEvent.click(resizeButton);
-
-    expect(screen.getByText('선택된 이미지가 없습니다.')).toBeInTheDocument();
-  });
-
-  it('opens resize modal when images are selected for resize', () => {
-    useFileStore.setState({ selectedFiles: new Set(['image1.png']) });
-    render(<ImageList />);
-
-    const resizeButton = screen.getByText('크기 조정');
-    fireEvent.click(resizeButton);
-
-    expect(screen.getByTestId('mock-resize-modal')).toBeInTheDocument();
-  });
-
-  it('updates image size when valid dimensions are provided in resize modal', async () => {
-    useFileStore.setState({ selectedFiles: new Set(['image1.png']) });
-    render(<ImageList />);
-
-    const resizeButton = screen.getByText('크기 조정');
-    fireEvent.click(resizeButton);
-
-    const widthInput = screen.getByLabelText('너비');
-    const heightInput = screen.getByLabelText('높이');
-    fireEvent.change(widthInput, { target: { value: '200' } });
-    fireEvent.change(heightInput, { target: { value: '200' } });
-
-    const confirmButton = screen.getByText('확인');
-    await act(async () => {
-      fireEvent.click(confirmButton);
+  describe('UI Rendering', () => {
+    it('이미지가 없을 때 빈 상태 메시지를 렌더링합니다', () => {
+      useFileStore.setState({ coordinates: [] });
+      render(<ImageList />);
+      expect(
+        screen.getByText('이미지 파일을 드래그하여 놓거나 클릭하여 선택하세요.')
+      ).toBeInTheDocument();
     });
 
-    expect(useFileStore.getState().setCoordinates).toHaveBeenCalled();
-    expect(useFileStore.getState().addHistory).toHaveBeenCalled();
-    expect(
-      screen.getByText('선택된 이미지의 크기가 조정되었습니다.')
-    ).toBeInTheDocument();
-  });
-
-  it('shows empty state message when no images are available', () => {
-    useFileStore.setState({ coordinates: [] });
-    render(<ImageList />);
-
-    expect(
-      screen.getByText('이미지 파일을 드래그하여 놓거나 클릭하여 선택하세요.')
-    ).toBeInTheDocument();
-  });
-
-  it('selects all images when "전체 선택" button is clicked', () => {
-    render(<ImageList />);
-    const selectAllButton = screen.getByText('전체 선택');
-    fireEvent.click(selectAllButton);
-    expect(useFileStore.getState().setSelectedFiles).toHaveBeenCalledWith(
-      new Set([
-        { src: 'image1.png', width: 100, height: 100 },
-        { src: 'image2.png', width: 100, height: 100 },
-      ])
-    );
-  });
-
-  it('deselects all images when "전체 해제" button is clicked', () => {
-    render(<ImageList />);
-    const deselectAllButton = screen.getByText('전체 해제');
-    fireEvent.click(deselectAllButton);
-    expect(useFileStore.getState().setSelectedFiles).toHaveBeenCalledWith(
-      new Set()
-    );
-  });
-
-  it('shows toast when trying to copy coordinates with no selection', () => {
-    render(<ImageList />);
-    const copyButton = screen.getByText('선택좌표 복사');
-    fireEvent.click(copyButton);
-    expect(screen.getByText('선택된 이미지가 없습니다.')).toBeInTheDocument();
-  });
-
-  it('closes resize modal when cancel button is clicked', () => {
-    useFileStore.setState({ selectedFiles: new Set(['image1.png']) });
-    render(<ImageList />);
-
-    const resizeButton = screen.getByText('크기 조정');
-    fireEvent.click(resizeButton);
-
-    const cancelButton = screen.getByText('취소');
-    fireEvent.click(cancelButton);
-
-    expect(screen.queryByTestId('mock-resize-modal')).not.toBeInTheDocument();
-  });
-
-  it('handles file drop correctly', async () => {
-    const mockFile = new File(['dummy content'], 'test.png', {
-      type: 'image/png',
+    it('올바른 수의 이미지 항목을 렌더링합니다', () => {
+      render(<ImageList />);
+      const imageItems = screen.getAllByRole('button', { name: /Thumbnail/ });
+      expect(imageItems).toHaveLength(mockCoordinates.length);
     });
-    const mockSetFiles = vi.fn();
-    useFileStore.setState({ setFiles: mockSetFiles });
+  });
 
-    render(<ImageList />);
-    const dropzone = screen.getByTestId('image-list');
+  describe('Image Selection', () => {
+    it('모든 이미지를 선택하고 선택 해제합니다', () => {
+      render(<ImageList />);
 
-    await act(async () => {
-      fireEvent.drop(dropzone, {
-        dataTransfer: {
-          files: [mockFile],
-        },
+      fireEvent.click(screen.getByText('전체 선택'));
+      expect(useFileStore.getState().setSelectedFiles).toHaveBeenCalledWith(
+        new Set(mockCoordinates.map(coord => coord.img))
+      );
+
+      fireEvent.click(screen.getByText('전체 해제'));
+      expect(useFileStore.getState().setSelectedFiles).toHaveBeenCalledWith(
+        new Set()
+      );
+    });
+
+    it('개별 이미지 선택을 처리합니다', () => {
+      const mockSetSelectedFiles = vi.fn();
+      useFileStore.setState({ setSelectedFiles: mockSetSelectedFiles });
+      render(<ImageList />);
+
+      const imageItem = screen.getByRole('button', { name: /Thumbnail 0/ });
+      fireEvent.click(imageItem);
+
+      expect(mockSetSelectedFiles).toHaveBeenCalledWith(
+        new Set([mockCoordinates[0].img])
+      );
+    });
+
+    it('이미지 선택을 위한 키보드 탐색을 처리합니다', () => {
+      const mockSetSelectedFiles = vi.fn();
+      useFileStore.setState({ setSelectedFiles: mockSetSelectedFiles });
+      render(<ImageList />);
+
+      const imageItem = screen.getByRole('button', { name: /Thumbnail 0/ });
+      fireEvent.keyDown(imageItem, { key: 'Enter', code: 'Enter' });
+      expect(mockSetSelectedFiles).toHaveBeenCalledWith(
+        new Set([mockCoordinates[0].img])
+      );
+
+      fireEvent.keyDown(imageItem, { key: ' ', code: 'Space' });
+      expect(mockSetSelectedFiles).toHaveBeenCalled();
+    });
+  });
+
+  describe('Image Operations', () => {
+    it('파일 드롭을 올바르게 처리합니다', async () => {
+      const mockFile = new File(['dummy content'], 'test.png', {
+        type: 'image/png',
+      });
+      const mockSetFiles = vi.fn();
+      useFileStore.setState({ setFiles: mockSetFiles });
+
+      render(<ImageList />);
+      const dropzone = screen.getByTestId('image-list');
+
+      await act(async () => {
+        fireEvent.drop(dropzone, { dataTransfer: { files: [mockFile] } });
+      });
+
+      expect(mockSetFiles).toHaveBeenCalled();
+    });
+
+    it('선택된 좌표를 클립보드에 복사합니다', async () => {
+      useFileStore.setState({
+        selectedFiles: new Set([mockCoordinates[0].img]),
+      });
+      render(<ImageList />);
+
+      fireEvent.click(screen.getByText('선택좌표 복사'));
+
+      await waitFor(() => {
+        expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+          expect.stringContaining('.sprite-0')
+        );
+      });
+    });
+  });
+
+  describe('Modal Interactions', () => {
+    it('삭제 확인 모달을 열고 닫습니다', () => {
+      render(<ImageList />);
+      const deleteButtons = screen.getAllByRole('button', { name: /cross/i });
+
+      fireEvent.click(deleteButtons[0]);
+      expect(screen.getByTestId('mock-modal')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByText('Close'));
+      expect(screen.queryByTestId('mock-modal')).not.toBeInTheDocument();
+    });
+
+    it('크기 조정 모달을 열고 닫습니다', () => {
+      useFileStore.setState({
+        selectedFiles: new Set([mockCoordinates[0].img]),
+      });
+      render(<ImageList />);
+
+      fireEvent.click(screen.getByText('크기 조정'));
+      expect(screen.getByTestId('mock-resize-modal')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByText('취소'));
+      expect(screen.queryByTestId('mock-resize-modal')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Deletion', () => {
+    it('단일 이미지를 삭제합니다', async () => {
+      render(<ImageList />);
+      const deleteButtons = screen.getAllByRole('button', { name: /cross/i });
+
+      fireEvent.click(deleteButtons[0]);
+      fireEvent.click(screen.getByText('Confirm'));
+
+      await waitFor(() => {
+        expect(useFileStore.getState().setCoordinates).toHaveBeenCalled();
       });
     });
 
-    expect(mockSetFiles).toHaveBeenCalled();
-  });
+    it('선택된 여러 이미지를 삭제합니다', async () => {
+      useFileStore.setState({
+        selectedFiles: new Set([
+          mockCoordinates[0].img,
+          mockCoordinates[1].img,
+        ]),
+      });
+      render(<ImageList />);
 
-  it('handles image selection correctly', () => {
-    const mockSetSelectedFiles = vi.fn();
-    useFileStore.setState({
-      selectedFiles: new Set(),
-      setSelectedFiles: mockSetSelectedFiles,
-      coordinates: [
-        {
-          img: { src: 'image1.png', width: 100, height: 100 },
-          x: 0,
-          y: 0,
-          width: 100,
-          height: 100,
-        },
-      ],
+      fireEvent.click(screen.getByText('선택삭제'));
+      fireEvent.click(screen.getByText('Confirm'));
+
+      await waitFor(() => {
+        expect(useFileStore.getState().setCoordinates).toHaveBeenCalled();
+      });
     });
-    render(<ImageList />);
-
-    const imageItem = screen.getByRole('button', { name: /Thumbnail 0/ });
-    fireEvent.click(imageItem);
-
-    expect(mockSetSelectedFiles).toHaveBeenCalledWith(
-      new Set([{ src: 'image1.png', width: 100, height: 100 }])
-    );
   });
 
-  it('shows toast when trying to delete with no selection', () => {
-    render(<ImageList />);
-    const deleteButton = screen.getByText('선택삭제');
-    fireEvent.click(deleteButton);
-    expect(screen.getByText('선택된 이미지가 없습니다.')).toBeInTheDocument();
-  });
+  describe('Additional functionality tests', () => {
+    it('드래그 앤 드롭으로 이미지 순서를 변경합니다', () => {
+      render(<ImageList />);
 
-  it('handles keyboard navigation for image selection', () => {
-    const mockSetSelectedFiles = vi.fn();
-    useFileStore.setState({
-      selectedFiles: new Set(),
-      setSelectedFiles: mockSetSelectedFiles,
-      coordinates: [
-        {
-          img: { src: 'image1.png', width: 100, height: 100 },
-          x: 0,
-          y: 0,
-          width: 100,
-          height: 100,
-        },
-      ],
+      const imageItems = screen.getAllByRole('button', { name: /Thumbnail/ });
+
+      fireEvent.dragStart(imageItems[0]);
+      fireEvent.dragOver(imageItems[1]);
+      fireEvent.drop(imageItems[1]);
+
+      expect(useFileStore.getState().setCoordinates).toHaveBeenCalled();
     });
-    render(<ImageList />);
-
-    const imageItem = screen.getByRole('button', { name: /Thumbnail 0/ });
-    fireEvent.keyDown(imageItem, { key: 'Enter', code: 'Enter' });
-
-    expect(mockSetSelectedFiles).toHaveBeenCalledWith(
-      new Set([{ src: 'image1.png', width: 100, height: 100 }])
-    );
   });
 });

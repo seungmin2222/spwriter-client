@@ -1,4 +1,4 @@
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import useFileStore from '../../store';
 
@@ -9,7 +9,7 @@ describe('useFileStore', () => {
     store = useFileStore.getState();
   });
 
-  it('should initialize with default values', () => {
+  it('기본값으로 초기화되어야 합니다', () => {
     expect(store.files).toEqual([]);
     expect(store.padding).toBe(10);
     expect(store.coordinates).toEqual([]);
@@ -17,7 +17,7 @@ describe('useFileStore', () => {
     expect(store.selectedFiles).toBeDefined();
   });
 
-  it('should set files', () => {
+  it('파일을 설정해야 합니다', () => {
     act(() => {
       store.setFiles(['file1', 'file2']);
     });
@@ -25,7 +25,7 @@ describe('useFileStore', () => {
     expect(newState.files).toEqual(['file1', 'file2']);
   });
 
-  it('should set padding', () => {
+  it('패딩을 설정해야 합니다', () => {
     act(() => {
       store.setPadding(20);
     });
@@ -33,7 +33,7 @@ describe('useFileStore', () => {
     expect(newState.padding).toBe(20);
   });
 
-  it('should set coordinates', () => {
+  it('좌표를 설정해야 합니다', () => {
     act(() => {
       store.setCoordinates([{ x: 0, y: 0 }]);
     });
@@ -41,7 +41,7 @@ describe('useFileStore', () => {
     expect(newState.coordinates).toEqual([{ x: 0, y: 0 }]);
   });
 
-  it('should set toast', () => {
+  it('토스트를 설정해야 합니다', () => {
     act(() => {
       store.setToast({ id: 1, message: 'Toast message' });
     });
@@ -49,7 +49,7 @@ describe('useFileStore', () => {
     expect(newState.toast).toEqual({ id: 1, message: 'Toast message' });
   });
 
-  it('should add toast', () => {
+  it('토스트를 추가해야 합니다', () => {
     act(() => {
       store.addToast('New toast message');
     });
@@ -59,7 +59,8 @@ describe('useFileStore', () => {
     });
     expect(newState.toast.id).toBeDefined();
   });
-  it('should set selected files', () => {
+
+  it('선택된 파일을 설정해야 합니다', () => {
     const newSelectedFiles = new Set(['file1', 'file2']);
     act(() => {
       store.setSelectedFiles(newSelectedFiles);
@@ -68,7 +69,7 @@ describe('useFileStore', () => {
     expect(newState.selectedFiles).toEqual(newSelectedFiles);
   });
 
-  it('should set file name', () => {
+  it('파일 이름을 설정해야 합니다', () => {
     act(() => {
       store.setFileName('test.jpg');
     });
@@ -76,7 +77,7 @@ describe('useFileStore', () => {
     expect(newState.fileName).toBe('test.jpg');
   });
 
-  it('should set resized image', () => {
+  it('크기 조정된 이미지를 설정해야 합니다', () => {
     const mockImage = new Blob([''], { type: 'image/jpeg' });
     act(() => {
       store.setResizedImage(mockImage);
@@ -85,7 +86,7 @@ describe('useFileStore', () => {
     expect(newState.resizedImage).toBe(mockImage);
   });
 
-  it('should set align element', () => {
+  it('정렬 요소를 설정해야 합니다', () => {
     act(() => {
       store.setAlignElement('grid');
     });
@@ -93,7 +94,7 @@ describe('useFileStore', () => {
     expect(newState.alignElement).toBe('grid');
   });
 
-  it('should add to history', () => {
+  it('히스토리에 추가해야 합니다', () => {
     const prevCoordinates = [{ x: 0, y: 0 }];
     act(() => {
       store.addHistory(prevCoordinates);
@@ -103,7 +104,7 @@ describe('useFileStore', () => {
     expect(newState.redoHistory).toEqual([]);
   });
 
-  it('should pop history', () => {
+  it('히스토리에서 제거해야 합니다', () => {
     const initialCoordinates = [{ x: 0, y: 0 }];
     const newCoordinates = [{ x: 1, y: 1 }];
     act(() => {
@@ -119,7 +120,7 @@ describe('useFileStore', () => {
     expect(newState.redoHistory).toContain(newCoordinates);
   });
 
-  it('should push history', () => {
+  it('히스토리를 푸시해야 합니다', () => {
     const initialCoordinates = [{ x: 0, y: 0 }];
     const newCoordinates = [{ x: 1, y: 1 }];
     act(() => {

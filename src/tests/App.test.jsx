@@ -21,22 +21,22 @@ describe('App component', () => {
     });
   });
 
-  it('renders correctly', () => {
+  it('올바르게 렌더링됩니다', () => {
     render(<App />);
     expect(screen.getByTestId('app')).toBeInTheDocument();
   });
 
-  it('contains the ImageList component', () => {
+  it('ImageList 컴포넌트를 포함합니다', () => {
     render(<App />);
     expect(screen.getByTestId('image-list')).toBeInTheDocument();
   });
 
-  it('contains the SpriteMain component', () => {
+  it('SpriteMain 컴포넌트를 포함합니다', () => {
     render(<App />);
     expect(screen.getByTestId('sprite-main')).toBeInTheDocument();
   });
 
-  it('displays mobile message on mobile devices', () => {
+  it('모바일 기기에서 모바일 메시지를 표시합니다', () => {
     Object.defineProperty(window.navigator, 'userAgent', {
       value:
         'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',

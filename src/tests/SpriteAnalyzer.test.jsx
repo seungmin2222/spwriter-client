@@ -2,7 +2,7 @@ import { expect, it, describe } from 'vitest';
 import analyzeSpritesSheet from '../utils/spriteAnalyzer';
 
 describe('analyzeSpritesSheet', () => {
-  it('should correctly identify a single sprite', () => {
+  it('단일 스프라이트를 올바르게 식별해야 합니다', () => {
     const imageData = new Uint8ClampedArray([
       255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255,
     ]);
@@ -14,7 +14,7 @@ describe('analyzeSpritesSheet', () => {
     expect(result).toEqual([{ x: 0, y: 0, width: 2, height: 2 }]);
   });
 
-  it('should merge adjacent sprites', () => {
+  it('인접한 스프라이트를 병합해야 합니다', () => {
     const imageData = new Uint8ClampedArray([
       255, 0, 0, 255, 0, 0, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0,
       255, 255, 0, 0, 255, 0, 0, 0, 0, 255, 0, 0, 255, 0, 0, 0, 0,
@@ -28,7 +28,7 @@ describe('analyzeSpritesSheet', () => {
     expect(result[0]).toEqual({ x: 0, y: 0, width: 3, height: 3 });
   });
 
-  it('should identify multiple separate sprites', () => {
+  it('여러 개의 분리된 스프라이트를 식별해야 합니다', () => {
     const imageData = new Uint8ClampedArray([
       255, 0, 0, 255, 0, 0, 0, 0, 255, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 255, 0, 0, 255, 0, 0, 0, 0,
@@ -44,7 +44,7 @@ describe('analyzeSpritesSheet', () => {
     expect(result).toContainEqual({ x: 1, y: 2, width: 1, height: 1 });
   });
 
-  it('should correctly handle multiple sprites by merging them into one', () => {
+  it('여러 스프라이트를 하나로 병합하여 올바르게 처리해야 합니다', () => {
     const imageData = new Uint8ClampedArray([
       255, 0, 0, 255, 0, 0, 0, 0, 255, 0, 0, 255, 0, 0, 0, 0, 255, 0, 0, 255, 0,
       0, 0, 0, 255, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 255, 255, 0,

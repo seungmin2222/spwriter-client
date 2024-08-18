@@ -40,7 +40,7 @@ describe('Footer component', () => {
     useFileStore.mockImplementation(selector => selector(mockStore));
   });
 
-  it('contains five buttons with appropriate icons and tooltips', () => {
+  it('적절한 아이콘과 툴팁이 있는 다섯 개의 버튼을 포함합니다', () => {
     render(<Footer />);
 
     const buttons = screen.getAllByRole('button');
@@ -53,7 +53,7 @@ describe('Footer component', () => {
     expect(screen.getByTitle('다시 실행')).toBeInTheDocument();
   });
 
-  it('renders tooltips for each button', () => {
+  it('각 버튼에 대한 툴팁을 렌더링합니다', () => {
     render(<Footer />);
 
     expect(screen.getByTitle('회전')).toHaveTextContent('90° 회전');
@@ -63,7 +63,7 @@ describe('Footer component', () => {
     expect(screen.getByTitle('다시 실행')).toHaveTextContent('다시 실행');
   });
 
-  it('applies correct styles to buttons', () => {
+  it('버튼에 올바른 스타일을 적용합니다', () => {
     render(<Footer />);
     const buttons = screen.getAllByRole('button');
     buttons.forEach(button => {
@@ -72,7 +72,7 @@ describe('Footer component', () => {
     });
   });
 
-  it('handles undo action when history exists', () => {
+  it('히스토리가 존재할 때 실행 취소 동작을 처리합니다', () => {
     mockStore.history = ['previousState'];
     render(<Footer />);
     const undoButton = screen.getByTitle('실행 취소');
@@ -81,7 +81,7 @@ describe('Footer component', () => {
     expect(mockStore.popHistory).toHaveBeenCalled();
   });
 
-  it('handles redo action when redo history exists', () => {
+  it('다시 실행 히스토리가 존재할 때 다시 실행 동작을 처리합니다', () => {
     mockStore.redoHistory = ['nextState'];
     render(<Footer />);
     const redoButton = screen.getByTitle('다시 실행');
@@ -90,7 +90,7 @@ describe('Footer component', () => {
     expect(mockStore.pushHistory).toHaveBeenCalled();
   });
 
-  it('shows toast when no files are selected for actions', () => {
+  it('동작을 위해 선택된 파일이 없을 때 토스트를 표시합니다', () => {
     render(<Footer />);
     const cloneButton = screen.getByTitle('복제');
     fireEvent.click(cloneButton);
@@ -100,7 +100,7 @@ describe('Footer component', () => {
     );
   });
 
-  it('shows toast when no history for undo', () => {
+  it('실행 취소할 히스토리가 없을 때 토스트를 표시합니다', () => {
     render(<Footer />);
     const undoButton = screen.getByTitle('실행 취소');
     fireEvent.click(undoButton);
@@ -110,7 +110,7 @@ describe('Footer component', () => {
     );
   });
 
-  it('shows toast when no redo history', () => {
+  it('다시 실행할 히스토리가 없을 때 토스트를 표시합니다', () => {
     render(<Footer />);
     const redoButton = screen.getByTitle('다시 실행');
     fireEvent.click(redoButton);
@@ -120,7 +120,7 @@ describe('Footer component', () => {
     );
   });
 
-  it('handles clone action when files are selected', () => {
+  it('파일이 선택되었을 때 복제 동작을 처리합니다', () => {
     mockStore.selectedFiles = new Set(['file1', 'file2']);
     render(<Footer />);
     const cloneButton = screen.getByTitle('복제');
@@ -136,7 +136,7 @@ describe('Footer component', () => {
     );
   });
 
-  it('handles rotate action when files are selected', () => {
+  it('파일이 선택되었을 때 회전 동작을 처리합니다', () => {
     mockStore.selectedFiles = new Set(['file1', 'file2']);
     render(<Footer />);
     const rotateButton = screen.getByTitle('회전');
@@ -150,7 +150,7 @@ describe('Footer component', () => {
     );
   });
 
-  it('handles inversion action when files are selected', () => {
+  it('파일이 선택되었을 때 반전 동작을 처리합니다', () => {
     mockStore.selectedFiles = new Set(['file1', 'file2']);
     render(<Footer />);
     const inversionButton = screen.getByTitle('반전');
