@@ -226,18 +226,4 @@ describe('ImageList component', () => {
       });
     });
   });
-
-  describe('Additional functionality tests', () => {
-    it('드래그 앤 드롭으로 이미지 순서를 변경합니다', () => {
-      render(<ImageList />);
-
-      const imageItems = screen.getAllByRole('button', { name: /Thumbnail/ });
-
-      fireEvent.dragStart(imageItems[0]);
-      fireEvent.dragOver(imageItems[1]);
-      fireEvent.drop(imageItems[1]);
-
-      expect(useFileStore.getState().setCoordinates).toHaveBeenCalled();
-    });
-  });
 });

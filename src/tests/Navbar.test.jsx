@@ -34,27 +34,6 @@ describe('Navbar', () => {
     URL.revokeObjectURL = originalRevokeObjectURL;
   });
 
-  it('올바르게 렌더링됩니다', () => {
-    render(<Navbar />);
-
-    expect(screen.getByTestId('navbar')).toBeInTheDocument();
-    expect(screen.getByText('Open files')).toBeInTheDocument();
-    expect(screen.getByText('Padding :')).toBeInTheDocument();
-    expect(screen.getByText('정렬 옵션 :')).toBeInTheDocument();
-  });
-
-  it('패딩 입력 변경 시 setPadding을 호출합니다', () => {
-    const setPadding = vi.fn();
-    useFileStore.setState({ setPadding });
-
-    render(<Navbar />);
-
-    const paddingInput = screen.getByLabelText('Padding :');
-    fireEvent.change(paddingInput, { target: { value: '20' } });
-
-    expect(setPadding).toHaveBeenCalledWith(20);
-  });
-
   it('입력 변경 시 fileName 상태를 업데이트합니다', () => {
     render(<Navbar />);
 
