@@ -4,8 +4,8 @@ import SpriteMain from './SpriteMain';
 
 import xMarkIcon from '../assets/images/circle-xmark-regular.svg';
 
-function App() {
-  const [isMobile, setIsMobile] = useState(false);
+const App: React.FC = () => {
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -35,7 +35,7 @@ function App() {
       const mobile = regex.test(navigator.userAgent);
 
       const isIPad =
-        /iPad|MacIntel/.test(navigator.maxTouchPoints) &&
+        /iPad|MacIntel/.test(`${navigator.maxTouchPoints}`) &&
         'ontouchend' in document;
 
       setIsMobile(mobile || isIPad);
@@ -74,6 +74,6 @@ function App() {
       <SpriteMain />
     </div>
   );
-}
+};
 
 export default App;
