@@ -342,7 +342,7 @@ export const trimImage = async (
 };
 
 export const handleFiles = async (
-  files: FileList,
+  files: File[],
   setFiles: React.Dispatch<React.SetStateAction<File[]>>,
   setCoordinates: (coords: PackedImage[]) => void,
   coordinates: PackedImage[],

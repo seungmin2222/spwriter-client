@@ -1,10 +1,10 @@
 import React from 'react';
-import Toast from './Toast.tsx';
+import Toast from './Toast';
 import useFileStore from '../../store';
-import { handleFiles } from '../utils/utils.tsx';
+import { handleFiles } from '../utils/utils';
 import downloadIcon from '../assets/images/download-solid.svg';
 
-function Navbar() {
+const Navbar = () => {
   const fileName = useFileStore(state => state.fileName);
   const setFileName = useFileStore(state => state.setFileName);
   const setFiles = useFileStore(state => state.setFiles);
@@ -18,7 +18,7 @@ function Navbar() {
   const alignElement = useFileStore(state => state.alignElement);
   const setAlignElement = useFileStore(state => state.setAlignElement);
 
-  const handlePaddingChange = e => {
+  const handlePaddingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
     if (value <= 0) {
       addToast('Padding 값은 1보다 작을 수 없습니다.');
@@ -41,8 +41,8 @@ function Navbar() {
       return;
     }
 
-    let totalWidth;
-    let maxHeight;
+    let totalWidth: number = 0;
+    let maxHeight: number = 0;
 
     if (alignElement === 'left-right') {
       totalWidth = coordinates.reduce(
@@ -88,7 +88,7 @@ function Navbar() {
     link.click();
   };
 
-  const removeToast = id => {
+  const removeToast = (id: number) => {
     if (toast && toast.id === id) {
       setToast(null);
     }
@@ -106,17 +106,23 @@ function Navbar() {
             id="fileInput"
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             multiple
-            onChange={e =>
-              handleFiles(
-                Array.from(e.target.files),
-                setFiles,
-                setCoordinates,
-                coordinates,
-                paddingValue,
-                alignElement
-              )
-            }
+            onChange={e => {
+              const files = e.target.files;
+              if (files) {
+                const filesArray = Array.from(files);
+                setFiles(filesArray);
+                handleFiles(
+                  filesArray,
+                  setFiles,
+                  setCoordinates,
+                  coordinates,
+                  paddingValue,
+                  alignElement
+                );
+              }
+            }}
           />
+
           <label
             htmlFor="fileInput"
             className="flex items-center justify-center text-[18px] w-[8rem] h-full px-3 text-white font-semibold cursor-pointer"
@@ -147,13 +153,18 @@ function Navbar() {
           <select
             id="align-elements"
             value={alignElement}
-            onChange={e => setAlignElement(e.target.value)}
+            onChange={e =>
+              setAlignElement(
+                e.target.value as 'bin-packing' | 'top-bottom' | 'left-right'
+              )
+            }
             className="w-32"
           >
             <option value="bin-packing">Bin-Packing</option>
             <option value="left-right">Left-Right</option>
             <option value="top-bottom">Top-Bottom</option>
           </select>
+          ㄴ
         </div>
       </div>
       <div className="flex w-[26%]">
@@ -183,6 +194,6 @@ function Navbar() {
       )}
     </nav>
   );
-}
+};
 
 export default Navbar;
