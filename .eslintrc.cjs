@@ -15,7 +15,16 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs', '*.spec.jsx', '*.spec.tsx', '*.test.jsx'],
+  ignorePatterns: [
+    'dist',
+    '.eslintrc.cjs',
+    '*.spec.jsx',
+    '*.spec.tsx',
+    '*.test.jsx',
+    'coverage/**/*',
+    'postcss.config.js',
+    'tailwind.config.js'
+  ],
   overrides: [
     {
       env: {
@@ -27,7 +36,10 @@ module.exports = {
       },
     },
     {
-      files: ['**/*.jsx', '**/*.tsx'],
+      files: ['**/*.ts', '**/*.tsx'],
+      extends: [
+        'plugin:@typescript-eslint/recommended',
+      ],
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
@@ -35,7 +47,11 @@ module.exports = {
       },
     },
     {
-      files: ['**/*.ts', '**/*.tsx'],
+      files: ['**/*.js', '**/*.jsx'],
+      extends: [
+        'eslint:recommended',
+        'plugin:react/recommended',
+      ],
       parser: '@typescript-eslint/parser',
       parserOptions: {
         ecmaVersion: 'latest',
