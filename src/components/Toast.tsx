@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
 interface ToastProps {
-  id: string;
+  id: number;
   message: string;
-  onClose: (id: string) => void;
+  onClose: (id: number) => void;
 }
 
 function Toast({ id, message, onClose }: ToastProps) {

@@ -16,7 +16,7 @@ interface Toast {
 
 interface FileStore {
   files: File[];
-  setFiles: (files: File[]) => void;
+  setFiles: React.Dispatch<React.SetStateAction<File[]>>;
 
   padding: number;
   setPadding: (padding: number) => void;
@@ -54,7 +54,14 @@ interface FileStore {
 
 const useFileStore = create<FileStore>(set => ({
   files: [],
-  setFiles: files => set({ files }),
+  setFiles: filesOrUpdater =>
+    set(state => {
+      const newFiles =
+        typeof filesOrUpdater === 'function'
+          ? filesOrUpdater(state.files)
+          : filesOrUpdater;
+      return { files: newFiles };
+    }),
 
   padding: 10,
   setPadding: padding => set({ padding }),
