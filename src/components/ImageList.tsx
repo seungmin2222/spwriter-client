@@ -1,18 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Modal from './Modal.tsx';
+import Modal from './Modal';
 import ResizeModal from './ResizeModal';
-import Toast from './Toast.tsx';
+import Toast from './Toast';
 import useFileStore from '../../store';
-import { handleFiles, calculateCoordinates } from '../utils/utils.tsx';
+import { handleFiles, calculateCoordinates } from '../utils/utils';
 import fileImageIcon from '../assets/images/file-image-regular.svg';
+
+interface PackedImage {
+  img: HTMLImageElement;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotated: boolean;
+}
 
 function ImageList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [toast, setToast] = useState(null);
-  const [deleteConfirmationType, setDeleteConfirmationType] = useState(null);
-  const [currentImage, setCurrentImage] = useState(null);
   const [deletingImages, setDeletingImages] = useState(new Set());
+  const [currentImage, setCurrentImage] = useState<HTMLImageElement | null>(
+    null
+  );
+  const [toast, setToast] = useState<{ id: number; message: string } | null>(
+    null
+  );
+  const [deleteConfirmationType, setDeleteConfirmationType] = useState<
+    'single' | 'batch' | null
+  >(null);
 
   const coordinates = useFileStore(state => state.coordinates) || [];
   const setCoordinates = useFileStore(state => state.setCoordinates);
@@ -53,15 +68,18 @@ function ImageList() {
 
     addHistory(coordinates);
 
-    const newSelectedFiles = new Set();
+    const newSelectedFiles = new Set<HTMLImageElement>();
 
-    const resizePromises = coordinates.map(async coord => {
+    const resizePromises = coordinates.map(async (coord: PackedImage) => {
       if (selectedFiles.has(coord.img)) {
-        const resizedImg = await processImage(coord, (ctx, canvas) => {
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(coord.img, 0, 0, width, height);
-        });
+        const resizedImg: HTMLImageElement = await processImage(
+          coord,
+          (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(coord.img, 0, 0, width, height);
+          }
+        );
 
         newSelectedFiles.add(resizedImg);
 
@@ -70,12 +88,12 @@ function ImageList() {
           img: resizedImg,
           width,
           height,
-        };
+        } as PackedImage;
       }
       return coord;
     });
 
-    Promise.all(resizePromises).then(updatedCoordinates => {
+    Promise.all(resizePromises).then((updatedCoordinates: PackedImage[]) => {
       const reorderedCoordinates = calculateCoordinates(
         updatedCoordinates.map(coord => coord.img),
         padding,
@@ -91,18 +109,26 @@ function ImageList() {
     });
   };
 
-  const processImage = async (coord, transformCallback) => {
+  const processImage = async (
+    coord: PackedImage,
+    transformCallback: (
+      ctx: CanvasRenderingContext2D,
+      canvas: HTMLCanvasElement
+    ) => void
+  ): Promise<HTMLImageElement> => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Failed to get canvas context');
+
     canvas.width = coord.img.width;
     canvas.height = coord.img.height;
 
-    await transformCallback(ctx, canvas, coord.img);
+    await transformCallback(ctx, canvas);
 
     const processedImg = new Image();
     processedImg.src = canvas.toDataURL();
 
-    return new Promise(resolve => {
+    return new Promise<HTMLImageElement>(resolve => {
       processedImg.onload = () => resolve(processedImg);
     });
   };
@@ -159,7 +185,7 @@ function ImageList() {
     setShowModal(false);
   };
 
-  const generateCSS = (image, index) =>
+  const generateCSS = (image: PackedImage, index: number): string =>
     `.sprite-${index} {
   width: ${image.width}px;
   height: ${image.height}px;
@@ -168,14 +194,14 @@ function ImageList() {
   }') -${image.x}px -${image.y}px;
 }`;
 
-  const generateToast = message => {
+  const generateToast = (message: string): void => {
     setToast({
       id: Date.now(),
       message,
     });
   };
 
-  const copyToClipboard = text => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard
       .writeText(text)
       .then(() => generateToast('좌표값이 클립보드에 복사되었습니다.'))
@@ -184,7 +210,7 @@ function ImageList() {
       });
   };
 
-  const handleImageListClick = image => {
+  const handleImageListClick = (image: PackedImage): void => {
     const newSelectedFiles = new Set(selectedFiles);
     if (newSelectedFiles.has(image.img)) {
       newSelectedFiles.delete(image.img);
@@ -194,7 +220,7 @@ function ImageList() {
     setSelectedFiles(newSelectedFiles);
   };
 
-  const handleToastClose = id => {
+  const handleToastClose = (id: number): void => {
     if (toast?.id === id) {
       setToast(null);
     }
@@ -210,9 +236,9 @@ function ImageList() {
     setSelectedFiles(new Set());
   };
 
-  const handleDrop = e => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>): void => {
     e.preventDefault();
-    const droppedFiles = Array.from(e.dataTransfer.files);
+    const droppedFiles: File[] = Array.from(e.dataTransfer.files);
     handleFiles(
       droppedFiles,
       setFiles,
@@ -223,11 +249,11 @@ function ImageList() {
     );
   };
 
-  const handleDragOver = e => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
     e.preventDefault();
   };
 
-  const deleteImages = imagesToDelete => {
+  const deleteImages = (imagesToDelete: Set<HTMLImageElement>): void => {
     addHistory(coordinates);
     setDeletingImages(new Set(imagesToDelete));
 
@@ -249,11 +275,11 @@ function ImageList() {
     deleteImages(selectedFiles);
   };
 
-  const deleteImage = imgSrc => {
+  const deleteImage = (imgSrc: HTMLImageElement): void => {
     deleteImages(new Set([imgSrc]));
   };
 
-  const copySelectedCoordinates = () => {
+  const copySelectedCoordinates = (): void => {
     const selectedCoordinates = coordinates.filter(coord =>
       selectedFiles.has(coord.img)
     );
@@ -268,7 +294,7 @@ function ImageList() {
     }
   };
 
-  const renderImageList = (image, index) => {
+  const renderImageList = (image: PackedImage, index: number): JSX.Element => {
     const isSelected = selectedFiles.has(image.img);
     const isDeleting = deletingImages.has(image.img);
 
@@ -282,7 +308,7 @@ function ImageList() {
           }
         }}
         role="button"
-        tabIndex="0"
+        tabIndex={0}
         className={`flex w-full h-[70px] bg-[#f8f8f8] rounded-[1rem] transition-colors duration-300 shadow-sm border transition-border duration-250 ${
           !isButtonHovered ? 'hover:bg-[#e9eaf1]' : ''
         } ${isSelected ? 'border border-[#23212f]' : ''} ${
@@ -326,14 +352,16 @@ function ImageList() {
     );
   };
 
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleClick = () => {
-    fileInputRef.current.click();
+  const handleClick = (): void => {
+    fileInputRef.current?.click();
   };
 
-  const handleFileInputChange = e => {
-    const newSelectFiles = Array.from(e.target.files);
+  const handleFileInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    const newSelectFiles = Array.from(e.target.files || []);
     handleFiles(
       newSelectFiles,
       setFiles,
@@ -445,6 +473,7 @@ function ImageList() {
       {toast && (
         <Toast
           key={toast.id}
+          id={toast.id}
           message={toast.message}
           onClose={() => handleToastClose(toast.id)}
         />
