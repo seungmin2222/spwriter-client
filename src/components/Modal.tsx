@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 
 export function useModalEventListener(
-  ref,
-  handleConfirm,
-  handleClose,
-  showModal
+  ref: React.RefObject<HTMLDivElement>,
+  handleConfirm: () => void,
+  handleClose: () => void,
+  showModal: boolean
 ) {
   useEffect(() => {
-    const handleKeyDown = e => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         handleConfirm();
       } else if (e.key === 'Escape') {
@@ -28,8 +28,18 @@ export function useModalEventListener(
   }, [showModal, handleConfirm, handleClose, ref]);
 }
 
-function Modal({ showModal, handleClose, handleConfirm, message }) {
-  const modalRef = useRef(null);
+function Modal({
+  showModal,
+  handleClose,
+  handleConfirm,
+  message,
+}: {
+  showModal: boolean;
+  handleClose: () => void;
+  handleConfirm: () => void;
+  message: string;
+}) {
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useModalEventListener(modalRef, handleConfirm, handleClose, showModal);
 
@@ -42,7 +52,7 @@ function Modal({ showModal, handleClose, handleConfirm, message }) {
       data-testid="modal"
       role="dialog"
       aria-modal="true"
-      tabIndex="-1"
+      tabIndex={-1}
     >
       <div
         className="p-6 border w-80 shadow-lg rounded-[1rem] bg-white"
