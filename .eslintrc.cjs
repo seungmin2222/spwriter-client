@@ -106,6 +106,10 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
+    "import/no-unresolved": "off",
+    "import/no-duplicates": "off",
+    "import/no-self-import": "off",
+    "import/no-relative-packages": "off"
   },
   settings: {
     react: {
