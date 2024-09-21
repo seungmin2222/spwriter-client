@@ -4,7 +4,7 @@ import {
   cloneSelectedImages,
   inversionSelectedImages,
   rotateSelectedImages,
-} from '../utils/utils.tsx';
+} from '../utils/utils';
 
 import rotateIcon from '../assets/images/arrows-spin-solid.svg';
 import inversionIcon from '../assets/images/right-left-solid.svg';
@@ -28,7 +28,7 @@ function Footer() {
   const buttonStyle =
     'p-[0.7rem] rounded-full bg-[#241f3a] hover:bg-[#565465] text-white hover:text-black font-bold transition-background duration-300 relative group';
 
-  const handleActionIfNoSelection = action => {
+  const handleActionIfNoSelection = (action: () => void) => {
     if (selectedFiles.size === 0) {
       addToast('선택된 이미지가 없습니다.');
     } else {
@@ -106,7 +106,7 @@ function Footer() {
           title="반전"
         >
           <div className="relative flex items-center justify-center">
-            <img src={inversionIcon} alt="Rotate Icon" className="h-6 w-6" />
+            <img src={inversionIcon} alt="Inversion Icon" className="h-6 w-6" />
             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 좌우 반전
@@ -121,7 +121,7 @@ function Footer() {
           title="복제"
         >
           <div className="relative flex items-center justify-center">
-            <img src={cloneIcon} alt="Rotate Icon" className="h-6 w-6" />
+            <img src={cloneIcon} alt="Clone Icon" className="h-6 w-6" />
             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 이미지 복제
