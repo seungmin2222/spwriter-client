@@ -164,7 +164,6 @@ const Navbar = () => {
             <option value="left-right">Left-Right</option>
             <option value="top-bottom">Top-Bottom</option>
           </select>
-          ㄴ
         </div>
       </div>
       <div className="flex w-[26%]">

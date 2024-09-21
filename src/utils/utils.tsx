@@ -375,7 +375,7 @@ export const handleFiles = async (
   }
 };
 
-export const handleDragOverFiles = (event: DragEvent) => {
+export const handleDragOverFiles = (event: React.DragEvent<HTMLDivElement>) => {
   event.preventDefault();
 };
 
