@@ -1,6 +1,26 @@
-export const calculateCoordinates = (images, initialPadding, alignElement) => {
+interface ImageData {
+  width: number;
+  height: number;
+}
+
+interface PackedImage {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotated: boolean;
+  img: HTMLImageElement;
+}
+
+export const calculateCoordinates = (
+  images: HTMLImageElement[],
+  initialPadding: number,
+  alignElement: 'bin-packing' | 'top-bottom' | 'left-right'
+): PackedImage[] => {
   if (alignElement === 'bin-packing') {
-    const sortImages = imagesToSort => {
+    const sortImages = (
+      imagesToSort: HTMLImageElement[]
+    ): HTMLImageElement[] => {
       return [...imagesToSort].sort((a, b) => {
         const aPerimeter = 2 * (a.width + a.height);
         const bPerimeter = 2 * (b.width + b.height);
@@ -13,21 +33,22 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
     const sortedImages = sortImages(images);
 
     class Rectangle {
-      constructor(x, y, width, height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-      }
+      constructor(
+        public x: number,
+        public y: number,
+        public width: number,
+        public height: number
+      ) {}
     }
 
     class Skyline {
-      constructor(width) {
-        this.width = width;
+      segments: { x: number; y: number; width: number }[];
+
+      constructor(public width: number) {
         this.segments = [{ x: 0, y: 0, width }];
       }
 
-      addRectangle(rect) {
+      addRectangle(rect: Rectangle) {
         let index = 0;
         while (index < this.segments.length) {
           const segment = this.segments[index];
@@ -74,7 +95,7 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
         }
       }
 
-      findPosition(width, height) {
+      findPosition(width: number, height: number): Rectangle | null {
         let bestY = Infinity;
         let bestX = 0;
         for (let i = 0; i < this.segments.length; i++) {
@@ -93,14 +114,17 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
     }
 
     class AdvancedBinPack {
-      constructor(width, height, padding) {
-        this.binWidth = width;
-        this.binHeight = height;
-        this.padding = padding;
-        this.skyline = new Skyline(width);
+      skyline: Skyline;
+
+      constructor(
+        public binWidth: number,
+        public binHeight: number,
+        public padding: number
+      ) {
+        this.skyline = new Skyline(binWidth);
       }
 
-      insert(width, height) {
+      insert(width: number, height: number) {
         const paddedWidth = width + this.padding * 2;
         const paddedHeight = height + this.padding * 2;
 
@@ -133,13 +157,14 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
         (img.width + initialPadding * 2) * (img.height + initialPadding * 2),
       0
     );
+
     const fixedAspectRatio = 1;
     let binWidth = Math.ceil(Math.sqrt(totalArea * fixedAspectRatio) * 1.3);
     let binHeight = Math.ceil(Math.sqrt(totalArea / fixedAspectRatio));
 
     let packer = new AdvancedBinPack(binWidth, binHeight, initialPadding);
 
-    const packedImages = [];
+    const packedImages: PackedImage[] = [];
     let allPacked = false;
 
     while (!allPacked) {
@@ -181,7 +206,7 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
       optimizedSize.height,
       initialPadding
     );
-    const finalPackedImages = [];
+    const finalPackedImages: PackedImage[] = [];
 
     for (const img of sortedImages) {
       const node = packer.insert(img.width, img.height);
@@ -211,7 +236,7 @@ export const calculateCoordinates = (images, initialPadding, alignElement) => {
   return [];
 };
 
-function optimizeCanvasSize(packedImages, padding) {
+function optimizeCanvasSize(packedImages: PackedImage[], padding: number) {
   let maxRight = 0;
   let maxBottom = 0;
   packedImages.forEach(img => {
@@ -223,26 +248,34 @@ function optimizeCanvasSize(packedImages, padding) {
   return { width: optimizedWidth, height: optimizedHeight };
 }
 
-const arrangeImages = (images, initialPadding, isVertical = false) => {
+const arrangeImages = (
+  images: HTMLImageElement[],
+  initialPadding: number,
+  isVertical = false
+): PackedImage[] => {
   const sortedImages = [...images].sort(
     (a, b) => b.width * b.height - a.width * a.height
   );
 
   let offset = initialPadding;
   return sortedImages.map(img => {
-    const coord = {
+    const coord: PackedImage = {
       x: isVertical ? initialPadding : offset,
       y: isVertical ? offset : initialPadding,
       width: img.width,
       height: img.height,
       img,
+      rotated: false,
     };
     offset += (isVertical ? img.height : img.width) + initialPadding;
     return coord;
   });
 };
 
-export const sortAndSetCoordinates = (newCoords, setCoordinates) => {
+export const sortAndSetCoordinates = (
+  newCoords: PackedImage[],
+  setCoordinates: (coords: PackedImage[]) => void
+) => {
   const sortedCoordinates = [...newCoords].sort(
     (a, b) => b.width * b.height - a.width * a.height
   );
@@ -250,9 +283,13 @@ export const sortAndSetCoordinates = (newCoords, setCoordinates) => {
   setCoordinates(sortedCoordinates);
 };
 
-export const trimImage = async img => {
+export const trimImage = async (
+  img: HTMLImageElement
+): Promise<HTMLImageElement> => {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Failed to get canvas context');
+
   canvas.width = img.width;
   canvas.height = img.height;
   ctx.drawImage(img, 0, 0);
@@ -280,6 +317,8 @@ export const trimImage = async img => {
   const trimmedHeight = bottom - top + 1;
   const trimmedCanvas = document.createElement('canvas');
   const trimmedCtx = trimmedCanvas.getContext('2d');
+  if (!trimmedCtx) throw new Error('Failed to get trimmed canvas context');
+
   trimmedCanvas.width = trimmedWidth;
   trimmedCanvas.height = trimmedHeight;
   trimmedCtx.drawImage(
@@ -297,18 +336,18 @@ export const trimImage = async img => {
   const trimmedImg = new Image();
   trimmedImg.src = trimmedCanvas.toDataURL();
 
-  return new Promise(resolve => {
+  return new Promise<HTMLImageElement>(resolve => {
     trimmedImg.onload = () => resolve(trimmedImg);
   });
 };
 
 export const handleFiles = async (
-  files,
-  setFiles,
-  setCoordinates,
-  coordinates,
-  padding,
-  alignElement
+  files: FileList,
+  setFiles: React.Dispatch<React.SetStateAction<File[]>>,
+  setCoordinates: (coords: PackedImage[]) => void,
+  coordinates: PackedImage[],
+  padding: number,
+  alignElement: 'bin-packing' | 'top-bottom' | 'left-right'
 ) => {
   const filesArray = Array.from(files);
   setFiles(prevFiles => [...prevFiles, ...filesArray]);
@@ -316,12 +355,12 @@ export const handleFiles = async (
   const newImages = await Promise.all(
     filesArray.map(
       file =>
-        new Promise(resolve => {
+        new Promise<HTMLImageElement>(resolve => {
           const reader = new FileReader();
           reader.onload = () => {
             const img = new Image();
             img.onload = () => trimImage(img).then(resolve);
-            img.src = reader.result;
+            img.src = reader.result as string;
           };
           reader.readAsDataURL(file);
         })
@@ -336,13 +375,22 @@ export const handleFiles = async (
   }
 };
 
-export const handleDragOverFiles = event => {
+export const handleDragOverFiles = (event: DragEvent) => {
   event.preventDefault();
 };
 
-const processImage = async (coord, transformCallback) => {
+const processImage = async (
+  coord: PackedImage,
+  transformCallback: (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
+    img: HTMLImageElement
+  ) => Promise<void>
+): Promise<HTMLImageElement> => {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Failed to get canvas context');
+
   canvas.width = coord.img.width;
   canvas.height = coord.img.height;
 
@@ -351,19 +399,19 @@ const processImage = async (coord, transformCallback) => {
   const processedImg = new Image();
   processedImg.src = canvas.toDataURL();
 
-  return new Promise(resolve => {
+  return new Promise<HTMLImageElement>(resolve => {
     processedImg.onload = () => resolve(processedImg);
   });
 };
 
 export const cloneSelectedImages = (
-  coordinates,
-  selectedFiles,
-  setCoordinates,
-  padding,
-  alignElement
+  coordinates: PackedImage[],
+  selectedFiles: Set<HTMLImageElement>,
+  setCoordinates: (coords: PackedImage[]) => void,
+  padding: number,
+  alignElement: 'bin-packing' | 'top-bottom' | 'left-right'
 ) => {
-  const newCoordinates = [...coordinates];
+  const newCoordinates: PackedImage[] = [...coordinates];
 
   const clonePromises = Array.from(selectedFiles).map(img => {
     const index = coordinates.findIndex(coord => coord.img === img);
@@ -372,7 +420,7 @@ export const cloneSelectedImages = (
       const newImg = new Image();
       newImg.src = coord.img.src;
 
-      return new Promise(resolve => {
+      return new Promise<HTMLImageElement>(resolve => {
         newImg.onload = () => {
           newCoordinates.push({
             img: newImg,
@@ -380,12 +428,13 @@ export const cloneSelectedImages = (
             height: coord.height,
             x: 0,
             y: 0,
+            rotated: false,
           });
           resolve(newImg);
         };
       });
     }
-    return Promise.resolve();
+    return Promise.resolve(new Image());
   });
 
   Promise.all(clonePromises).then(() => {
@@ -400,20 +449,21 @@ export const cloneSelectedImages = (
 };
 
 export const inversionSelectedImages = (
-  coordinates,
-  selectedFiles,
-  setCoordinates
+  coordinates: PackedImage[],
+  selectedFiles: Set<HTMLImageElement>,
+  setCoordinates: (coords: PackedImage[]) => void
 ) => {
   const updatedCoordinatesPromises = coordinates.map(async coord => {
     if (selectedFiles.has(coord.img)) {
-      const flippedImg = await processImage(coord, (ctx, canvas) => {
+      const flippedImg = await processImage(coord, async (ctx, canvas, img) => {
         ctx.translate(canvas.width, 0);
         ctx.scale(-1, 1);
-        ctx.drawImage(coord.img, 0, 0);
+        ctx.drawImage(img, 0, 0);
+        return Promise.resolve();
       });
 
       const newX = coord.x + coord.width - flippedImg.width;
-      const updatedCoord = {
+      const updatedCoord: PackedImage = {
         ...coord,
         img: flippedImg,
         x: newX,
@@ -431,21 +481,22 @@ export const inversionSelectedImages = (
 };
 
 export const rotateSelectedImages = (
-  coordinates,
-  selectedFiles,
-  setCoordinates
+  coordinates: PackedImage[],
+  selectedFiles: Set<HTMLImageElement>,
+  setCoordinates: (coords: PackedImage[]) => void
 ) => {
   const updatedCoordinatesPromises = coordinates.map(async coord => {
     if (selectedFiles.has(coord.img)) {
-      const rotatedImg = await processImage(coord, (ctx, canvas) => {
+      const rotatedImg = await processImage(coord, async (ctx, canvas, img) => {
         canvas.width = coord.img.height;
         canvas.height = coord.img.width;
         ctx.translate(canvas.width / 2, canvas.height / 2);
         ctx.rotate((90 * Math.PI) / 180);
-        ctx.drawImage(coord.img, -coord.img.width / 2, -coord.img.height / 2);
+        ctx.drawImage(img, -coord.img.width / 2, -coord.img.height / 2);
+        return Promise.resolve();
       });
 
-      const updatedCoord = {
+      const updatedCoord: PackedImage = {
         ...coord,
         img: rotatedImg,
         width: coord.img.height,
@@ -466,22 +517,23 @@ export const rotateSelectedImages = (
 };
 
 export const resizeSelectedImages = (
-  coordinates,
-  selectedFiles,
-  setCoordinates,
-  setSelectedFiles
+  coordinates: PackedImage[],
+  selectedFiles: Set<HTMLImageElement>,
+  setCoordinates: (coords: PackedImage[]) => void,
+  setSelectedFiles: (files: Set<HTMLImageElement>) => void
 ) => {
-  let resizedImage = null;
+  let resizedImage: PackedImage | null = null;
 
   const updatedCoordinatesPromises = coordinates.map(async coord => {
     if (selectedFiles.has(coord.img)) {
-      const resizedImg = await processImage(coord, (ctx, canvas) => {
+      const resizedImg = await processImage(coord, async (ctx, canvas, img) => {
         canvas.width = coord.width;
         canvas.height = coord.height;
-        ctx.drawImage(coord.img, 0, 0, coord.width, coord.height);
+        ctx.drawImage(img, 0, 0, coord.width, coord.height);
+        return Promise.resolve();
       });
 
-      const updatedCoord = {
+      const updatedCoord: PackedImage = {
         ...coord,
         img: resizedImg,
         width: coord.width,
