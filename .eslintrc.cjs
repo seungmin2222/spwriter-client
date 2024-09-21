@@ -1,6 +1,7 @@
 const globals = require('globals');
 const pluginJs = require('@eslint/js');
 const pluginReactConfig = require('eslint-plugin-react/configs/recommended.js');
+
 module.exports = {
   env: {
     browser: true,
@@ -9,10 +10,12 @@ module.exports = {
   },
   extends: [
     'airbnb',
+    'airbnb-typescript',
     'plugin:react/recommended',
+    'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs', '*.spec.jsx'],
+  ignorePatterns: ['dist', '.eslintrc.cjs', '*.spec.jsx', '*.spec.tsx', '*.test.jsx'],
   overrides: [
     {
       env: {
@@ -24,22 +27,33 @@ module.exports = {
       },
     },
     {
-      files: ['**/*.jsx'],
+      files: ['**/*.jsx', '**/*.tsx'],
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
         },
       },
     },
+    {
+      files: ['**/*.ts', '**/*.tsx'],
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        project: './tsconfig.json',
+      },
+    },
   ],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
     },
     ecmaVersion: 'latest',
     sourceType: 'module',
+    project: './tsconfig.json',
   },
-  plugins: ['react', 'prettier', 'react-hooks'],
+  plugins: ['react', 'prettier', 'react-hooks', '@typescript-eslint'],
   rules: {
     semi: 'warn',
     'no-unused-vars': 'warn',
@@ -72,11 +86,17 @@ module.exports = {
       "labelAttributes": [],
       "controlComponents": [],
       "assert": "either",
-      "depth": 25,}]
+      "depth": 25,}],
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-explicit-any': 'warn',
   },
   settings: {
     react: {
       version: 'detect',
+    },
+    'import/resolver': {
+      typescript: {},
     },
   },
   globals: {
