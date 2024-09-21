@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
+import { configDefaults } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react()],
@@ -15,7 +16,7 @@ export default defineConfig({
         'postcss.config.js',
         '.eslintrc.cjs',
         'vite.config.js',
-        'src/main.jsx',
+        'src/main.tsx',
         'src/tests/**/*',
       ],
     },
