@@ -1,10 +1,24 @@
 import React, { useEffect, useRef } from 'react';
 
-function ResizeModal({ isOpen, onClose, onConfirm, setWidth, setHeight }) {
-  const inputRef = useRef(null);
+interface ResizeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  setWidth: (width: string) => void;
+  setHeight: (height: string) => void;
+}
+
+const ResizeModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  setWidth,
+  setHeight,
+}: ResizeModalProps) => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    const handleKeyDown = e => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         onConfirm();
       } else if (e.key === 'Escape') {
@@ -80,6 +94,6 @@ function ResizeModal({ isOpen, onClose, onConfirm, setWidth, setHeight }) {
       </div>
     </div>
   );
-}
+};
 
 export default ResizeModal;
