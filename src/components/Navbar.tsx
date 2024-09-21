@@ -1,7 +1,7 @@
 import React from 'react';
-import Toast from './Toast';
+import Toast from './Toast.tsx';
 import useFileStore from '../../store';
-import { handleFiles } from '../utils/utils';
+import { handleFiles } from '../utils/utils.tsx';
 import downloadIcon from '../assets/images/download-solid.svg';
 
 function Navbar() {

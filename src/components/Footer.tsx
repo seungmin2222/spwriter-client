@@ -4,7 +4,7 @@ import {
   cloneSelectedImages,
   inversionSelectedImages,
   rotateSelectedImages,
-} from '../utils/utils';
+} from '../utils/utils.tsx';
 
 import rotateIcon from '../assets/images/arrows-spin-solid.svg';
 import inversionIcon from '../assets/images/right-left-solid.svg';

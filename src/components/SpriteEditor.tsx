@@ -5,8 +5,8 @@ import {
   handleDragOverFiles,
   resizeSelectedImages,
   calculateCoordinates,
-} from '../utils/utils';
-import analyzeSpritesSheet from '../utils/spriteAnalyzer';
+} from '../utils/utils.tsx';
+import analyzeSpritesSheet from '../utils/spriteAnalyzer.ts';
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 function SpriteEditor() {

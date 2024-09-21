@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Modal from './Modal';
+import Modal from './Modal.tsx';
 import ResizeModal from './ResizeModal';
-import Toast from './Toast';
+import Toast from './Toast.tsx';
 import useFileStore from '../../store';
-import { handleFiles, calculateCoordinates } from '../utils/utils';
+import { handleFiles, calculateCoordinates } from '../utils/utils.tsx';
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 function ImageList() {
