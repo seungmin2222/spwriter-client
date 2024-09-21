@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
-function Toast({ id, message, onClose }) {
-  const [visible, setVisible] = useState(false);
+interface ToastProps {
+  id: string;
+  message: string;
+  onClose: (id: string) => void;
+}
+
+function Toast({ id, message, onClose }: ToastProps) {
+  const [visible, setVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const showTimer = setTimeout(() => {
