@@ -1,6 +1,58 @@
 import { create } from 'zustand';
 
-const useFileStore = create(set => ({
+interface PackedImage {
+  img: HTMLImageElement;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotated: boolean;
+}
+
+interface Toast {
+  id: number;
+  message: string;
+}
+
+interface FileStore {
+  files: File[];
+  setFiles: (files: File[]) => void;
+
+  padding: number;
+  setPadding: (padding: number) => void;
+
+  coordinates: PackedImage[];
+  setCoordinates: (coordinates: PackedImage[]) => void;
+
+  toast: Toast | null;
+  setToast: (toast: Toast | null) => void;
+  addToast: (message: string) => void;
+
+  selectedFiles: Set<HTMLImageElement>;
+  setSelectedFiles: (selectedFiles: Set<HTMLImageElement>) => void;
+
+  fileName: string;
+  setFileName: (fileName: string) => void;
+
+  resizedImage: PackedImage | null;
+  setResizedImage: (resizedImage: PackedImage | null) => void;
+
+  history: PackedImage[][];
+  redoHistory: PackedImage[][];
+
+  alignElement: 'bin-packing' | 'top-bottom' | 'left-right';
+  setAlignElement: (
+    alignElement: 'bin-packing' | 'top-bottom' | 'left-right'
+  ) => void;
+
+  addHistory: (prevCoordinates: PackedImage[]) => void;
+
+  popHistory: () => void;
+
+  pushHistory: () => void;
+}
+
+const useFileStore = create<FileStore>(set => ({
   files: [],
   setFiles: files => set({ files }),
 
