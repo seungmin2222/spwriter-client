@@ -1,4 +1,8 @@
-export default function analyzeSpritesSheet(imageData, width, height) {
+export default function analyzeSpritesSheet(
+  imageData: number[],
+  width: number,
+  height: number
+): { x: number; y: number; width: number; height: number }[] {
   const labels = new Array(width * height).fill(0);
   let nextLabel = 1;
 
@@ -14,7 +18,11 @@ export default function analyzeSpritesSheet(imageData, width, height) {
     }
   }
 
-  const boundingBoxes = new Map();
+  const boundingBoxes = new Map<
+    number,
+    { minX: number; minY: number; maxX: number; maxY: number }
+  >();
+
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const label = labels[y * width + x];
@@ -22,7 +30,7 @@ export default function analyzeSpritesSheet(imageData, width, height) {
         if (!boundingBoxes.has(label)) {
           boundingBoxes.set(label, { minX: x, minY: y, maxX: x, maxY: y });
         } else {
-          const box = boundingBoxes.get(label);
+          const box = boundingBoxes.get(label)!;
           box.minX = Math.min(box.minX, x);
           box.minY = Math.min(box.minY, y);
           box.maxX = Math.max(box.maxX, x);
@@ -37,11 +45,19 @@ export default function analyzeSpritesSheet(imageData, width, height) {
   return sprites;
 }
 
-function floodFill(imageData, width, height, startX, startY, label, labels) {
+function floodFill(
+  imageData: number[],
+  width: number,
+  height: number,
+  startX: number,
+  startY: number,
+  label: number,
+  labels: number[]
+): void {
   const stack = [{ x: startX, y: startY }];
 
   while (stack.length > 0) {
-    const { x, y } = stack.pop();
+    const { x, y } = stack.pop()!;
     const index = y * width + x;
 
     if (
@@ -62,13 +78,21 @@ function floodFill(imageData, width, height, startX, startY, label, labels) {
   }
 }
 
-function isTransparent(imageData, x, y, width) {
+function isTransparent(
+  imageData: number[],
+  x: number,
+  y: number,
+  width: number
+): boolean {
   const index = (y * width + x) * 4;
   return imageData[index + 3] === 0;
 }
 
-function mergeBoundingBoxes(boxes) {
-  const merged = [];
+function mergeBoundingBoxes(
+  boxes: { minX: number; minY: number; maxX: number; maxY: number }[]
+): { x: number; y: number; width: number; height: number }[] {
+  const merged: { minX: number; minY: number; maxX: number; maxY: number }[] =
+    [];
 
   for (const box of boxes) {
     let mergedBox = false;
@@ -92,7 +116,10 @@ function mergeBoundingBoxes(boxes) {
   }));
 }
 
-function isAdjacent(box1, box2) {
+function isAdjacent(
+  box1: { minX: number; minY: number; maxX: number; maxY: number },
+  box2: { minX: number; minY: number; maxX: number; maxY: number }
+): boolean {
   const gap = 1;
   return !(
     box2.minX > box1.maxX + gap ||
@@ -102,7 +129,10 @@ function isAdjacent(box1, box2) {
   );
 }
 
-function mergeBoxes(box1, box2) {
+function mergeBoxes(
+  box1: { minX: number; minY: number; maxX: number; maxY: number },
+  box2: { minX: number; minY: number; maxX: number; maxY: number }
+): { minX: number; minY: number; maxX: number; maxY: number } {
   return {
     minX: Math.min(box1.minX, box2.minX),
     minY: Math.min(box1.minY, box2.minY),
