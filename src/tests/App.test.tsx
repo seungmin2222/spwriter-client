@@ -46,7 +46,7 @@ describe('App component', () => {
     expect(
       screen.getByText((content, element) => {
         return (
-          element.tagName.toLowerCase() === 'h1' &&
+          element?.tagName.toLowerCase() === 'h1' &&
           content.includes('죄송합니다.') &&
           content.includes('모바일은 지원하지 않습니다.')
         );
