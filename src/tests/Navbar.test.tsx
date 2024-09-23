@@ -10,6 +10,15 @@ import Navbar from '../components/Navbar';
 import useFileStore from '../../store';
 import { handleFiles } from '../utils/utils';
 
+interface PackedImage {
+  img: HTMLImageElement;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotated: boolean;
+}
+
 vi.mock('../utils/utils', () => ({
   handleFiles: vi.fn(),
   trimImage: vi.fn().mockResolvedValue(new Image()),
@@ -24,8 +33,8 @@ describe('Navbar', () => {
     URL.createObjectURL = vi.fn(() => 'blob:test');
     URL.revokeObjectURL = vi.fn();
 
-    delete window.location;
-    window.location = { href: '' };
+    const windowWithLocation = window as Window & { location: Location };
+    windowWithLocation.location = { href: '' } as Location;
   });
 
   afterEach(() => {
@@ -36,8 +45,9 @@ describe('Navbar', () => {
   it('입력 변경 시 fileName 상태를 업데이트합니다', () => {
     render(<Navbar />);
 
-    const fileNameInput =
-      screen.getByPlaceholderText(/파일 이름을 입력해주세요./i);
+    const fileNameInput = screen.getByPlaceholderText(
+      /파일 이름을 입력해주세요./i
+    ) as HTMLInputElement;
     fireEvent.change(fileNameInput, { target: { value: 'test-file' } });
 
     expect(fileNameInput.value).toBe('test-file');
@@ -58,7 +68,9 @@ describe('Navbar', () => {
   it('정렬 요소 옵션을 올바르게 렌더링합니다', () => {
     render(<Navbar />);
 
-    const selectElement = screen.getByLabelText('정렬 옵션 :');
+    const selectElement = screen.getByLabelText(
+      '정렬 옵션 :'
+    ) as HTMLSelectElement;
     const options = selectElement.querySelectorAll('option');
 
     expect(options).toHaveLength(3);
@@ -73,7 +85,7 @@ describe('Navbar', () => {
 
     render(<Navbar />);
 
-    const paddingInput = screen.getByLabelText('Padding :');
+    const paddingInput = screen.getByLabelText('Padding :') as HTMLInputElement;
     fireEvent.change(paddingInput, { target: { value: '0' } });
 
     expect(addToast).toHaveBeenCalledWith(
@@ -84,7 +96,9 @@ describe('Navbar', () => {
   it('정렬 요소에 대해 선택된 옵션을 설정합니다', () => {
     render(<Navbar />);
 
-    const selectElement = screen.getByLabelText('정렬 옵션 :');
+    const selectElement = screen.getByLabelText(
+      '정렬 옵션 :'
+    ) as HTMLSelectElement;
     fireEvent.change(selectElement, { target: { value: 'bin-packing' } });
 
     expect(selectElement.value).toBe('bin-packing');
@@ -112,18 +126,23 @@ describe('Navbar', () => {
   it('캔버스 컨텍스트를 생성할 수 없을 때 토스트를 표시합니다', async () => {
     const addToast = vi.fn();
     useFileStore.setState({
-      coordinates: [{ img: new Image(), width: 50, height: 50, x: 0, y: 0 }],
+      coordinates: [
+        { img: new Image(), width: 50, height: 50, x: 0, y: 0, rotated: false },
+      ],
       addToast,
     });
 
-    document.createElement = element => {
+    document.createElement = ((element: string) => {
       if (element === 'canvas') {
-        const canvas = originalCreateElement.call(document, element);
+        const canvas = originalCreateElement.call(
+          document,
+          element
+        ) as HTMLCanvasElement;
         canvas.getContext = vi.fn().mockReturnValue(null);
         return canvas;
       }
       return originalCreateElement.call(document, element);
-    };
+    }) as typeof document.createElement;
 
     render(<Navbar />);
 
@@ -140,9 +159,9 @@ describe('Navbar', () => {
   it('파일 입력 변경을 올바르게 처리합니다', async () => {
     const setFiles = vi.fn();
     const setCoordinates = vi.fn();
-    const coordinates = [];
+    const coordinates: PackedImage[] = [];
     const paddingValue = 10;
-    const alignElement = 'bin-packing';
+    const alignElement = 'bin-packing' as const;
 
     useFileStore.setState({
       setFiles,
@@ -154,7 +173,7 @@ describe('Navbar', () => {
 
     render(<Navbar />);
 
-    const fileInput = screen.getByLabelText('Open files');
+    const fileInput = screen.getByLabelText('Open files') as HTMLInputElement;
     const files = [
       new File(['sprite'], 'chucknorris.png', { type: 'image/png' }),
     ];

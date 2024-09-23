@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Footer from '../components/Footer';
@@ -9,7 +8,6 @@ import {
   rotateSelectedImages,
 } from '../utils/utils';
 
-// 먼저 Zustand 스토어의 타입을 정의합니다
 type FileStore = {
   coordinates: PackedImage[];
   setCoordinates: (coordinates: PackedImage[]) => void;
@@ -64,7 +62,8 @@ describe('Footer component', () => {
     };
 
     (useFileStore as unknown as ReturnType<typeof vi.fn>).mockImplementation(
-      (selector: (store: FileStore) => any) => selector(mockStore)
+      <T extends unknown>(selector: (store: FileStore) => T): T =>
+        selector(mockStore)
     );
   });
 
