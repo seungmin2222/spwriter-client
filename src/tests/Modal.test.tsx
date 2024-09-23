@@ -6,6 +6,7 @@ import Modal from '../components/Modal';
 describe('Modal component', () => {
   const handleClose = vi.fn();
   const handleConfirm = vi.fn();
+  const testMessage = '테스트 메시지';
 
   beforeEach(() => {
     handleClose.mockClear();
@@ -18,6 +19,7 @@ describe('Modal component', () => {
         showModal
         handleClose={handleClose}
         handleConfirm={handleConfirm}
+        message={testMessage}
       />
     );
     expect(screen.getByTestId('modal')).toBeInTheDocument();
@@ -29,6 +31,7 @@ describe('Modal component', () => {
         showModal={false}
         handleClose={handleClose}
         handleConfirm={handleConfirm}
+        message={testMessage}
       />
     );
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
@@ -40,6 +43,7 @@ describe('Modal component', () => {
         showModal
         handleClose={handleClose}
         handleConfirm={handleConfirm}
+        message={testMessage}
       />
     );
     const modal = screen.getByTestId('modal');
@@ -53,6 +57,7 @@ describe('Modal component', () => {
         showModal
         handleClose={handleClose}
         handleConfirm={handleConfirm}
+        message={testMessage}
       />
     );
     const modal = screen.getByTestId('modal');
