@@ -15,7 +15,7 @@ export default defineConfig({
         'tailwind.config.js',
         'postcss.config.js',
         '.eslintrc.cjs',
-        'vite.config.js',
+        'vite.config.ts',
         'src/main.tsx',
         'src/tests/**/*',
       ],
