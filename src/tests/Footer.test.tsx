@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Footer from '../components/Footer';
@@ -7,6 +8,21 @@ import {
   inversionSelectedImages,
   rotateSelectedImages,
 } from '../utils/utils';
+
+// 먼저 Zustand 스토어의 타입을 정의합니다
+type FileStore = {
+  coordinates: PackedImage[];
+  setCoordinates: (coordinates: PackedImage[]) => void;
+  addHistory: (prevCoordinates: PackedImage[]) => void;
+  popHistory: () => void;
+  pushHistory: () => void;
+  selectedFiles: Set<HTMLImageElement>;
+  addToast: (message: string) => void;
+  history: PackedImage[][];
+  redoHistory: PackedImage[][];
+  padding: number;
+  alignElement: AlignElement;
+};
 
 vi.mock('../../store', () => ({
   default: vi.fn(),
@@ -18,8 +34,19 @@ vi.mock('../utils/utils', () => ({
   rotateSelectedImages: vi.fn(),
 }));
 
+interface PackedImage {
+  img: HTMLImageElement;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotated: boolean;
+}
+
+type AlignElement = 'bin-packing' | 'top-bottom' | 'left-right';
+
 describe('Footer component', () => {
-  let mockStore;
+  let mockStore: FileStore;
 
   beforeEach(() => {
     mockStore = {
@@ -36,7 +63,9 @@ describe('Footer component', () => {
       alignElement: 'bin-packing',
     };
 
-    useFileStore.mockImplementation(selector => selector(mockStore));
+    (useFileStore as unknown as ReturnType<typeof vi.fn>).mockImplementation(
+      (selector: (store: FileStore) => any) => selector(mockStore)
+    );
   });
 
   it('적절한 아이콘과 툴팁이 있는 다섯 개의 버튼을 포함합니다', () => {
@@ -72,7 +101,7 @@ describe('Footer component', () => {
   });
 
   it('히스토리가 존재할 때 실행 취소 동작을 처리합니다', () => {
-    mockStore.history = ['previousState'];
+    mockStore.history = [[]];
     render(<Footer />);
     const undoButton = screen.getByTitle('실행 취소');
     fireEvent.click(undoButton);
@@ -81,7 +110,7 @@ describe('Footer component', () => {
   });
 
   it('다시 실행 히스토리가 존재할 때 다시 실행 동작을 처리합니다', () => {
-    mockStore.redoHistory = ['nextState'];
+    mockStore.redoHistory = [[]];
     render(<Footer />);
     const redoButton = screen.getByTitle('다시 실행');
     fireEvent.click(redoButton);
@@ -120,7 +149,8 @@ describe('Footer component', () => {
   });
 
   it('파일이 선택되었을 때 복제 동작을 처리합니다', () => {
-    mockStore.selectedFiles = new Set(['file1', 'file2']);
+    const mockImg = new Image();
+    mockStore.selectedFiles = new Set([mockImg]);
     render(<Footer />);
     const cloneButton = screen.getByTitle('복제');
     fireEvent.click(cloneButton);
@@ -136,7 +166,8 @@ describe('Footer component', () => {
   });
 
   it('파일이 선택되었을 때 회전 동작을 처리합니다', () => {
-    mockStore.selectedFiles = new Set(['file1', 'file2']);
+    const mockImg = new Image();
+    mockStore.selectedFiles = new Set([mockImg]);
     render(<Footer />);
     const rotateButton = screen.getByTitle('회전');
     fireEvent.click(rotateButton);
@@ -150,7 +181,8 @@ describe('Footer component', () => {
   });
 
   it('파일이 선택되었을 때 반전 동작을 처리합니다', () => {
-    mockStore.selectedFiles = new Set(['file1', 'file2']);
+    const mockImg = new Image();
+    mockStore.selectedFiles = new Set([mockImg]);
     render(<Footer />);
     const inversionButton = screen.getByTitle('반전');
     fireEvent.click(inversionButton);
