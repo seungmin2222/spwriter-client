@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   render,
   screen,
@@ -10,9 +9,26 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ImageList from '../components/ImageList';
 import useFileStore from '../../store';
 
+interface PackedImage {
+  img: HTMLImageElement;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotated: boolean;
+}
+
 vi.mock('../components/Modal', () => ({
   __esModule: true,
-  default: ({ showModal, handleClose, handleConfirm }) =>
+  default: ({
+    showModal,
+    handleClose,
+    handleConfirm,
+  }: {
+    showModal: boolean;
+    handleClose: () => void;
+    handleConfirm: () => void;
+  }) =>
     showModal ? (
       <div data-testid="mock-modal">
         <button onClick={handleClose}>Close</button>
@@ -23,7 +39,19 @@ vi.mock('../components/Modal', () => ({
 
 vi.mock('../components/ResizeModal', () => ({
   __esModule: true,
-  default: ({ isOpen, onClose, onConfirm, setWidth, setHeight }) =>
+  default: ({
+    isOpen,
+    onClose,
+    onConfirm,
+    setWidth,
+    setHeight,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    setWidth: (width: string) => void;
+    setHeight: (height: string) => void;
+  }) =>
     isOpen ? (
       <div data-testid="mock-resize-modal">
         <input aria-label="너비" onChange={e => setWidth(e.target.value)} />
@@ -35,34 +63,37 @@ vi.mock('../components/ResizeModal', () => ({
 }));
 
 describe('ImageList component', () => {
-  const mockCoordinates = [
+  const mockCoordinates: PackedImage[] = [
     {
-      img: { src: 'image1.png', width: 100, height: 100 },
+      img: { src: 'image1.png', width: 100, height: 100 } as HTMLImageElement,
       width: 100,
       height: 100,
       x: 0,
       y: 0,
+      rotated: false,
     },
     {
-      img: { src: 'image2.png', width: 100, height: 100 },
+      img: { src: 'image2.png', width: 100, height: 100 } as HTMLImageElement,
       width: 100,
       height: 100,
       x: 0,
       y: 0,
+      rotated: false,
     },
   ];
 
   beforeEach(() => {
-    HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+    const mockContext = {
       drawImage: vi.fn(),
       getImageData: vi.fn(() => ({ data: new Uint8ClampedArray(400) })),
-    }));
+    };
+
     HTMLCanvasElement.prototype.toDataURL = vi.fn(
       () => 'data:image/png;base64,mockDataUrl'
     );
 
     Object.assign(navigator, {
-      clipboard: { writeText: vi.fn().mockResolvedValue() },
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
     });
 
     useFileStore.setState({
