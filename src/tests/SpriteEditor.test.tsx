@@ -1,8 +1,48 @@
-import { render, fireEvent } from '@testing-library/react';
-import { describe, it, vi, beforeEach, expect, beforeAll } from 'vitest';
+import { render, fireEvent, RenderResult } from '@testing-library/react';
+import {
+  describe,
+  it,
+  vi,
+  beforeEach,
+  expect,
+  beforeAll,
+  afterEach,
+  Mock,
+} from 'vitest';
 import SpriteEditor from '../components/SpriteEditor';
 import useFileStore from '../../store';
 import * as utils from '../utils/utils';
+
+interface Coordinate {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  img?: {
+    complete: boolean;
+    src: string;
+    width: number;
+    height: number;
+  };
+  circle?: {
+    x: number;
+    y: number;
+    radius: number;
+  };
+}
+
+interface MockStore {
+  coordinates: Coordinate[];
+  setCoordinates: Mock;
+  padding: number;
+  selectedFiles: Set<File>;
+  setSelectedFiles: Mock;
+  files: File[];
+  setFiles: Mock;
+  addHistory: Mock;
+  alignElement: string;
+  addToast: Mock;
+}
 
 vi.mock('../../store', () => ({
   default: vi.fn(),
@@ -25,12 +65,12 @@ vi.mock('../utils/spriteAnalyzer', () => ({
 }));
 
 describe('SpriteEditor', () => {
-  let getByTestId;
-  let queryByText;
-  let mockStore;
+  let getByTestId: RenderResult['getByTestId'];
+  let queryByText: RenderResult['queryByText'];
+  let mockStore: MockStore;
 
   beforeAll(() => {
-    global.HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+    window.HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
       drawImage: vi.fn(),
       clearRect: vi.fn(),
       fillRect: vi.fn(),
@@ -41,12 +81,12 @@ describe('SpriteEditor', () => {
       fill: vi.fn(),
       getImageData: vi.fn(() => ({ data: new Uint8ClampedArray(400) })),
       createPattern: vi.fn(() => ({})),
-    }));
+    })) as Object as HTMLCanvasElement['getContext'];
 
-    global.HTMLCanvasElement.prototype.toBlob = vi.fn(callback =>
+    window.HTMLCanvasElement.prototype.toBlob = vi.fn(callback =>
       callback(new Blob())
-    );
-    global.URL.createObjectURL = vi.fn(() => 'mockedObjectURL');
+    ) as Object as HTMLCanvasElement['toBlob'];
+    window.URL.createObjectURL = vi.fn(() => 'mockedObjectURL');
   });
 
   beforeEach(() => {
@@ -72,35 +112,32 @@ describe('SpriteEditor', () => {
       addToast: vi.fn(),
     };
 
-    useFileStore.mockImplementation(selector => selector(mockStore));
+    (useFileStore as Object as Mock).mockImplementation(
+      (selector: (state: MockStore) => Object) => selector(mockStore)
+    );
 
     const rendered = render(<SpriteEditor />);
     getByTestId = rendered.getByTestId;
     queryByText = rendered.queryByText;
   });
 
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('선택된 이미지가 시각적으로 표시됩니다', () => {
     const canvas = getByTestId('canvas');
-
     fireEvent.mouseDown(canvas, { clientX: 50, clientY: 50 });
     fireEvent.mouseUp(canvas, { clientX: 50, clientY: 50 });
-
     expect(mockStore.setSelectedFiles).toHaveBeenCalledWith(expect.any(Set));
   });
 
-  it('캔버스 마우스 다운을 처리합니다', () => {
+  it('캔버스 마우스 이벤트를 처리합니다', () => {
     const canvas = getByTestId('canvas');
     fireEvent.mouseDown(canvas, { clientX: 100, clientY: 100 });
-  });
-
-  it('캔버스 마우스 이동을 처리합니다', () => {
-    const canvas = getByTestId('canvas');
     fireEvent.mouseMove(canvas, { clientX: 150, clientY: 150 });
-  });
-
-  it('캔버스 마우스 업을 처리합니다', () => {
-    const canvas = getByTestId('canvas');
     fireEvent.mouseUp(canvas, { clientX: 150, clientY: 150 });
+    expect(mockStore.setCoordinates).toHaveBeenCalled();
   });
 
   it('파일 드롭을 처리합니다', () => {
