@@ -1,8 +1,3 @@
-interface ImageData {
-  width: number;
-  height: number;
-}
-
 interface PackedImage {
   x: number;
   y: number;

@@ -7,46 +7,16 @@ import {
   expect,
   beforeAll,
   afterEach,
-  Mock,
 } from 'vitest';
 import SpriteEditor from '../components/SpriteEditor';
-import useFileStore from '../../store';
+import useFileStore, { FileStoreState, PackedImage } from '../../store';
 import * as utils from '../utils/utils';
 
-interface Coordinate {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  img?: {
-    complete: boolean;
-    src: string;
-    width: number;
-    height: number;
-  };
-  circle?: {
-    x: number;
-    y: number;
-    radius: number;
-  };
+interface MockStore extends FileStoreState {
+  setCoordinates: (coordinates: PackedImage[]) => void;
+  setSelectedFiles: (files: Set<HTMLImageElement>) => void;
+  addToast: (message: string) => void;
 }
-
-interface MockStore {
-  coordinates: Coordinate[];
-  setCoordinates: Mock;
-  padding: number;
-  selectedFiles: Set<File>;
-  setSelectedFiles: Mock;
-  files: File[];
-  setFiles: Mock;
-  addHistory: Mock;
-  alignElement: string;
-  addToast: Mock;
-}
-
-vi.mock('../../store', () => ({
-  default: vi.fn(),
-}));
 
 vi.mock('../utils/utils', () => ({
   handleFiles: vi.fn(),
@@ -70,51 +40,45 @@ describe('SpriteEditor', () => {
   let mockStore: MockStore;
 
   beforeAll(() => {
-    window.HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
-      drawImage: vi.fn(),
-      clearRect: vi.fn(),
-      fillRect: vi.fn(),
-      fillStyle: '',
-      strokeRect: vi.fn(),
-      beginPath: vi.fn(),
-      arc: vi.fn(),
-      fill: vi.fn(),
-      getImageData: vi.fn(() => ({ data: new Uint8ClampedArray(400) })),
-      createPattern: vi.fn(() => ({})),
-    })) as Object as HTMLCanvasElement['getContext'];
-
     window.HTMLCanvasElement.prototype.toBlob = vi.fn(callback =>
       callback(new Blob())
-    ) as Object as HTMLCanvasElement['toBlob'];
+    );
     window.URL.createObjectURL = vi.fn(() => 'mockedObjectURL');
   });
 
   beforeEach(() => {
+    const imgElement = new Image();
+    imgElement.src = 'test.png';
+    imgElement.width = 100;
+    imgElement.height = 100;
+
     mockStore = {
+      files: [],
+      padding: 10,
       coordinates: [
         {
-          img: { complete: true, src: 'test.png', width: 100, height: 100 },
+          img: imgElement,
           x: 0,
           y: 0,
           width: 100,
           height: 100,
+          rotated: false,
           circle: { x: 100, y: 100, radius: 8 },
         },
       ],
+      toast: null,
+      selectedFiles: new Set<HTMLImageElement>(),
+      fileName: '',
+      resizedImage: null,
+      history: [],
+      redoHistory: [],
+      alignElement: 'bin-packing',
       setCoordinates: vi.fn(),
-      padding: 0,
-      selectedFiles: new Set(),
       setSelectedFiles: vi.fn(),
-      files: [],
-      setFiles: vi.fn(),
-      addHistory: vi.fn(),
-      alignElement: 'left-right',
       addToast: vi.fn(),
     };
 
-    (useFileStore as Object as Mock).mockImplementation(
-      (selector: (state: MockStore) => Object) => selector(mockStore)
-    );
+    useFileStore.setState(mockStore);
 
     const rendered = render(<SpriteEditor />);
     getByTestId = rendered.getByTestId;
@@ -174,12 +138,18 @@ describe('SpriteEditor', () => {
   });
 
   it('선택 상자를 사용하여 이미지를 적절히 선택합니다', () => {
+    const imgElement2 = new Image();
+    imgElement2.src = 'test2.png';
+    imgElement2.width = 100;
+    imgElement2.height = 100;
+
     mockStore.coordinates.push({
-      img: { complete: true, src: 'test2.png', width: 100, height: 100 },
+      img: imgElement2,
       x: 120,
       y: 120,
       width: 100,
       height: 100,
+      rotated: false,
       circle: { x: 220, y: 220, radius: 8 },
     });
 

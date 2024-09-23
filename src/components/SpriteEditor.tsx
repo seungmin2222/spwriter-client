@@ -36,6 +36,10 @@ interface Sprite {
   height: number;
 }
 
+type MouseEventWithNativeEvent =
+  | MouseEvent
+  | (React.MouseEvent<HTMLDivElement> & { nativeEvent: MouseEvent });
+
 function SpriteEditor() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const coordinates = useFileStore(state => state.coordinates) || [];
@@ -80,12 +84,9 @@ function SpriteEditor() {
     const canvas = canvasRef.current;
 
     if (canvas) {
-      const handleMouseMove = (e: MouseEvent) =>
-        handleCanvasMouseMove(e as Object as React.MouseEvent<HTMLDivElement>);
-      const handleMouseUp = (e: MouseEvent) =>
-        handleCanvasMouseUp(e as Object as React.MouseEvent<HTMLDivElement>);
-      const handleMouseDown = (e: MouseEvent) =>
-        handleCanvasMouseDown(e as Object as React.MouseEvent<HTMLDivElement>);
+      const handleMouseMove = (e: MouseEvent) => handleCanvasMouseMove(e);
+      const handleMouseUp = (e: MouseEvent) => handleCanvasMouseUp(e);
+      const handleMouseDown = (e: MouseEvent) => handleCanvasMouseDown(e);
 
       canvas.addEventListener('mousemove', handleMouseMove);
       canvas.addEventListener('mouseup', handleMouseUp);
@@ -235,7 +236,7 @@ function SpriteEditor() {
     }
   };
 
-  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleCanvasMouseDown = (e: MouseEventWithNativeEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -272,7 +273,7 @@ function SpriteEditor() {
     }
   };
 
-  const handleCanvasMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleCanvasMouseMove = (e: MouseEventWithNativeEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -345,7 +346,7 @@ function SpriteEditor() {
     setTooltip({ show: showTooltip, x: tooltipX, y: tooltipY });
   };
 
-  const handleCanvasMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleCanvasMouseUp = (e: MouseEventWithNativeEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -482,7 +483,7 @@ function SpriteEditor() {
     });
   };
 
-  const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleCanvasClick = (e: MouseEventWithNativeEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 

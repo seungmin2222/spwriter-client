@@ -65,7 +65,11 @@ vi.mock('../components/ResizeModal', () => ({
 describe('ImageList component', () => {
   const mockCoordinates: PackedImage[] = [
     {
-      img: { src: 'image1.png', width: 100, height: 100 } as HTMLImageElement,
+      img: Object.assign(new Image(), {
+        src: 'image1.png',
+        width: 100,
+        height: 100,
+      }),
       width: 100,
       height: 100,
       x: 0,
@@ -73,7 +77,11 @@ describe('ImageList component', () => {
       rotated: false,
     },
     {
-      img: { src: 'image2.png', width: 100, height: 100 } as HTMLImageElement,
+      img: Object.assign(new Image(), {
+        src: 'image2.png',
+        width: 100,
+        height: 100,
+      }),
       width: 100,
       height: 100,
       x: 0,

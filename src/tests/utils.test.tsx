@@ -8,53 +8,116 @@ import {
   resizeSelectedImages,
 } from '../utils/utils';
 
-interface PackedImage {
-  x: number;
-  y: number;
+interface ImageSize {
   width: number;
   height: number;
+}
+
+interface PackedImage extends ImageSize {
+  x: number;
+  y: number;
   rotated: boolean;
   img: HTMLImageElement;
 }
 
-const mockCtx = {
+type PartialCanvasRenderingContext2D = Pick<
+  CanvasRenderingContext2D,
+  | 'drawImage'
+  | 'getImageData'
+  | 'translate'
+  | 'scale'
+  | 'rotate'
+  | 'putImageData'
+>;
+
+const mockCtx: PartialCanvasRenderingContext2D = {
   drawImage: vi.fn(),
-  getImageData: vi.fn(() => ({
-    data: new Uint8ClampedArray(100 * 100 * 4).fill(255),
-  })),
+  getImageData: vi.fn(
+    (sx: number, sy: number, sw: number, sh: number): ImageData => ({
+      data: new Uint8ClampedArray(sw * sh * 4).fill(255),
+      width: sw,
+      height: sh,
+      colorSpace: 'srgb',
+    })
+  ),
   translate: vi.fn(),
   scale: vi.fn(),
   rotate: vi.fn(),
   putImageData: vi.fn(),
 };
 
-const mockCanvas = {
-  getContext: vi.fn(() => mockCtx),
+interface PartialHTMLCanvasElement
+  extends Pick<HTMLCanvasElement, 'width' | 'height' | 'toDataURL'> {
+  getContext(contextId: '2d'): PartialCanvasRenderingContext2D | null;
+}
+
+const mockCanvas: PartialHTMLCanvasElement = {
+  getContext: vi.fn((contextId: '2d') => (contextId === '2d' ? mockCtx : null)),
   toDataURL: vi.fn(() => 'data:image/png;base64,mockDataUrl'),
   width: 100,
   height: 100,
 };
 
-global.document.createElement = vi.fn((tagName: string) => {
-  if (tagName === 'canvas') return mockCanvas as Object as HTMLCanvasElement;
-  return document.createElement(tagName);
-});
+type HTMLElementOrCanvas = HTMLElement | PartialHTMLCanvasElement;
 
-global.Image = class {
+function createElementMock(tagName: 'canvas'): PartialHTMLCanvasElement;
+function createElementMock(tagName: string): HTMLElement;
+function createElementMock(tagName: string): HTMLElementOrCanvas {
+  if (tagName === 'canvas') return mockCanvas;
+  return document.createElement(tagName);
+}
+
+global.document.createElement = vi.fn(createElementMock);
+
+interface PartialHTMLImageElement {
+  width: number;
+  height: number;
+  src: string;
+  onload: (() => void) | null;
+  alt?: string;
+  align?: string;
+  border?: string;
+  complete?: boolean;
+}
+
+class MockImage implements PartialHTMLImageElement {
   width: number = 100;
   height: number = 100;
-  onload: (() => void) | null = null;
   src: string = '';
+  onload: (() => void) | null = null;
+  alt: string = '';
+  align: string = '';
+  border: string = '';
+  complete: boolean = false;
 
   constructor() {
-    setTimeout(() => this.onload?.(), 0);
+    setTimeout(() => {
+      if (this.onload) {
+        this.onload();
+      }
+      this.complete = true;
+    }, 0);
   }
-} as Object as typeof global.Image;
+}
+
+declare global {
+  interface Global {
+    Image: typeof MockImage;
+  }
+}
+(global as Global).Image = MockImage;
 
 global.window.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
 global.window.URL.revokeObjectURL = vi.fn();
 
 global.HTMLAnchorElement.prototype.click = vi.fn();
+
+function imageSizeToHTMLImageElement(imageSize: ImageSize): HTMLImageElement {
+  const img = new Image();
+  img.width = imageSize.width;
+  img.height = imageSize.height;
+  return img;
+}
 
 describe('Image Processing Functions', () => {
   beforeEach(() => {
@@ -63,33 +126,44 @@ describe('Image Processing Functions', () => {
 
   describe('calculateCoordinates', () => {
     it('bin-packing 정렬을 위한 좌표를 계산해야 합니다', () => {
-      const images = [
+      const images: ImageSize[] = [
         { width: 100, height: 100 },
         { width: 50, height: 50 },
         { width: 75, height: 75 },
-      ] as HTMLImageElement[];
-      const result = calculateCoordinates(images, 10, 'bin-packing');
+      ];
+
+      const htmlImages = images.map(imageSizeToHTMLImageElement);
+      const result = calculateCoordinates(htmlImages, 10, 'bin-packing');
       expect(result).toHaveLength(3);
       expect(result[0].x).toBeDefined();
       expect(result[0].y).toBeDefined();
+
+      result.forEach(item => {
+        expect(typeof item.width).toBe('number');
+        expect(typeof item.height).toBe('number');
+        expect(typeof item.x).toBe('number');
+        expect(typeof item.y).toBe('number');
+      });
     });
 
     it('top-bottom 정렬을 위한 좌표를 계산해야 합니다', () => {
-      const images = [
+      const images: ImageSize[] = [
         { width: 100, height: 100 },
         { width: 50, height: 50 },
-      ] as HTMLImageElement[];
-      const result = calculateCoordinates(images, 10, 'top-bottom');
+      ];
+      const htmlImages = images.map(imageSizeToHTMLImageElement);
+      const result = calculateCoordinates(htmlImages, 10, 'top-bottom');
       expect(result).toHaveLength(2);
       expect(result[1].y).toBeGreaterThan(result[0].y);
     });
 
     it('left-right 정렬을 위한 좌표를 계산해야 합니다', () => {
-      const images = [
+      const images: ImageSize[] = [
         { width: 100, height: 100 },
         { width: 50, height: 50 },
-      ] as HTMLImageElement[];
-      const result = calculateCoordinates(images, 10, 'left-right');
+      ];
+      const htmlImages = images.map(imageSizeToHTMLImageElement);
+      const result = calculateCoordinates(htmlImages, 10, 'left-right');
       expect(result).toHaveLength(2);
       expect(result[1].x).toBeGreaterThan(result[0].x);
     });
@@ -98,16 +172,30 @@ describe('Image Processing Functions', () => {
   describe('sortAndSetCoordinates', () => {
     it('좌표를 면적별로 정렬하고 설정해야 합니다', () => {
       const coords: PackedImage[] = [
-        { width: 50, height: 50, x: 0, y: 0, rotated: false, img: new Image() },
+        {
+          width: 50,
+          height: 50,
+          x: 0,
+          y: 0,
+          rotated: false,
+          img: imageSizeToHTMLImageElement({ width: 50, height: 50 }),
+        },
         {
           width: 100,
           height: 100,
           x: 0,
           y: 0,
           rotated: false,
-          img: new Image(),
+          img: imageSizeToHTMLImageElement({ width: 100, height: 100 }),
         },
-        { width: 75, height: 75, x: 0, y: 0, rotated: false, img: new Image() },
+        {
+          width: 75,
+          height: 75,
+          x: 0,
+          y: 0,
+          rotated: false,
+          img: imageSizeToHTMLImageElement({ width: 75, height: 75 }),
+        },
       ];
       const setCoordinates = vi.fn();
       sortAndSetCoordinates(coords, setCoordinates);
@@ -123,9 +211,10 @@ describe('Image Processing Functions', () => {
 
   describe('trimImage', () => {
     it('이미지를 트리밍해야 합니다', async () => {
-      const img = new Image();
+      const img = imageSizeToHTMLImageElement({ width: 100, height: 100 });
       const result = await trimImage(img);
-      expect(result).toBeInstanceOf(Image);
+      expect(result).toHaveProperty('width');
+      expect(result).toHaveProperty('height');
       expect(result.src).toBe('data:image/png;base64,mockDataUrl');
     });
   });
@@ -155,7 +244,7 @@ describe('Image Processing Functions', () => {
     it('선택된 이미지의 크기를 조정해야 합니다', async () => {
       const coordinates: PackedImage[] = [
         {
-          img: new Image(),
+          img: imageSizeToHTMLImageElement({ width: 100, height: 100 }),
           width: 100,
           height: 100,
           x: 0,

@@ -1,26 +1,13 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Footer from '../components/Footer';
-import useFileStore from '../../store';
+import useFileStore, { FileStore } from '../../store';
 import {
   cloneSelectedImages,
   inversionSelectedImages,
   rotateSelectedImages,
 } from '../utils/utils';
-
-type FileStore = {
-  coordinates: PackedImage[];
-  setCoordinates: (coordinates: PackedImage[]) => void;
-  addHistory: (prevCoordinates: PackedImage[]) => void;
-  popHistory: () => void;
-  pushHistory: () => void;
-  selectedFiles: Set<HTMLImageElement>;
-  addToast: (message: string) => void;
-  history: PackedImage[][];
-  redoHistory: PackedImage[][];
-  padding: number;
-  alignElement: AlignElement;
-};
+import { StateCreator, create } from 'zustand';
 
 vi.mock('../../store', () => ({
   default: vi.fn(),
@@ -32,39 +19,40 @@ vi.mock('../utils/utils', () => ({
   rotateSelectedImages: vi.fn(),
 }));
 
-interface PackedImage {
-  img: HTMLImageElement;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotated: boolean;
-}
-
-type AlignElement = 'bin-packing' | 'top-bottom' | 'left-right';
-
 describe('Footer component', () => {
   let mockStore: FileStore;
 
-  beforeEach(() => {
-    mockStore = {
-      coordinates: [],
-      setCoordinates: vi.fn(),
-      addHistory: vi.fn(),
-      popHistory: vi.fn(),
-      pushHistory: vi.fn(),
-      selectedFiles: new Set(),
-      addToast: vi.fn(),
-      history: [],
-      redoHistory: [],
-      padding: 10,
-      alignElement: 'bin-packing',
-    };
+  const createMockStore = (): StateCreator<FileStore> => set => ({
+    files: [],
+    padding: 10,
+    coordinates: [],
+    toast: null,
+    selectedFiles: new Set<HTMLImageElement>(),
+    fileName: '',
+    resizedImage: null,
+    history: [],
+    redoHistory: [],
+    alignElement: 'bin-packing',
+    setFiles: vi.fn(),
+    setPadding: vi.fn(),
+    setCoordinates: vi.fn(),
+    setToast: vi.fn(),
+    addToast: vi.fn(),
+    setSelectedFiles: vi.fn(),
+    setFileName: vi.fn(),
+    setResizedImage: vi.fn(),
+    setAlignElement: vi.fn(),
+    addHistory: vi.fn(),
+    popHistory: vi.fn(),
+    pushHistory: vi.fn(),
+  });
 
-    (useFileStore as Object as ReturnType<typeof vi.fn>).mockImplementation(
-      <T extends Object>(selector: (store: FileStore) => T): T =>
-        selector(mockStore)
-    );
+  beforeEach(() => {
+    const mockStoreCreator = createMockStore();
+    const mockUseFileStore = create(mockStoreCreator);
+    mockStore = mockUseFileStore.getState();
+
+    vi.mocked(useFileStore).mockImplementation(mockUseFileStore);
   });
 
   it('적절한 아이콘과 툴팁이 있는 다섯 개의 버튼을 포함합니다', () => {

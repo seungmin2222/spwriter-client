@@ -1,6 +1,6 @@
 const globals = require('globals');
 const pluginJs = require('@eslint/ts');
-const pluginReactConfig = require('eslint-plugin-react/configs/recommended.js');
+
 
 module.exports = {
   env: {
@@ -82,34 +82,9 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'react/require-default-props': 'warn',
     'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx'] }],
-    'no-param-reassign': 0,
-    'global-require': 0,
-    'no-underscore-dangle': 'off',
-    'no-restricted-syntax': 'off',
-    'no-cond-assign': 'off',
-    'no-use-before-define': 'off',
-    'no-await-in-loop': 'off',
-    'radix': 'off',
-    'no-plusplus': 'off',
-    'max-classes-per-file': 'off',
-    'jsx-a11y/label-has-associated-control': 'off',
-    'jsx-a11y/click-events-have-key-events': 'off',
-    'jsx-a11y/no-static-element-interactions': 'off',
-    'jsx-a11y/no-noninteractive-element-interactions': 'off',
-    'jsx-a11y/no-noninteractive-tabindex': 'off',
-    "jsx-a11y/label-has-associated-control": [ "error", {
-      "labelComponents": [],
-      "labelAttributes": [],
-      "controlComponents": [],
-      "assert": "either",
-      "depth": 25,}],
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
-    "import/no-unresolved": "off",
-    "import/no-duplicates": "off",
-    "import/no-self-import": "off",
-    "import/no-relative-packages": "off"
   },
   settings: {
     react: {

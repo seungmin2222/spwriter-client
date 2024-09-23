@@ -83,13 +83,32 @@ function ImageList() {
 
         newSelectedFiles.add(resizedImg);
 
-        return {
-          ...coord,
-          img: resizedImg,
+        const createPackedImage = (
+          img: HTMLImageElement,
+          x: number,
+          y: number,
+          width: number,
+          height: number,
+          rotated: boolean
+        ): PackedImage => ({
+          img,
+          x,
+          y,
           width,
           height,
-        } as PackedImage;
+          rotated,
+        });
+
+        return createPackedImage(
+          resizedImg,
+          coord.x,
+          coord.y,
+          width,
+          height,
+          coord.rotated
+        );
       }
+
       return coord;
     });
 

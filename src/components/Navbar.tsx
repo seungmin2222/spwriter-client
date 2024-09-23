@@ -153,11 +153,15 @@ const Navbar = () => {
           <select
             id="align-elements"
             value={alignElement}
-            onChange={e =>
-              setAlignElement(
-                e.target.value as 'bin-packing' | 'top-bottom' | 'left-right'
-              )
-            }
+            onChange={e => {
+              if (
+                e.target.value === 'bin-packing' ||
+                e.target.value === 'left-right' ||
+                e.target.value === 'top-bottom'
+              ) {
+                return setAlignElement(e.target.value);
+              }
+            }}
             className="w-32"
           >
             <option value="bin-packing">Bin-Packing</option>

@@ -5,7 +5,7 @@ import SpriteMain from './SpriteMain';
 import xMarkIcon from '../assets/images/circle-xmark-regular.svg';
 
 const App: React.FC = () => {
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {

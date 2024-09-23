@@ -32,7 +32,7 @@ describe('useFileStore', () => {
   });
 
   it('파일을 설정해야 합니다', () => {
-    const mockFiles = [new File([], 'file1'), new File([], 'file2')] as File[];
+    const mockFiles = [new File([], 'file1'), new File([], 'file2')];
     act(() => {
       store.setFiles(mockFiles);
     });
