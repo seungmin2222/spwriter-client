@@ -8,6 +8,15 @@ import {
   resizeSelectedImages,
 } from '../utils/utils';
 
+interface PackedImage {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotated: boolean;
+  img: HTMLImageElement;
+}
+
 const mockCtx = {
   drawImage: vi.fn(),
   getImageData: vi.fn(() => ({
@@ -26,20 +35,21 @@ const mockCanvas = {
   height: 100,
 };
 
-global.document.createElement = vi.fn(tagName => {
-  if (tagName === 'canvas') return mockCanvas;
+global.document.createElement = vi.fn((tagName: string) => {
+  if (tagName === 'canvas') return mockCanvas as Object as HTMLCanvasElement;
   return document.createElement(tagName);
 });
 
 global.Image = class {
+  width: number = 100;
+  height: number = 100;
+  onload: (() => void) | null = null;
+  src: string = '';
+
   constructor() {
-    this.width = 100;
-    this.height = 100;
     setTimeout(() => this.onload?.(), 0);
   }
-
-  src = '';
-};
+} as Object as typeof global.Image;
 
 global.window.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
 global.window.URL.revokeObjectURL = vi.fn();
@@ -57,7 +67,7 @@ describe('Image Processing Functions', () => {
         { width: 100, height: 100 },
         { width: 50, height: 50 },
         { width: 75, height: 75 },
-      ];
+      ] as HTMLImageElement[];
       const result = calculateCoordinates(images, 10, 'bin-packing');
       expect(result).toHaveLength(3);
       expect(result[0].x).toBeDefined();
@@ -68,7 +78,7 @@ describe('Image Processing Functions', () => {
       const images = [
         { width: 100, height: 100 },
         { width: 50, height: 50 },
-      ];
+      ] as HTMLImageElement[];
       const result = calculateCoordinates(images, 10, 'top-bottom');
       expect(result).toHaveLength(2);
       expect(result[1].y).toBeGreaterThan(result[0].y);
@@ -78,7 +88,7 @@ describe('Image Processing Functions', () => {
       const images = [
         { width: 100, height: 100 },
         { width: 50, height: 50 },
-      ];
+      ] as HTMLImageElement[];
       const result = calculateCoordinates(images, 10, 'left-right');
       expect(result).toHaveLength(2);
       expect(result[1].x).toBeGreaterThan(result[0].x);
@@ -87,10 +97,17 @@ describe('Image Processing Functions', () => {
 
   describe('sortAndSetCoordinates', () => {
     it('좌표를 면적별로 정렬하고 설정해야 합니다', () => {
-      const coords = [
-        { width: 50, height: 50 },
-        { width: 100, height: 100 },
-        { width: 75, height: 75 },
+      const coords: PackedImage[] = [
+        { width: 50, height: 50, x: 0, y: 0, rotated: false, img: new Image() },
+        {
+          width: 100,
+          height: 100,
+          x: 0,
+          y: 0,
+          rotated: false,
+          img: new Image(),
+        },
+        { width: 75, height: 75, x: 0, y: 0, rotated: false, img: new Image() },
       ];
       const setCoordinates = vi.fn();
       sortAndSetCoordinates(coords, setCoordinates);
@@ -118,7 +135,7 @@ describe('Image Processing Functions', () => {
       const files = [new File([''], 'test.png', { type: 'image/png' })];
       const setFiles = vi.fn();
       const setCoordinates = vi.fn();
-      const coordinates = [];
+      const coordinates: PackedImage[] = [];
       await act(async () => {
         await handleFiles(
           files,
@@ -136,8 +153,15 @@ describe('Image Processing Functions', () => {
 
   describe('resizeSelectedImages', () => {
     it('선택된 이미지의 크기를 조정해야 합니다', async () => {
-      const coordinates = [
-        { img: new Image(), width: 100, height: 100, x: 0, y: 0 },
+      const coordinates: PackedImage[] = [
+        {
+          img: new Image(),
+          width: 100,
+          height: 100,
+          x: 0,
+          y: 0,
+          rotated: false,
+        },
       ];
       const selectedFiles = new Set([coordinates[0].img]);
       const setCoordinates = vi.fn();
