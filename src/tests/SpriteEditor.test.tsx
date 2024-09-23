@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { describe, it, vi, beforeEach, expect, beforeAll } from 'vitest';
 import SpriteEditor from '../components/SpriteEditor';
