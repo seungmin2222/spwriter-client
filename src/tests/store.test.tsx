@@ -2,8 +2,22 @@ import { act } from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import useFileStore from '../../store';
 
+interface PackedImage {
+  img: HTMLImageElement;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotated: boolean;
+}
+
+interface Toast {
+  id: number;
+  message: string;
+}
+
 describe('useFileStore', () => {
-  let store;
+  let store: ReturnType<typeof useFileStore.getState>;
 
   beforeEach(() => {
     store = useFileStore.getState();
@@ -18,11 +32,12 @@ describe('useFileStore', () => {
   });
 
   it('파일을 설정해야 합니다', () => {
+    const mockFiles = [new File([], 'file1'), new File([], 'file2')] as File[];
     act(() => {
-      store.setFiles(['file1', 'file2']);
+      store.setFiles(mockFiles);
     });
     const newState = useFileStore.getState();
-    expect(newState.files).toEqual(['file1', 'file2']);
+    expect(newState.files).toEqual(mockFiles);
   });
 
   it('패딩을 설정해야 합니다', () => {
@@ -34,19 +49,30 @@ describe('useFileStore', () => {
   });
 
   it('좌표를 설정해야 합니다', () => {
+    const mockCoordinates: PackedImage[] = [
+      {
+        img: new Image(),
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        rotated: false,
+      },
+    ];
     act(() => {
-      store.setCoordinates([{ x: 0, y: 0 }]);
+      store.setCoordinates(mockCoordinates);
     });
     const newState = useFileStore.getState();
-    expect(newState.coordinates).toEqual([{ x: 0, y: 0 }]);
+    expect(newState.coordinates).toEqual(mockCoordinates);
   });
 
   it('토스트를 설정해야 합니다', () => {
+    const mockToast: Toast = { id: 1, message: 'Toast message' };
     act(() => {
-      store.setToast({ id: 1, message: 'Toast message' });
+      store.setToast(mockToast);
     });
     const newState = useFileStore.getState();
-    expect(newState.toast).toEqual({ id: 1, message: 'Toast message' });
+    expect(newState.toast).toEqual(mockToast);
   });
 
   it('토스트를 추가해야 합니다', () => {
@@ -57,11 +83,13 @@ describe('useFileStore', () => {
     expect(newState.toast).toMatchObject({
       message: 'New toast message',
     });
-    expect(newState.toast.id).toBeDefined();
+    expect(newState.toast?.id).toBeDefined();
   });
 
   it('선택된 파일을 설정해야 합니다', () => {
-    const newSelectedFiles = new Set(['file1', 'file2']);
+    const mockImage1 = new Image();
+    const mockImage2 = new Image();
+    const newSelectedFiles = new Set([mockImage1, mockImage2]);
     act(() => {
       store.setSelectedFiles(newSelectedFiles);
     });
@@ -78,35 +106,69 @@ describe('useFileStore', () => {
   });
 
   it('크기 조정된 이미지를 설정해야 합니다', () => {
-    const mockImage = new Blob([''], { type: 'image/jpeg' });
+    const mockResizedImage: PackedImage = {
+      img: new Image(),
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      rotated: false,
+    };
     act(() => {
-      store.setResizedImage(mockImage);
+      store.setResizedImage(mockResizedImage);
     });
     const newState = useFileStore.getState();
-    expect(newState.resizedImage).toBe(mockImage);
+    expect(newState.resizedImage).toEqual(mockResizedImage);
   });
 
   it('정렬 요소를 설정해야 합니다', () => {
     act(() => {
-      store.setAlignElement('grid');
+      store.setAlignElement('left-right');
     });
     const newState = useFileStore.getState();
-    expect(newState.alignElement).toBe('grid');
+    expect(newState.alignElement).toBe('left-right');
   });
 
   it('히스토리에 추가해야 합니다', () => {
-    const prevCoordinates = [{ x: 0, y: 0 }];
+    const prevCoordinates: PackedImage[] = [
+      {
+        img: new Image(),
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        rotated: false,
+      },
+    ];
     act(() => {
       store.addHistory(prevCoordinates);
     });
     const newState = useFileStore.getState();
-    expect(newState.history).toContain(prevCoordinates);
+    expect(newState.history).toContainEqual(prevCoordinates);
     expect(newState.redoHistory).toEqual([]);
   });
 
   it('히스토리에서 제거해야 합니다', () => {
-    const initialCoordinates = [{ x: 0, y: 0 }];
-    const newCoordinates = [{ x: 1, y: 1 }];
+    const initialCoordinates: PackedImage[] = [
+      {
+        img: new Image(),
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        rotated: false,
+      },
+    ];
+    const newCoordinates: PackedImage[] = [
+      {
+        img: new Image(),
+        x: 1,
+        y: 1,
+        width: 100,
+        height: 100,
+        rotated: false,
+      },
+    ];
     act(() => {
       store.setCoordinates(initialCoordinates);
       store.addHistory(initialCoordinates);
@@ -117,12 +179,30 @@ describe('useFileStore', () => {
     });
     const newState = useFileStore.getState();
     expect(newState.coordinates).toEqual(initialCoordinates);
-    expect(newState.redoHistory).toContain(newCoordinates);
+    expect(newState.redoHistory).toContainEqual(newCoordinates);
   });
 
   it('히스토리를 푸시해야 합니다', () => {
-    const initialCoordinates = [{ x: 0, y: 0 }];
-    const newCoordinates = [{ x: 1, y: 1 }];
+    const initialCoordinates: PackedImage[] = [
+      {
+        img: new Image(),
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        rotated: false,
+      },
+    ];
+    const newCoordinates: PackedImage[] = [
+      {
+        img: new Image(),
+        x: 1,
+        y: 1,
+        width: 100,
+        height: 100,
+        rotated: false,
+      },
+    ];
     act(() => {
       store.setCoordinates(initialCoordinates);
       store.addHistory(initialCoordinates);
@@ -134,7 +214,7 @@ describe('useFileStore', () => {
     });
     const newState = useFileStore.getState();
     expect(newState.coordinates).toEqual(newCoordinates);
-    expect(newState.history).toContain(initialCoordinates);
+    expect(newState.history).toContainEqual(initialCoordinates);
     expect(newState.redoHistory).toEqual([]);
   });
 });
