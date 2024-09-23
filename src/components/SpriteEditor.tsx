@@ -81,11 +81,11 @@ function SpriteEditor() {
 
     if (canvas) {
       const handleMouseMove = (e: MouseEvent) =>
-        handleCanvasMouseMove(e as unknown as React.MouseEvent<HTMLDivElement>);
+        handleCanvasMouseMove(e as Object as React.MouseEvent<HTMLDivElement>);
       const handleMouseUp = (e: MouseEvent) =>
-        handleCanvasMouseUp(e as unknown as React.MouseEvent<HTMLDivElement>);
+        handleCanvasMouseUp(e as Object as React.MouseEvent<HTMLDivElement>);
       const handleMouseDown = (e: MouseEvent) =>
-        handleCanvasMouseDown(e as unknown as React.MouseEvent<HTMLDivElement>);
+        handleCanvasMouseDown(e as Object as React.MouseEvent<HTMLDivElement>);
 
       canvas.addEventListener('mousemove', handleMouseMove);
       canvas.addEventListener('mouseup', handleMouseUp);

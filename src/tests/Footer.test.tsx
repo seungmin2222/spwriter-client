@@ -61,8 +61,8 @@ describe('Footer component', () => {
       alignElement: 'bin-packing',
     };
 
-    (useFileStore as unknown as ReturnType<typeof vi.fn>).mockImplementation(
-      <T extends unknown>(selector: (store: FileStore) => T): T =>
+    (useFileStore as Object as ReturnType<typeof vi.fn>).mockImplementation(
+      <T extends Object>(selector: (store: FileStore) => T): T =>
         selector(mockStore)
     );
   });
