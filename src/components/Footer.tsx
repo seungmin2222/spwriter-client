@@ -86,6 +86,7 @@ function Footer() {
     >
       <div className="flex space-x-4">
         <button
+          type="button"
           className={buttonStyle}
           onClick={handleRotateSelectedImages}
           title="회전"
@@ -96,11 +97,12 @@ function Footer() {
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 90° 회전
               </span>
-              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700"></div>
+              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700" />
             </div>
           </div>
         </button>
         <button
+          type="button"
           className={buttonStyle}
           onClick={handleInversionSelectedImages}
           title="반전"
@@ -111,11 +113,12 @@ function Footer() {
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 좌우 반전
               </span>
-              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700"></div>
+              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700" />
             </div>
           </div>
         </button>
         <button
+          type="button"
           className={buttonStyle}
           onClick={handleCloneSelectedImages}
           title="복제"
@@ -126,13 +129,18 @@ function Footer() {
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 이미지 복제
               </span>
-              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700"></div>
+              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700" />
             </div>
           </div>
         </button>
       </div>
       <div className="flex space-x-4">
-        <button className={buttonStyle} onClick={handleUndo} title="실행 취소">
+        <button
+          type="button"
+          className={buttonStyle}
+          onClick={handleUndo}
+          title="실행 취소"
+        >
           <div className="relative flex items-center justify-center">
             <img
               src={leftIcon}
@@ -143,11 +151,16 @@ function Footer() {
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 실행 취소
               </span>
-              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700"></div>
+              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700" />
             </div>
           </div>
         </button>
-        <button className={buttonStyle} onClick={handleRedo} title="다시 실행">
+        <button
+          type="button"
+          className={buttonStyle}
+          onClick={handleRedo}
+          title="다시 실행"
+        >
           <div className="relative flex items-center justify-center">
             <img
               src={rightIcon}
@@ -158,7 +171,7 @@ function Footer() {
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 다시 실행
               </span>
-              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700"></div>
+              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700" />
             </div>
           </div>
         </button>
