@@ -483,9 +483,10 @@ export const rotateSelectedImages = (
   const updatedCoordinatesPromises = coordinates.map(async coord => {
     if (selectedFiles.has(coord.img)) {
       const rotatedImg = await processImage(coord, async (ctx, canvas, img) => {
-        canvas.width = coord.img.height;
-        canvas.height = coord.img.width;
-        ctx.translate(canvas.width / 2, canvas.height / 2);
+        const newCanvas = canvas;
+        newCanvas.width = coord.img.height;
+        newCanvas.height = coord.img.width;
+        ctx.translate(newCanvas.width / 2, newCanvas.height / 2);
         ctx.rotate((90 * Math.PI) / 180);
         ctx.drawImage(img, -coord.img.width / 2, -coord.img.height / 2);
         return Promise.resolve();
@@ -522,8 +523,9 @@ export const resizeSelectedImages = (
   const updatedCoordinatesPromises = coordinates.map(async coord => {
     if (selectedFiles.has(coord.img)) {
       const resizedImg = await processImage(coord, async (ctx, canvas, img) => {
-        canvas.width = coord.width;
-        canvas.height = coord.height;
+        const newCanvas = canvas;
+        newCanvas.width = coord.width;
+        newCanvas.height = coord.height;
         ctx.drawImage(img, 0, 0, coord.width, coord.height);
         return Promise.resolve();
       });
