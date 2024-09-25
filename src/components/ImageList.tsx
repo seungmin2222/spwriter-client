@@ -42,6 +42,13 @@ function ImageList() {
   const [modalWidth, setModalWidth] = useState('');
   const [modalHeight, setModalHeight] = useState('');
 
+  const generateToast = (message: string): void => {
+    setToast({
+      id: Date.now(),
+      message,
+    });
+  };
+
   const handleResizeImages = () => {
     if (selectedFiles.size === 0) {
       generateToast('선택된 이미지가 없습니다.');
@@ -53,8 +60,8 @@ function ImageList() {
   };
 
   const handleResizeConfirm = () => {
-    const width = parseInt(modalWidth);
-    const height = parseInt(modalHeight);
+    const width = parseInt(modalWidth, 10);
+    const height = parseInt(modalHeight, 10);
 
     if (
       Number.isNaN(width) ||
@@ -70,13 +77,38 @@ function ImageList() {
 
     const newSelectedFiles = new Set<HTMLImageElement>();
 
+    const processImage = async (
+      coord: PackedImage,
+      transformCallback: (
+        ctx: CanvasRenderingContext2D,
+        canvas: HTMLCanvasElement
+      ) => void
+    ): Promise<HTMLImageElement> => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Failed to get canvas context');
+
+      canvas.width = coord.img.width;
+      canvas.height = coord.img.height;
+
+      await transformCallback(ctx, canvas);
+
+      const processedImg = new Image();
+      processedImg.src = canvas.toDataURL();
+
+      return new Promise<HTMLImageElement>(resolve => {
+        processedImg.onload = () => resolve(processedImg);
+      });
+    };
+
     const resizePromises = coordinates.map(async (coord: PackedImage) => {
       if (selectedFiles.has(coord.img)) {
         const resizedImg: HTMLImageElement = await processImage(
           coord,
           (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-            canvas.width = width;
-            canvas.height = height;
+            const newCanvas = canvas;
+            newCanvas.width = width;
+            newCanvas.height = height;
             ctx.drawImage(coord.img, 0, 0, width, height);
           }
         );
@@ -87,8 +119,8 @@ function ImageList() {
           img: HTMLImageElement,
           x: number,
           y: number,
-          width: number,
-          height: number,
+          imageWidth: number,
+          imageHeight: number,
           rotated: boolean
         ): PackedImage => ({
           img,
@@ -125,30 +157,6 @@ function ImageList() {
       setModalWidth('');
       setModalHeight('');
       generateToast('선택된 이미지의 크기가 조정되었습니다.');
-    });
-  };
-
-  const processImage = async (
-    coord: PackedImage,
-    transformCallback: (
-      ctx: CanvasRenderingContext2D,
-      canvas: HTMLCanvasElement
-    ) => void
-  ): Promise<HTMLImageElement> => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Failed to get canvas context');
-
-    canvas.width = coord.img.width;
-    canvas.height = coord.img.height;
-
-    await transformCallback(ctx, canvas);
-
-    const processedImg = new Image();
-    processedImg.src = canvas.toDataURL();
-
-    return new Promise<HTMLImageElement>(resolve => {
-      processedImg.onload = () => resolve(processedImg);
     });
   };
 
@@ -195,6 +203,32 @@ function ImageList() {
     setCurrentImage(null);
   };
 
+  const deleteImages = (imagesToDelete: Set<HTMLImageElement>): void => {
+    addHistory(coordinates);
+    setDeletingImages(new Set(imagesToDelete));
+
+    setTimeout(() => {
+      const updatedCoordinates = coordinates.filter(
+        coord => !imagesToDelete.has(coord.img)
+      );
+
+      setCoordinates(updatedCoordinates);
+      setSelectedFiles(new Set());
+      setDeletingImages(new Set());
+      generateToast(
+        `${imagesToDelete.size > 1 ? '선택된 이미지가' : '이미지가'} 삭제되었습니다.`
+      );
+    }, 400);
+  };
+
+  const deleteSelectedImages = () => {
+    deleteImages(selectedFiles);
+  };
+
+  const deleteImage = (imgSrc: HTMLImageElement): void => {
+    deleteImages(new Set([imgSrc]));
+  };
+
   const handleConfirm = () => {
     if (deleteConfirmationType === 'batch') {
       deleteSelectedImages();
@@ -212,13 +246,6 @@ function ImageList() {
     fileName ? `${fileName}.png` : 'sprites.png'
   }') -${image.x}px -${image.y}px;
 }`;
-
-  const generateToast = (message: string): void => {
-    setToast({
-      id: Date.now(),
-      message,
-    });
-  };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard
@@ -272,32 +299,6 @@ function ImageList() {
     e.preventDefault();
   };
 
-  const deleteImages = (imagesToDelete: Set<HTMLImageElement>): void => {
-    addHistory(coordinates);
-    setDeletingImages(new Set(imagesToDelete));
-
-    setTimeout(() => {
-      const updatedCoordinates = coordinates.filter(
-        coord => !imagesToDelete.has(coord.img)
-      );
-
-      setCoordinates(updatedCoordinates);
-      setSelectedFiles(new Set());
-      setDeletingImages(new Set());
-      generateToast(
-        `${imagesToDelete.size > 1 ? '선택된 이미지가' : '이미지가'} 삭제되었습니다.`
-      );
-    }, 400);
-  };
-
-  const deleteSelectedImages = () => {
-    deleteImages(selectedFiles);
-  };
-
-  const deleteImage = (imgSrc: HTMLImageElement): void => {
-    deleteImages(new Set([imgSrc]));
-  };
-
   const copySelectedCoordinates = (): void => {
     const selectedCoordinates = coordinates.filter(coord =>
       selectedFiles.has(coord.img)
@@ -348,6 +349,7 @@ function ImageList() {
         </div>
 
         <button
+          type="button"
           className="flex justify-center items-center w-[9%] h-full group"
           onMouseEnter={() => setIsButtonHovered(true)}
           onMouseLeave={() => setIsButtonHovered(false)}
@@ -406,24 +408,28 @@ function ImageList() {
           <div className="flex w-full justify-between">
             <div>
               <button
+                type="button"
                 className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#25203b] transition-colors"
                 onClick={handleSelectAll}
               >
                 전체 선택
               </button>
               <button
+                type="button"
                 className="p-1 border mr-2 rounded-md shadow-sm hover:bg-[#c9c7d2] transition-colors duration-300"
                 onClick={handleDeselectAll}
               >
                 전체 해제
               </button>
               <button
+                type="button"
                 className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#25203b] transition-colors duration-300"
                 onClick={copySelectedCoordinates}
               >
                 선택좌표 복사
               </button>
               <button
+                type="button"
                 className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#25203b] transition-colors duration-300"
                 onClick={handleResizeImages}
               >
@@ -431,6 +437,7 @@ function ImageList() {
               </button>
             </div>
             <button
+              type="button"
               className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#c53030] transition-colors duration-300"
               onClick={handleOpenModal}
             >
@@ -453,6 +460,13 @@ function ImageList() {
             <span
               className="flex bg-[#f8f8fd] text-[#6b7280] text-[15px] border rounded-[1rem] p-2 animate-fadeIn select-none cursor-pointer"
               onClick={handleClick}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleClick();
+                }
+              }}
             >
               이미지 파일을 드래그하여 놓거나 클릭하여 선택하세요.
               <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
