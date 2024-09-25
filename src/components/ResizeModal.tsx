@@ -8,13 +8,13 @@ interface ResizeModalProps {
   setHeight: (height: string) => void;
 }
 
-const ResizeModal = ({
+function ResizeModal({
   isOpen,
   onClose,
   onConfirm,
   setWidth,
   setHeight,
-}: ResizeModalProps) => {
+}: ResizeModalProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -48,13 +48,11 @@ const ResizeModal = ({
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center"
-      onClick={onClose}
       role="dialog"
       aria-modal="true"
     >
       <div
         className="p-6 border w-[23rem] shadow-lg rounded-[1rem] bg-white"
-        onClick={e => e.stopPropagation()}
         role="document"
       >
         <div className="text-center">
@@ -78,12 +76,14 @@ const ResizeModal = ({
           </div>
           <div>
             <button
+              type="button"
               onClick={onConfirm}
               className="px-4 py-2 bg-[#241f3a] text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-[#565465] duration-300 mb-3"
             >
               확인
             </button>
             <button
+              type="button"
               onClick={onClose}
               className="px-4 py-2 bg-[#f0f0f2] text-gray-700 text-base font-medium rounded-md w-full shadow-sm hover:bg-[#c9c7d2] duration-300"
             >
@@ -92,8 +92,14 @@ const ResizeModal = ({
           </div>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={onClose}
+        className="fixed inset-0 w-full h-full cursor-default focus:outline-none"
+        aria-label="Close modal"
+      />
     </div>
   );
-};
+}
 
 export default ResizeModal;
