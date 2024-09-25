@@ -98,6 +98,8 @@ function SpriteEditor() {
         canvas.removeEventListener('mousedown', handleMouseDown);
       };
     }
+
+    return undefined;
   }, [isResizing, resizing, startPos]);
 
   useEffect(() => {
@@ -164,8 +166,10 @@ function SpriteEditor() {
       yOffset: number = 0
     ) => {
       const isSelected = selectedFiles.has(coord.img);
+      const newCoord = coord;
+
       if (!isSelected) {
-        coord.circle = undefined;
+        newCoord.circle = undefined;
         return;
       }
 
@@ -183,7 +187,7 @@ function SpriteEditor() {
       ctx.fillStyle = '#2b67d1';
       ctx.fill();
 
-      coord.circle = { x: circleX, y: circleY, radius: circleRadius };
+      newCoord.circle = { x: circleX, y: circleY, radius: circleRadius };
     };
 
     if (!Array.isArray(coordinates) || coordinates.length === 0) {
@@ -273,6 +277,28 @@ function SpriteEditor() {
     }
   };
 
+  const drawSelectionBox = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    drawImages();
+
+    const left = Math.min(dragStart.x, dragEnd.x);
+    const top = Math.min(dragStart.y, dragEnd.y);
+    const width = Math.abs(dragEnd.x - dragStart.x);
+    const height = Math.abs(dragEnd.y - dragStart.y);
+
+    ctx.fillStyle = 'rgba(35, 33, 47, 0.3)';
+    ctx.fillRect(left, top, width, height);
+
+    ctx.strokeStyle = '#23212f';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(left, top, width, height);
+  };
+
   const handleCanvasMouseMove = (e: MouseEventWithNativeEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -346,113 +372,6 @@ function SpriteEditor() {
     setTooltip({ show: showTooltip, x: tooltipX, y: tooltipY });
   };
 
-  const handleCanvasMouseUp = (e: MouseEventWithNativeEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    if (isResizing) {
-      setIsResizing(false);
-      setResizing(null);
-      if (changeCoordinates) {
-        addHistory(coordinates);
-        setCoordinates(changeCoordinates);
-        resizeSelectedImages(
-          changeCoordinates,
-          selectedFiles,
-          setCoordinates,
-          setSelectedFiles
-        ).then(({ newCoordinates, resizedImage }) => {
-          const calculatedCoordinates = calculateCoordinates(
-            newCoordinates.map(coord => coord.img),
-            padding,
-            alignElement
-          );
-          setCoordinates(calculatedCoordinates);
-          drawImages();
-
-          if (resizedImage) {
-            const updatedResizedImage = calculatedCoordinates.find(
-              coord => coord.img === resizedImage.img
-            );
-            if (updatedResizedImage) {
-              scrollToResizedImage(updatedResizedImage);
-            }
-          }
-        });
-      }
-    } else if (isDragging) {
-      setIsDragging(false);
-      if (
-        Math.abs(dragEnd.x - dragStart.x) > 5 ||
-        Math.abs(dragEnd.y - dragStart.y) > 5
-      ) {
-        selectImagesInBox();
-      } else {
-        handleCanvasClick(e);
-      }
-      clearSelectionBox();
-    }
-  };
-
-  const drawSelectionBox = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    drawImages();
-
-    const left = Math.min(dragStart.x, dragEnd.x);
-    const top = Math.min(dragStart.y, dragEnd.y);
-    const width = Math.abs(dragEnd.x - dragStart.x);
-    const height = Math.abs(dragEnd.y - dragStart.y);
-
-    ctx.fillStyle = 'rgba(35, 33, 47, 0.3)';
-    ctx.fillRect(left, top, width, height);
-
-    ctx.strokeStyle = '#23212f';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(left, top, width, height);
-  };
-
-  const selectImagesInBox = () => {
-    const newSelectedFiles = new Set(selectedFiles);
-    coordinates.forEach(coord => {
-      if (isImageInSelectionBox(coord)) {
-        if (newSelectedFiles.has(coord.img)) {
-          newSelectedFiles.delete(coord.img);
-        } else {
-          newSelectedFiles.add(coord.img);
-        }
-      }
-    });
-    setSelectedFiles(newSelectedFiles);
-    drawImages();
-  };
-
-  const isImageInSelectionBox = (coord: PackedImage): boolean => {
-    const left = Math.min(dragStart.x, dragEnd.x);
-    const right = Math.max(dragStart.x, dragEnd.x);
-    const top = Math.min(dragStart.y, dragEnd.y);
-    const bottom = Math.max(dragStart.y, dragEnd.y);
-
-    return (
-      coord.x < right &&
-      coord.x + coord.width > left &&
-      coord.y < bottom &&
-      coord.y + coord.height > top
-    );
-  };
-
-  const clearSelectionBox = () => {
-    drawImages();
-  };
-
   const scrollToResizedImage = (resizedCoord: PackedImage) => {
     const container = document.querySelector('.sprite-editor');
     const canvas = canvasRef.current;
@@ -514,6 +433,87 @@ function SpriteEditor() {
     });
   };
 
+  const isImageInSelectionBox = (coord: PackedImage): boolean => {
+    const left = Math.min(dragStart.x, dragEnd.x);
+    const right = Math.max(dragStart.x, dragEnd.x);
+    const top = Math.min(dragStart.y, dragEnd.y);
+    const bottom = Math.max(dragStart.y, dragEnd.y);
+
+    return (
+      coord.x < right &&
+      coord.x + coord.width > left &&
+      coord.y < bottom &&
+      coord.y + coord.height > top
+    );
+  };
+
+  const selectImagesInBox = () => {
+    const newSelectedFiles = new Set(selectedFiles);
+    coordinates.forEach(coord => {
+      if (isImageInSelectionBox(coord)) {
+        if (newSelectedFiles.has(coord.img)) {
+          newSelectedFiles.delete(coord.img);
+        } else {
+          newSelectedFiles.add(coord.img);
+        }
+      }
+    });
+    setSelectedFiles(newSelectedFiles);
+    drawImages();
+  };
+
+  const clearSelectionBox = () => {
+    drawImages();
+  };
+
+  const handleCanvasMouseUp = (e: MouseEventWithNativeEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    if (isResizing) {
+      setIsResizing(false);
+      setResizing(null);
+      if (changeCoordinates) {
+        addHistory(coordinates);
+        setCoordinates(changeCoordinates);
+        resizeSelectedImages(
+          changeCoordinates,
+          selectedFiles,
+          setCoordinates,
+          setSelectedFiles
+        ).then(({ newCoordinates, resizedImage }) => {
+          const calculatedCoordinates = calculateCoordinates(
+            newCoordinates.map(coord => coord.img),
+            padding,
+            alignElement
+          );
+          setCoordinates(calculatedCoordinates);
+          drawImages();
+
+          if (resizedImage) {
+            const updatedResizedImage = calculatedCoordinates.find(
+              coord => coord.img === resizedImage.img
+            );
+            if (updatedResizedImage) {
+              scrollToResizedImage(updatedResizedImage);
+            }
+          }
+        });
+      }
+    } else if (isDragging) {
+      setIsDragging(false);
+      if (
+        Math.abs(dragEnd.x - dragStart.x) > 5 ||
+        Math.abs(dragEnd.y - dragStart.y) > 5
+      ) {
+        selectImagesInBox();
+      } else {
+        handleCanvasClick(e);
+      }
+      clearSelectionBox();
+    }
+  };
+
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
@@ -558,6 +558,32 @@ function SpriteEditor() {
       canvas.height
     );
 
+    const createImageFromSprite = async (
+      newCanvas: HTMLCanvasElement,
+      sprite: Sprite
+    ): Promise<HTMLImageElement> => {
+      const { x, y, width, height } = sprite;
+      const spriteCanvas = document.createElement('canvas');
+      const newCtx = spriteCanvas.getContext('2d');
+      if (!newCtx) throw new Error('Failed to get context');
+
+      spriteCanvas.width = width;
+      spriteCanvas.height = height;
+      newCtx.drawImage(newCanvas, x, y, width, height, 0, 0, width, height);
+
+      return new Promise(resolve => {
+        spriteCanvas.toBlob(blob => {
+          if (!blob) throw new Error('Failed to create blob');
+          const file = new File([blob], `sprite_${Date.now()}.png`, {
+            type: 'image/png',
+          });
+          const img = new Image();
+          img.src = URL.createObjectURL(file);
+          img.onload = () => resolve(img);
+        });
+      });
+    };
+
     const spriteImages = await Promise.all(
       sprites.map(sprite => createImageFromSprite(canvas, sprite))
     );
@@ -572,7 +598,7 @@ function SpriteEditor() {
             spriteCanvas.width = img.width;
             spriteCanvas.height = img.height;
             spriteCtx.drawImage(img, 0, 0);
-            spriteCanvas.toBlob(blob => resolve(blob), 'image/png');
+            spriteCanvas.toBlob(newBlob => resolve(newBlob), 'image/png');
           } else {
             resolve(null);
           }
@@ -619,32 +645,6 @@ function SpriteEditor() {
     }
   }, [coordinates, setFiles, padding, alignElement, setCoordinates]);
 
-  const createImageFromSprite = async (
-    canvas: HTMLCanvasElement,
-    sprite: Sprite
-  ): Promise<HTMLImageElement> => {
-    const { x, y, width, height } = sprite;
-    const spriteCanvas = document.createElement('canvas');
-    const ctx = spriteCanvas.getContext('2d');
-    if (!ctx) throw new Error('Failed to get context');
-
-    spriteCanvas.width = width;
-    spriteCanvas.height = height;
-    ctx.drawImage(canvas, x, y, width, height, 0, 0, width, height);
-
-    return new Promise(resolve => {
-      spriteCanvas.toBlob(blob => {
-        if (!blob) throw new Error('Failed to create blob');
-        const file = new File([blob], `sprite_${Date.now()}.png`, {
-          type: 'image/png',
-        });
-        const img = new Image();
-        img.src = URL.createObjectURL(file);
-        img.onload = () => resolve(img);
-      });
-    });
-  };
-
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleClick = () => {
@@ -652,8 +652,8 @@ function SpriteEditor() {
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
+    const { files: uploadFile } = e.target;
+    if (uploadFile) {
       const newSelectFiles: File[] = Array.from(files);
       handleFiles(
         newSelectFiles,
@@ -675,19 +675,20 @@ function SpriteEditor() {
       onMouseDown={handleCanvasMouseDown}
       onMouseMove={handleCanvasMouseMove}
       onMouseUp={handleCanvasMouseUp}
-      tabIndex={0}
       role="application"
       aria-label="Sprite Editor Canvas"
     >
       {coordinates.length === 0 ? (
         <div className="flex items-center justify-center h-full">
-          <span
+          <button
+            tabIndex={0}
+            type="button"
             className="flex bg-[#f8f8fd] text-[#6b7280] text-xl border rounded-[1rem] p-3 animate-fadeIn select-none cursor-pointer"
             onClick={handleClick}
           >
             이미지 파일을 드래그하여 놓거나 클릭하여 선택하세요.
             <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
-          </span>
+          </button>
           <input
             type="file"
             ref={fileInputRef}
@@ -699,13 +700,10 @@ function SpriteEditor() {
         </div>
       ) : (
         <>
-          <canvas
-            ref={canvasRef}
-            className="flex"
-            data-testid="canvas"
-          ></canvas>
+          <canvas ref={canvasRef} className="flex" data-testid="canvas" />
           {coordinates.length === 1 && (
             <button
+              type="button"
               onClick={extractSpritesFromSheet}
               disabled={isExtracting}
               className={`absolute top-4 right-4 bg-[#241f3a] hover:bg-[#565465] text-white font-bold py-2 px-4 rounded-[1rem] animate-fadeIn duration-300 ${
