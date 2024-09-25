@@ -1,5 +1,5 @@
 declare module '*.svg' {
-  const content: any;
+  const content: string;
   export default content;
 }
 
@@ -8,4 +8,4 @@ declare module '*.png' {
   export default content;
 }
 
-declare var global: typeof globalThis;
+declare const global: typeof globalThis;
