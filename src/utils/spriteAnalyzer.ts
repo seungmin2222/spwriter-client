@@ -3,7 +3,7 @@ export default function analyzeSpritesSheet(
   width: number,
   height: number
 ): { x: number; y: number; width: number; height: number }[] {
-  const labels = new Array(width * height).fill(0);
+  let labels = new Array(width * height).fill(0);
   let nextLabel = 1;
 
   for (let y = 0; y < height; y++) {
@@ -12,7 +12,7 @@ export default function analyzeSpritesSheet(
         !isTransparent(imageData, x, y, width) &&
         labels[y * width + x] === 0
       ) {
-        floodFill(imageData, width, height, x, y, nextLabel, labels);
+        labels = floodFill(imageData, width, height, x, y, nextLabel, labels);
         nextLabel++;
       }
     }
@@ -53,7 +53,8 @@ function floodFill(
   startY: number,
   label: number,
   labels: number[]
-): void {
+): number[] {
+  const newLabels = [...labels];
   const stack = [{ x: startX, y: startY }];
 
   while (stack.length > 0) {
@@ -65,10 +66,10 @@ function floodFill(
       x < width &&
       y >= 0 &&
       y < height &&
-      labels[index] === 0 &&
+      newLabels[index] === 0 &&
       !isTransparent(imageData, x, y, width)
     ) {
-      labels[index] = label;
+      newLabels[index] = label;
 
       stack.push({ x: x + 1, y });
       stack.push({ x: x - 1, y });
@@ -76,6 +77,8 @@ function floodFill(
       stack.push({ x, y: y - 1 });
     }
   }
+
+  return newLabels;
 }
 
 function isTransparent(
