@@ -62,12 +62,14 @@ function Modal({
           <h3 className="text-xl leading-6 text-gray-900 mb-6">{message}</h3>
           <div>
             <button
+              type="button"
               onClick={handleConfirm}
               className="px-4 py-2 bg-[#241f3a] text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-[#565465] duration-300 mb-3"
             >
               확인
             </button>
             <button
+              type="button"
               onClick={handleClose}
               className="px-4 py-2 bg-[#f0f0f2] text-gray-700 text-base font-medium rounded-md w-full shadow-sm hover:bg-[#c9c7d2] duration-300"
             >
