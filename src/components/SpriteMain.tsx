@@ -1,3 +1,4 @@
+import React from 'react';
 import Navbar from './Navbar';
 import SpriteEditor from './SpriteEditor';
 import Footer from './Footer';
