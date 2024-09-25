@@ -4,19 +4,34 @@ import useFileStore from '../../store';
 import { handleFiles } from '../utils/utils';
 import downloadIcon from '../assets/images/download-solid.svg';
 
-const Navbar = () => {
-  const fileName = useFileStore(state => state.fileName);
-  const setFileName = useFileStore(state => state.setFileName);
-  const setFiles = useFileStore(state => state.setFiles);
-  const coordinates = useFileStore(state => state.coordinates);
-  const setCoordinates = useFileStore(state => state.setCoordinates);
-  const paddingValue = useFileStore(state => state.padding);
-  const setPadding = useFileStore(state => state.setPadding);
-  const addToast = useFileStore(state => state.addToast);
-  const toast = useFileStore(state => state.toast);
-  const setToast = useFileStore(state => state.setToast);
-  const alignElement = useFileStore(state => state.alignElement);
-  const setAlignElement = useFileStore(state => state.setAlignElement);
+function Navbar() {
+  const {
+    fileName,
+    setFileName,
+    setFiles,
+    coordinates,
+    setCoordinates,
+    padding: paddingValue,
+    setPadding,
+    addToast,
+    toast,
+    setToast,
+    alignElement,
+    setAlignElement,
+  } = useFileStore(state => ({
+    fileName: state.fileName,
+    setFileName: state.setFileName,
+    setFiles: state.setFiles,
+    coordinates: state.coordinates,
+    setCoordinates: state.setCoordinates,
+    padding: state.padding,
+    setPadding: state.setPadding,
+    addToast: state.addToast,
+    toast: state.toast,
+    setToast: state.setToast,
+    alignElement: state.alignElement,
+    setAlignElement: state.setAlignElement,
+  }));
 
   const handlePaddingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
@@ -41,8 +56,8 @@ const Navbar = () => {
       return;
     }
 
-    let totalWidth: number = 0;
-    let maxHeight: number = 0;
+    let totalWidth = 0;
+    let maxHeight = 0;
 
     if (alignElement === 'left-right') {
       totalWidth = coordinates.reduce(
@@ -106,8 +121,7 @@ const Navbar = () => {
             id="fileInput"
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             multiple
-            onChange={e => {
-              const files = e.target.files;
+            onChange={({ target: { files } }) => {
               if (files) {
                 const filesArray = Array.from(files);
                 setFiles(filesArray);
@@ -153,13 +167,13 @@ const Navbar = () => {
           <select
             id="align-elements"
             value={alignElement}
-            onChange={e => {
+            onChange={({ target: { value } }) => {
               if (
-                e.target.value === 'bin-packing' ||
-                e.target.value === 'left-right' ||
-                e.target.value === 'top-bottom'
+                value === 'bin-packing' ||
+                value === 'left-right' ||
+                value === 'top-bottom'
               ) {
-                return setAlignElement(e.target.value);
+                setAlignElement(value);
               }
             }}
             className="w-32"
@@ -180,6 +194,7 @@ const Navbar = () => {
             onChange={e => setFileName(e.target.value)}
           />
           <button
+            type="button"
             onClick={handleDownload}
             className="p-[0.7rem] rounded-full bg-[#241f3a] hover:bg-[#565465] text-white transition-colors duration-300"
           >
@@ -197,6 +212,6 @@ const Navbar = () => {
       )}
     </nav>
   );
-};
+}
 
 export default Navbar;
