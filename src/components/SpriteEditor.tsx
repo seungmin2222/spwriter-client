@@ -6,6 +6,14 @@ import {
   resizeSelectedImages,
   calculateCoordinates,
 } from '../utils/utils';
+import {
+  drawSelectionBox,
+  drawImages,
+  scrollToResizedImage,
+  selectImagesInBox,
+  clearSelectionBox,
+  handleCanvasClick,
+} from '../utils/spriteEditorUtils.js';
 import analyzeSpritesSheet from '../utils/spriteAnalyzer';
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
@@ -76,7 +84,13 @@ function SpriteEditor() {
 
   useEffect(() => {
     if (canvasRef.current && files.length > 0) {
-      drawImages();
+      drawImages(
+        canvasRef.current,
+        coordinates,
+        selectedFiles,
+        padding,
+        alignElement
+      );
     }
   }, [coordinates, padding, selectedFiles, files, alignElement]);
 
@@ -119,127 +133,6 @@ function SpriteEditor() {
     };
   }, []);
 
-  const createCheckerboardPattern = (): HTMLCanvasElement => {
-    const patternCanvas = document.createElement('canvas');
-    patternCanvas.width = 20;
-    patternCanvas.height = 20;
-    const patternContext = patternCanvas.getContext('2d');
-
-    if (patternContext) {
-      patternContext.fillStyle = '#ccc';
-      patternContext.fillRect(0, 0, 10, 10);
-      patternContext.fillRect(10, 10, 10, 10);
-    }
-
-    return patternCanvas;
-  };
-
-  const drawImages = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const setupCanvas = (width: number, height: number) => {
-      canvas.width = width;
-      canvas.height = height;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = ctx.createPattern(createCheckerboardPattern(), 'repeat')!;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    };
-
-    const drawImage = (
-      coord: PackedImage,
-      xOffset: number = 0,
-      yOffset: number = 0
-    ) => {
-      if (!coord.img.complete) return;
-      ctx.drawImage(coord.img, xOffset, yOffset, coord.width, coord.height);
-    };
-
-    const drawSelection = (
-      coord: PackedImage,
-      xOffset: number = 0,
-      yOffset: number = 0
-    ) => {
-      const isSelected = selectedFiles.has(coord.img);
-      const newCoord = coord;
-
-      if (!isSelected) {
-        newCoord.circle = undefined;
-        return;
-      }
-
-      ctx.strokeStyle = 'black';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(xOffset, yOffset, coord.width, coord.height);
-
-      const circleRadius = 8;
-      const circleOffset = -10;
-      const circleX = xOffset + coord.width + circleOffset;
-      const circleY = yOffset + coord.height + circleOffset;
-
-      ctx.beginPath();
-      ctx.arc(circleX, circleY, circleRadius, 0, 2 * Math.PI);
-      ctx.fillStyle = '#2b67d1';
-      ctx.fill();
-
-      newCoord.circle = { x: circleX, y: circleY, radius: circleRadius };
-    };
-
-    if (!Array.isArray(coordinates) || coordinates.length === 0) {
-      setupCanvas(canvas.width, canvas.height);
-      return;
-    }
-
-    if (alignElement === 'left-right') {
-      const totalWidth = coordinates.reduce(
-        (acc, coord) => acc + coord.width + padding,
-        -padding
-      );
-      const maxHeight =
-        Math.max(...coordinates.map(coord => coord.height)) + padding * 2;
-      setupCanvas(totalWidth, maxHeight);
-
-      let xOffset = 0;
-      coordinates.forEach(coord => {
-        drawImage(coord, xOffset, padding);
-        drawSelection(coord, xOffset, padding);
-        xOffset += coord.width + padding;
-      });
-    } else if (alignElement === 'top-bottom') {
-      const maxWidth =
-        Math.max(...coordinates.map(coord => coord.width)) + padding;
-      const totalHeight = coordinates.reduce(
-        (acc, coord) => acc + coord.height + padding,
-        0
-      );
-      setupCanvas(maxWidth, totalHeight);
-
-      let yOffset = 0;
-      coordinates.forEach(coord => {
-        const xOffset = padding;
-        drawImage(coord, xOffset, yOffset);
-        drawSelection(coord, xOffset, yOffset);
-        yOffset += coord.height + padding;
-      });
-    } else if (alignElement === 'bin-packing') {
-      const maxWidth =
-        Math.max(...coordinates.map(coord => coord.x + coord.width)) + padding;
-      const maxHeight =
-        Math.max(...coordinates.map(coord => coord.y + coord.height)) + padding;
-      setupCanvas(maxWidth, maxHeight);
-
-      coordinates.forEach(coord => {
-        drawImage(coord, coord.x, coord.y);
-        drawSelection(coord, coord.x, coord.y);
-      });
-    }
-  };
-
   const handleCanvasMouseDown = (e: MouseEventWithNativeEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -275,28 +168,6 @@ function SpriteEditor() {
       setDragStart({ x, y });
       setDragEnd({ x, y });
     }
-  };
-
-  const drawSelectionBox = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    drawImages();
-
-    const left = Math.min(dragStart.x, dragEnd.x);
-    const top = Math.min(dragStart.y, dragEnd.y);
-    const width = Math.abs(dragEnd.x - dragStart.x);
-    const height = Math.abs(dragEnd.y - dragStart.y);
-
-    ctx.fillStyle = 'rgba(35, 33, 47, 0.3)';
-    ctx.fillRect(left, top, width, height);
-
-    ctx.strokeStyle = '#23212f';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(left, top, width, height);
   };
 
   const handleCanvasMouseMove = (e: MouseEventWithNativeEvent) => {
@@ -340,11 +211,29 @@ function SpriteEditor() {
       });
       changeCoordinates = updatedCoordinates;
       setCoordinates(updatedCoordinates);
-      drawImages();
+      drawImages(
+        canvasRef.current,
+        updatedCoordinates,
+        selectedFiles,
+        padding,
+        alignElement
+      );
     } else if (isDragging) {
-      setDragEnd({ x, y });
-      drawImages();
-      drawSelectionBox();
+      const currentDragEnd = { x, y };
+      setDragEnd(currentDragEnd);
+      drawImages(
+        canvasRef.current,
+        coordinates,
+        selectedFiles,
+        padding,
+        alignElement
+      );
+      drawSelectionBox(
+        canvas,
+        canvas.getContext('2d'),
+        dragStart,
+        currentDragEnd
+      );
     }
 
     let cursorStyle: string = 'default';
@@ -372,100 +261,6 @@ function SpriteEditor() {
     setTooltip({ show: showTooltip, x: tooltipX, y: tooltipY });
   };
 
-  const scrollToResizedImage = (resizedCoord: PackedImage) => {
-    const container = document.querySelector('.sprite-editor');
-    const canvas = canvasRef.current;
-
-    if (!container || !canvas) return;
-
-    const containerRect = container.getBoundingClientRect();
-
-    const centerX = resizedCoord.x + resizedCoord.width / 2;
-    const centerY = resizedCoord.y + resizedCoord.height / 2;
-
-    let scrollLeft = centerX - containerRect.width / 2;
-    let scrollTop = centerY - containerRect.height / 2;
-
-    scrollLeft = Math.max(
-      0,
-      Math.min(scrollLeft, canvas.width - containerRect.width)
-    );
-    scrollTop = Math.max(
-      0,
-      Math.min(scrollTop, canvas.height - containerRect.height)
-    );
-
-    container.scrollTo({
-      left: scrollLeft,
-      top: scrollTop,
-      behavior: 'smooth',
-    });
-  };
-
-  const handleCanvasClick = (e: MouseEventWithNativeEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const x = e.clientX - rect.left - scrollLeft;
-    const y = e.clientY - rect.top - scrollTop;
-
-    const newSelectedFiles = new Set(selectedFiles);
-
-    coordinates.forEach(coord => {
-      const startX = coord.x;
-      const endX = coord.x + coord.width;
-      const startY = coord.y;
-      const endY = coord.y + coord.height;
-
-      if (x >= startX && x <= endX && y >= startY && y <= endY) {
-        if (newSelectedFiles.has(coord.img)) {
-          newSelectedFiles.delete(coord.img);
-        } else {
-          newSelectedFiles.add(coord.img);
-        }
-
-        setSelectedFiles(newSelectedFiles);
-        drawImages();
-      }
-    });
-  };
-
-  const isImageInSelectionBox = (coord: PackedImage): boolean => {
-    const left = Math.min(dragStart.x, dragEnd.x);
-    const right = Math.max(dragStart.x, dragEnd.x);
-    const top = Math.min(dragStart.y, dragEnd.y);
-    const bottom = Math.max(dragStart.y, dragEnd.y);
-
-    return (
-      coord.x < right &&
-      coord.x + coord.width > left &&
-      coord.y < bottom &&
-      coord.y + coord.height > top
-    );
-  };
-
-  const selectImagesInBox = () => {
-    const newSelectedFiles = new Set(selectedFiles);
-    coordinates.forEach(coord => {
-      if (isImageInSelectionBox(coord)) {
-        if (newSelectedFiles.has(coord.img)) {
-          newSelectedFiles.delete(coord.img);
-        } else {
-          newSelectedFiles.add(coord.img);
-        }
-      }
-    });
-    setSelectedFiles(newSelectedFiles);
-    drawImages();
-  };
-
-  const clearSelectionBox = () => {
-    drawImages();
-  };
-
   const handleCanvasMouseUp = (e: MouseEventWithNativeEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -488,14 +283,20 @@ function SpriteEditor() {
             alignElement
           );
           setCoordinates(calculatedCoordinates);
-          drawImages();
+          drawImages(
+            canvasRef.current,
+            calculatedCoordinates,
+            selectedFiles,
+            padding,
+            alignElement
+          );
 
           if (resizedImage) {
             const updatedResizedImage = calculatedCoordinates.find(
               coord => coord.img === resizedImage.img
             );
             if (updatedResizedImage) {
-              scrollToResizedImage(updatedResizedImage);
+              scrollToResizedImage(updatedResizedImage, canvasRef.current);
             }
           }
         });
@@ -506,11 +307,44 @@ function SpriteEditor() {
         Math.abs(dragEnd.x - dragStart.x) > 5 ||
         Math.abs(dragEnd.y - dragStart.y) > 5
       ) {
-        selectImagesInBox();
+        const newSelectedFiles = selectImagesInBox(
+          coordinates,
+          selectedFiles,
+          dragStart,
+          dragEnd
+        );
+        setSelectedFiles(newSelectedFiles);
+        drawImages(
+          canvasRef.current,
+          coordinates,
+          newSelectedFiles,
+          padding,
+          alignElement
+        );
       } else {
-        handleCanvasClick(e);
+        const event = e instanceof MouseEvent ? e : e.nativeEvent;
+        handleCanvasClick(
+          event,
+          canvasRef.current,
+          coordinates,
+          selectedFiles,
+          setSelectedFiles
+        );
+        drawImages(
+          canvasRef.current,
+          coordinates,
+          selectedFiles,
+          padding,
+          alignElement
+        );
       }
-      clearSelectionBox();
+      clearSelectionBox(
+        canvasRef.current,
+        coordinates,
+        selectedFiles,
+        padding,
+        alignElement
+      );
     }
   };
 
@@ -654,7 +488,7 @@ function SpriteEditor() {
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files: uploadFile } = e.target;
     if (uploadFile) {
-      const newSelectFiles: File[] = Array.from(files);
+      const newSelectFiles: File[] = Array.from(uploadFile);
       handleFiles(
         newSelectFiles,
         setFiles,
