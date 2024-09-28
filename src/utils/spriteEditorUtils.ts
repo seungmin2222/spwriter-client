@@ -18,7 +18,7 @@ interface PackedImage {
   circle?: Circle;
 }
 
-function createCheckerboardPattern(): HTMLCanvasElement {
+const createCheckerboardPattern = (): HTMLCanvasElement => {
   const patternCanvas = document.createElement('canvas');
   patternCanvas.width = 20;
   patternCanvas.height = 20;
@@ -31,14 +31,14 @@ function createCheckerboardPattern(): HTMLCanvasElement {
   }
 
   return patternCanvas;
-}
+};
 
-export function drawSelectionBox(
+export const drawSelectionBox = (
   canvas: HTMLCanvasElement | null,
   ctx: CanvasRenderingContext2D | null,
   dragStart: Position,
   dragEnd: Position
-) {
+) => {
   if (!canvas || !ctx) return;
 
   const left = Math.min(dragStart.x, dragEnd.x);
@@ -52,15 +52,15 @@ export function drawSelectionBox(
   ctx.strokeStyle = '#23212f';
   ctx.lineWidth = 2;
   ctx.strokeRect(left, top, width, height);
-}
+};
 
-export function drawImages(
+export const drawImages = (
   canvas: HTMLCanvasElement | null,
   coordinates: PackedImage[],
   selectedFiles: Set<HTMLImageElement>,
   padding: number,
   alignElement: string
-) {
+) => {
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
@@ -164,12 +164,12 @@ export function drawImages(
       drawSelection(coord, coord.x, coord.y);
     });
   }
-}
+};
 
-export function scrollToResizedImage(
+export const scrollToResizedImage = (
   resizedCoord: PackedImage,
   canvas: HTMLCanvasElement | null
-) {
+) => {
   const container = document.querySelector('.sprite-editor');
 
   if (!container || !canvas) return;
@@ -196,13 +196,13 @@ export function scrollToResizedImage(
     top: scrollTop,
     behavior: 'smooth',
   });
-}
+};
 
-function isImageInSelectionBox(
+const isImageInSelectionBox = (
   coord: PackedImage,
   dragStart: Position,
   dragEnd: Position
-): boolean {
+): boolean => {
   const left = Math.min(dragStart.x, dragEnd.x);
   const right = Math.max(dragStart.x, dragEnd.x);
   const top = Math.min(dragStart.y, dragEnd.y);
@@ -214,14 +214,14 @@ function isImageInSelectionBox(
     coord.y < bottom &&
     coord.y + coord.height > top
   );
-}
+};
 
-export function selectImagesInBox(
+export const selectImagesInBox = (
   coordinates: PackedImage[],
   selectedFiles: Set<HTMLImageElement>,
   dragStart: Position,
   dragEnd: Position
-): Set<HTMLImageElement> {
+): Set<HTMLImageElement> => {
   const newSelectedFiles = new Set(selectedFiles);
   coordinates.forEach(coord => {
     if (isImageInSelectionBox(coord, dragStart, dragEnd)) {
@@ -233,25 +233,25 @@ export function selectImagesInBox(
     }
   });
   return newSelectedFiles;
-}
+};
 
-export function clearSelectionBox(
+export const clearSelectionBox = (
   canvas: HTMLCanvasElement | null,
   coordinates: PackedImage[],
   selectedFiles: Set<HTMLImageElement>,
   padding: number,
   alignElement: string
-) {
+) => {
   drawImages(canvas, coordinates, selectedFiles, padding, alignElement);
-}
+};
 
-export function handleCanvasClick(
+export const handleCanvasClick = (
   e: MouseEvent,
   canvas: HTMLCanvasElement | null,
   coordinates: PackedImage[],
   selectedFiles: Set<HTMLImageElement>,
   setSelectedFiles: (selectedFiles: Set<HTMLImageElement>) => void
-) {
+) => {
   if (!canvas) return;
 
   const rect = canvas.getBoundingClientRect();
@@ -276,4 +276,4 @@ export function handleCanvasClick(
   });
 
   setSelectedFiles(newSelectedFiles);
-}
+};

@@ -1,9 +1,23 @@
-export default function analyzeSpritesSheet(
+type BoundingBox = {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+};
+
+type Sprite = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+const analyzeSpritesSheet = (
   imageData: number[],
   width: number,
   height: number
-): { x: number; y: number; width: number; height: number }[] {
-  let labels = new Array(width * height).fill(0);
+): Sprite[] => {
+  let labels: number[] = new Array(width * height).fill(0);
   let nextLabel = 1;
 
   for (let y = 0; y < height; y++) {
@@ -18,10 +32,7 @@ export default function analyzeSpritesSheet(
     }
   }
 
-  const boundingBoxes = new Map<
-    number,
-    { minX: number; minY: number; maxX: number; maxY: number }
-  >();
+  const boundingBoxes = new Map<number, BoundingBox>();
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -40,12 +51,14 @@ export default function analyzeSpritesSheet(
     }
   }
 
-  const sprites = mergeBoundingBoxes(Array.from(boundingBoxes.values()));
+  const sprites: Sprite[] = mergeBoundingBoxes(
+    Array.from(boundingBoxes.values())
+  );
 
   return sprites;
-}
+};
 
-function floodFill(
+const floodFill = (
   imageData: number[],
   width: number,
   height: number,
@@ -53,7 +66,7 @@ function floodFill(
   startY: number,
   label: number,
   labels: number[]
-): number[] {
+): number[] => {
   const newLabels = [...labels];
   const stack = [{ x: startX, y: startY }];
 
@@ -79,23 +92,20 @@ function floodFill(
   }
 
   return newLabels;
-}
+};
 
-function isTransparent(
+const isTransparent = (
   imageData: number[],
   x: number,
   y: number,
   width: number
-): boolean {
+): boolean => {
   const index = (y * width + x) * 4;
   return imageData[index + 3] === 0;
-}
+};
 
-function mergeBoundingBoxes(
-  boxes: { minX: number; minY: number; maxX: number; maxY: number }[]
-): { x: number; y: number; width: number; height: number }[] {
-  const merged: { minX: number; minY: number; maxX: number; maxY: number }[] =
-    [];
+const mergeBoundingBoxes = (boxes: BoundingBox[]): Sprite[] => {
+  const merged: BoundingBox[] = [];
 
   for (const box of boxes) {
     let mergedBox = false;
@@ -117,12 +127,9 @@ function mergeBoundingBoxes(
     width: box.maxX - box.minX + 1,
     height: box.maxY - box.minY + 1,
   }));
-}
+};
 
-function isAdjacent(
-  box1: { minX: number; minY: number; maxX: number; maxY: number },
-  box2: { minX: number; minY: number; maxX: number; maxY: number }
-): boolean {
+const isAdjacent = (box1: BoundingBox, box2: BoundingBox): boolean => {
   const gap = 1;
   return !(
     box2.minX > box1.maxX + gap ||
@@ -130,16 +137,13 @@ function isAdjacent(
     box2.minY > box1.maxY + gap ||
     box2.maxY < box1.minY - gap
   );
-}
+};
 
-function mergeBoxes(
-  box1: { minX: number; minY: number; maxX: number; maxY: number },
-  box2: { minX: number; minY: number; maxX: number; maxY: number }
-): { minX: number; minY: number; maxX: number; maxY: number } {
-  return {
-    minX: Math.min(box1.minX, box2.minX),
-    minY: Math.min(box1.minY, box2.minY),
-    maxX: Math.max(box1.maxX, box2.maxX),
-    maxY: Math.max(box1.maxY, box2.maxY),
-  };
-}
+const mergeBoxes = (box1: BoundingBox, box2: BoundingBox): BoundingBox => ({
+  minX: Math.min(box1.minX, box2.minX),
+  minY: Math.min(box1.minY, box2.minY),
+  maxX: Math.max(box1.maxX, box2.maxX),
+  maxY: Math.max(box1.maxY, box2.maxY),
+});
+
+export default analyzeSpritesSheet;

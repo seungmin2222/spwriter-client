@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Modal from './Modal';
+import { Modal } from './Modal';
 import ResizeModal from './ResizeModal';
 import Toast from './Toast';
 import useFileStore from '../../store';

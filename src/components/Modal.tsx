@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 
-export function useModalEventListener(
+const useModalEventListener = (
   ref: React.RefObject<HTMLDivElement>,
   handleConfirm: () => void,
   handleClose: () => void,
   showModal: boolean
-) {
+) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
@@ -26,7 +26,7 @@ export function useModalEventListener(
       }
     };
   }, [showModal, handleConfirm, handleClose, ref]);
-}
+};
 
 function Modal({
   showModal,
@@ -82,4 +82,4 @@ function Modal({
   );
 }
 
-export default Modal;
+export { useModalEventListener, Modal };

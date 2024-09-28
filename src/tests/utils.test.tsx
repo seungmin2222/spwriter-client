@@ -112,12 +112,14 @@ global.window.URL.revokeObjectURL = vi.fn();
 
 global.HTMLAnchorElement.prototype.click = vi.fn();
 
-function imageSizeToHTMLImageElement(imageSize: ImageSize): HTMLImageElement {
+const imageSizeToHTMLImageElement = (
+  imageSize: ImageSize
+): HTMLImageElement => {
   const img = new Image();
   img.width = imageSize.width;
   img.height = imageSize.height;
   return img;
-}
+};
 
 describe('Image Processing Functions', () => {
   beforeEach(() => {

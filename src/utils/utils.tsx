@@ -231,7 +231,7 @@ export const calculateCoordinates = (
   return [];
 };
 
-function optimizeCanvasSize(packedImages: PackedImage[], padding: number) {
+const optimizeCanvasSize = (packedImages: PackedImage[], padding: number) => {
   let maxRight = 0;
   let maxBottom = 0;
   packedImages.forEach(img => {
@@ -241,7 +241,7 @@ function optimizeCanvasSize(packedImages: PackedImage[], padding: number) {
   const optimizedWidth = maxRight + padding;
   const optimizedHeight = maxBottom + padding;
   return { width: optimizedWidth, height: optimizedHeight };
-}
+};
 
 const arrangeImages = (
   images: HTMLImageElement[],
