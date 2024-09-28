@@ -1237,13 +1237,6 @@ coordinates.forEach(coord => {
     const newHeight = Math.max(originalHeight + deltaY, 10);
     ```
     이 방식으로 이미지의 크기를 자연스럽게 조절하면서도,<br> 사용자가 실수로 이미지를 너무 작게 만드는 것을 방지합니다.
-- 실시간 업데이트
-  - requestAnimationFrame을 사용하여 브라우저의 리페인트 주기에 맞춰 업데이트합니다.
-  - 이 기술은 부드러운 애니메이션 효과를 제공하며, 불필요한 렌더링을 줄여 성능을 최적화합니다.
-  - requestAnimationFrame의 원리
-    - 브라우저의 다음 리페인트 직전에 지정된 함수를 실행합니다.
-    - 일반적으로 초당 60회(60fps) 실행되어 부드러운 애니메이션을 구현합니다.
-    - setTimeout과 달리, 디스플레이 주사율에 맞춰 실행되어 더 부드럽고 효율적인 애니메이션을 제공합니다.
 - Canvas 다시 그리기
   - 계산된 새 크기로 Canvas를 지우고 이미지를 다시 그립니다.
   - 이 과정을 마우스 이동이 끝날 때까지 반복하여 실시간으로 크기 변화를 시각화합니다.
@@ -1296,8 +1289,6 @@ coordinates.forEach(coord => {
   ```
 - 실시간 적용
   - 계산된 새로운 크기로 이미지를 즉시 업데이트합니다.
-  - requestAnimationFrame을 사용하여 부드러운 애니메이션을 구현합니다.<br>
-    ([5) 실시간 리사이징의 requestAnimationFrame과 같은 원리 적용](#5-실시간-리사이징))
     <br>
 
 #### 이러한 비율 유지 리사이징 구현을 통해 다음과 같은 이점을 제공합니다.
@@ -1493,7 +1484,7 @@ CSS 호환성
 먼저 `analyzeSpritesSheet` 함수를 통해 스프라이트 시트 분석을 시작합니다.
 
 ```jsx
-export function analyzeSpritesSheet(imageData, width, height) {
+export const = analyzeSpritesSheet(imageData, width, height) => {
   const labels = new Array(width * height).fill(0);
   let nextLabel = 1;
   // ... (이후 코드)
