@@ -1,11 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import useFileStore from '../../store.js';
-import {
-  handleFiles,
-  handleDragOverFiles,
-  resizeSelectedImages,
-  calculateCoordinates,
-} from '../utils/utils';
+
 import {
   drawSelectionBox,
   drawImages,
@@ -15,17 +10,11 @@ import {
   handleCanvasClick,
 } from '../utils/spriteEditorUtils.js';
 import analyzeSpritesSheet from '../utils/spriteAnalyzer';
+import { resizeSelectedImages } from '../utils/selectionUtils.js';
+import { calculateCoordinates } from '../utils/coordinateUtils.js';
+import { handleDragOverFiles, handleFiles } from '../utils/fileUtils.js';
+import { PackedImage } from '../utils/types.js';
 import fileImageIcon from '../assets/images/file-image-regular.svg';
-
-interface PackedImage {
-  img: HTMLImageElement;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotated: boolean;
-  circle?: { x: number; y: number; radius: number } | undefined;
-}
 
 interface Size {
   width: number;
@@ -276,30 +265,38 @@ function SpriteEditor() {
           selectedFiles,
           setCoordinates,
           setSelectedFiles
-        ).then(({ newCoordinates, resizedImage }) => {
-          const calculatedCoordinates = calculateCoordinates(
-            newCoordinates.map(coord => coord.img),
-            padding,
-            alignElement
-          );
-          setCoordinates(calculatedCoordinates);
-          drawImages(
-            canvasRef.current,
-            calculatedCoordinates,
-            selectedFiles,
-            padding,
-            alignElement
-          );
-
-          if (resizedImage) {
-            const updatedResizedImage = calculatedCoordinates.find(
-              coord => coord.img === resizedImage.img
+        ).then(
+          ({
+            newCoordinates,
+            resizedImage,
+          }: {
+            newCoordinates: PackedImage[];
+            resizedImage: PackedImage | null;
+          }) => {
+            const calculatedCoordinates = calculateCoordinates(
+              newCoordinates.map((coord: PackedImage) => coord.img),
+              padding,
+              alignElement
             );
-            if (updatedResizedImage) {
-              scrollToResizedImage(updatedResizedImage, canvasRef.current);
+            setCoordinates(calculatedCoordinates);
+            drawImages(
+              canvasRef.current,
+              calculatedCoordinates,
+              selectedFiles,
+              padding,
+              alignElement
+            );
+
+            if (resizedImage) {
+              const updatedResizedImage = calculatedCoordinates.find(
+                (coord: PackedImage) => coord.img === resizedImage.img
+              );
+              if (updatedResizedImage) {
+                scrollToResizedImage(updatedResizedImage, canvasRef.current);
+              }
             }
           }
-        });
+        );
       }
     } else if (isDragging) {
       setIsDragging(false);

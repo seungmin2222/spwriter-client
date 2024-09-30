@@ -7,7 +7,7 @@ interface ToastProps {
 }
 
 function Toast({ id, message, onClose }: ToastProps) {
-  const [visible, setVisible] = useState<boolean>(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const showTimer = setTimeout(() => {

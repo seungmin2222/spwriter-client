@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal } from './Modal';
 import ResizeModal from './ResizeModal';
 import Toast from './Toast';
+import { Modal } from './Modal';
 import useFileStore from '../../store';
-import { handleFiles, calculateCoordinates } from '../utils/utils';
+import { calculateCoordinates } from '../utils/coordinateUtils';
+import { handleFiles } from '../utils/fileUtils';
+
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 interface PackedImage {

@@ -1,21 +1,8 @@
+import { PackedImage } from './types';
+
 interface Position {
   x: number;
   y: number;
-}
-interface Circle {
-  x: number;
-  y: number;
-  radius: number;
-}
-
-interface PackedImage {
-  img: HTMLImageElement;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotated: boolean;
-  circle?: Circle;
 }
 
 const createCheckerboardPattern = (): HTMLCanvasElement => {
