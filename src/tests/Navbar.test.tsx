@@ -8,16 +8,8 @@ import {
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Navbar from '../components/Navbar';
 import useFileStore from '../../store';
-import { handleFiles } from '../utils/utils';
-
-interface PackedImage {
-  img: HTMLImageElement;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotated: boolean;
-}
+import { handleFiles } from '../utils/fileUtils';
+import { PackedImage } from 'utils/types';
 
 interface MinimalLocation {
   href: string;
@@ -27,13 +19,12 @@ interface MinimalWindow {
   location: MinimalLocation;
 }
 
-vi.mock('../utils/utils', () => ({
+vi.mock('../utils/fileUtils', () => ({
   handleFiles: vi.fn(),
   trimImage: vi.fn().mockResolvedValue(new Image()),
 }));
 
 describe('Navbar', () => {
-  const originalCreateElement = document.createElement;
   const originalCreateObjectURL = URL.createObjectURL;
   const originalRevokeObjectURL = URL.revokeObjectURL;
 

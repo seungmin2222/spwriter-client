@@ -3,21 +3,15 @@ import { act } from 'react';
 import {
   calculateCoordinates,
   sortAndSetCoordinates,
-  trimImage,
-  handleFiles,
-  resizeSelectedImages,
-} from '../utils/utils';
+} from '../utils/coordinateUtils';
+import { trimImage } from '../utils/imageProcessing';
+import { handleFiles } from '../utils/fileUtils';
+import { resizeSelectedImages } from '../utils/selectionUtils';
+import { PackedImage } from '../utils/types';
 
 interface ImageSize {
   width: number;
   height: number;
-}
-
-interface PackedImage extends ImageSize {
-  x: number;
-  y: number;
-  rotated: boolean;
-  img: HTMLImageElement;
 }
 
 type PartialCanvasRenderingContext2D = Pick<

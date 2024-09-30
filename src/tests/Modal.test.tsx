@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Modal } from '../components/Modal';
+import Modal from '../components/Modal';
 
 describe('Modal component', () => {
   const handleClose = vi.fn();

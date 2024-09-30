@@ -1,20 +1,7 @@
 import { act } from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import useFileStore from '../../store';
-
-interface PackedImage {
-  img: HTMLImageElement;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotated: boolean;
-}
-
-interface Toast {
-  id: number;
-  message: string;
-}
+import { PackedImage, Toast } from '../utils/types';
 
 describe('useFileStore', () => {
   let store: ReturnType<typeof useFileStore.getState>;

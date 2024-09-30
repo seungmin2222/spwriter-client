@@ -9,8 +9,9 @@ import {
   afterEach,
 } from 'vitest';
 import SpriteEditor from '../components/SpriteEditor';
-import useFileStore, { FileStoreState, PackedImage } from '../../store';
-import * as utils from '../utils/utils';
+import { FileStoreState, PackedImage } from '../utils/types';
+import { handleFiles } from '../utils/fileUtils';
+import useFileStore from '../../store';
 
 interface MockStore extends FileStoreState {
   setCoordinates: (coordinates: PackedImage[]) => void;
@@ -18,15 +19,21 @@ interface MockStore extends FileStoreState {
   addToast: (message: string) => void;
 }
 
-vi.mock('../utils/utils', () => ({
+vi.mock('../utils/fileUtils', () => ({
   handleFiles: vi.fn(),
   handleDragOverFiles: vi.fn(),
+}));
+
+vi.mock('../utils/selectionUtils', () => ({
   resizeSelectedImages: vi.fn(() =>
     Promise.resolve({
       newCoordinates: [{ x: 0, y: 0, width: 150, height: 150 }],
       resizedImage: null,
     })
   ),
+}));
+
+vi.mock('../utils/coordinateUtils', () => ({
   calculateCoordinates: vi.fn(() => [{ x: 0, y: 0, width: 50, height: 50 }]),
 }));
 
@@ -108,7 +115,7 @@ describe('SpriteEditor', () => {
     const editor = getByTestId('sprite-editor');
     const file = new File([''], 'test.png', { type: 'image/png' });
     fireEvent.drop(editor, { dataTransfer: { files: [file] } });
-    expect(utils.handleFiles).toHaveBeenCalled();
+    expect(handleFiles).toHaveBeenCalled();
   });
 
   it('키보드 이벤트를 처리합니다', () => {

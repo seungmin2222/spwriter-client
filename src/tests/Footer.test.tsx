@@ -1,19 +1,20 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Footer from '../components/Footer';
-import useFileStore, { FileStore } from '../../store';
+import useFileStore from '../../store';
+import { FileStore } from '../utils/types';
+import { StateCreator, create } from 'zustand';
 import {
   cloneSelectedImages,
   inversionSelectedImages,
   rotateSelectedImages,
-} from '../utils/utils';
-import { StateCreator, create } from 'zustand';
+} from '../utils/selectionUtils';
 
 vi.mock('../../store', () => ({
   default: vi.fn(),
 }));
 
-vi.mock('../utils/utils', () => ({
+vi.mock('../utils/selectionUtils', () => ({
   cloneSelectedImages: vi.fn(),
   inversionSelectedImages: vi.fn(),
   rotateSelectedImages: vi.fn(),

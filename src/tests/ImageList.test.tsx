@@ -8,15 +8,7 @@ import {
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ImageList from '../components/ImageList';
 import useFileStore from '../../store';
-
-interface PackedImage {
-  img: HTMLImageElement;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotated: boolean;
-}
+import { PackedImage } from '../utils/types';
 
 vi.mock('../components/Modal', () => ({
   __esModule: true,
