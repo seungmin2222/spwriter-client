@@ -82,4 +82,4 @@ function Modal({
   );
 }
 
-export { useModalEventListener, Modal };
+export default Modal;

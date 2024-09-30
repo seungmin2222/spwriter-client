@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ResizeModal from './ResizeModal';
 import Toast from './Toast';
-import { Modal } from './Modal';
+import Modal from './Modal';
 import useFileStore from '../../store';
 import { calculateCoordinates } from '../utils/coordinateUtils';
 import { handleFiles } from '../utils/fileUtils';
