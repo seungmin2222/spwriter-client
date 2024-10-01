@@ -29,6 +29,7 @@ describe('Navbar', () => {
   const originalRevokeObjectURL = URL.revokeObjectURL;
 
   beforeEach(() => {
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => null);
     URL.createObjectURL = vi.fn(() => 'blob:test');
     URL.revokeObjectURL = vi.fn();
 
