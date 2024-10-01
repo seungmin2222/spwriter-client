@@ -69,7 +69,7 @@ export const drawImages = (
     xOffset: number = 0,
     yOffset: number = 0
   ) => {
-    if (!coord.img.complete) return;
+    if (!coord.img) return;
     ctx.drawImage(coord.img, xOffset, yOffset, coord.width, coord.height);
   };
 
