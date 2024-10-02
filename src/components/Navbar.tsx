@@ -2,106 +2,36 @@ import React from 'react';
 import Toast from './Toast';
 import useFileStore from '../../store';
 import { handleFiles } from '../utils/fileUtils';
+import { downloadUtility, handlePaddingChangeUtility } from '../utils/navUtils';
 
 import downloadIcon from '../assets/images/download-solid.svg';
 
 function Navbar() {
-  const {
-    fileName,
-    setFileName,
-    setFiles,
-    coordinates,
-    setCoordinates,
-    padding: paddingValue,
-    setPadding,
-    addToast,
-    toast,
-    setToast,
-    alignElement,
-    setAlignElement,
-  } = useFileStore(state => ({
-    fileName: state.fileName,
-    setFileName: state.setFileName,
-    setFiles: state.setFiles,
-    coordinates: state.coordinates,
-    setCoordinates: state.setCoordinates,
-    padding: state.padding,
-    setPadding: state.setPadding,
-    addToast: state.addToast,
-    toast: state.toast,
-    setToast: state.setToast,
-    alignElement: state.alignElement,
-    setAlignElement: state.setAlignElement,
-  }));
+  const fileName = useFileStore(state => state.fileName);
+  const setFileName = useFileStore(state => state.setFileName);
+  const setFiles = useFileStore(state => state.setFiles);
+  const coordinates = useFileStore(state => state.coordinates);
+  const setCoordinates = useFileStore(state => state.setCoordinates);
+  const padding = useFileStore(state => state.padding);
+  const setPadding = useFileStore(state => state.setPadding);
+  const addToast = useFileStore(state => state.addToast);
+  const toast = useFileStore(state => state.toast);
+  const setToast = useFileStore(state => state.setToast);
+  const alignElement = useFileStore(state => state.alignElement);
+  const setAlignElement = useFileStore(state => state.setAlignElement);
 
   const handlePaddingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    if (value <= 0) {
-      addToast('Padding 값은 1보다 작을 수 없습니다.');
-    } else {
-      setPadding(value);
-    }
+    handlePaddingChangeUtility(e, setPadding, addToast);
   };
 
-  const handleDownload = async () => {
-    if (coordinates.length === 0) {
-      addToast('다운로드할 이미지가 없습니다.');
-      return;
-    }
-
-    const downloadCanvas = document.createElement('canvas');
-    const downloadCtx = downloadCanvas.getContext('2d');
-
-    if (!downloadCtx) {
-      addToast('Canvas context를 생성할 수 없습니다.');
-      return;
-    }
-
-    let totalWidth = 0;
-    let maxHeight = 0;
-
-    if (alignElement === 'left-right') {
-      totalWidth = coordinates.reduce(
-        (acc, coord) => acc + coord.width + paddingValue,
-        paddingValue
-      );
-      maxHeight =
-        Math.max(...coordinates.map(coord => coord.height)) + paddingValue * 2;
-    } else if (alignElement === 'top-bottom') {
-      totalWidth =
-        Math.max(...coordinates.map(coord => coord.width)) + paddingValue * 2;
-      maxHeight = coordinates.reduce(
-        (acc, coord) => acc + coord.height + paddingValue,
-        paddingValue
-      );
-    } else if (alignElement === 'bin-packing') {
-      totalWidth =
-        Math.max(...coordinates.map(coord => coord.x + coord.width)) +
-        paddingValue;
-      maxHeight =
-        Math.max(...coordinates.map(coord => coord.y + coord.height)) +
-        paddingValue;
-    }
-
-    downloadCanvas.width = totalWidth;
-    downloadCanvas.height = maxHeight;
-
-    downloadCtx.clearRect(0, 0, downloadCanvas.width, downloadCanvas.height);
-
-    coordinates.forEach(coord => {
-      downloadCtx.drawImage(
-        coord.img,
-        coord.x,
-        coord.y,
-        coord.width,
-        coord.height
-      );
+  const handleDownload = () => {
+    downloadUtility({
+      coordinates,
+      padding,
+      alignElement,
+      addToast,
+      fileName,
     });
-
-    const link = document.createElement('a');
-    link.href = downloadCanvas.toDataURL('image/png');
-    link.download = fileName ? `${fileName}.png` : 'sprites.png';
-    link.click();
   };
 
   const removeToast = (id: number) => {
@@ -131,7 +61,7 @@ function Navbar() {
                   setFiles,
                   setCoordinates,
                   coordinates,
-                  paddingValue,
+                  padding,
                   alignElement
                 );
               }
@@ -151,7 +81,7 @@ function Navbar() {
             <input
               type="number"
               id="paddingInput"
-              value={paddingValue}
+              value={padding}
               onChange={handlePaddingChange}
               className="w-16 p-1 border rounded-[0.5rem] text-center"
             />
