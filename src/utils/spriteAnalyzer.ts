@@ -1,16 +1,11 @@
-type BoundingBox = {
+import { Sprite } from './types';
+
+interface BoundingBox {
   minX: number;
   minY: number;
   maxX: number;
   maxY: number;
-};
-
-type Sprite = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
+}
 
 const analyzeSpritesSheet = (
   imageData: number[],

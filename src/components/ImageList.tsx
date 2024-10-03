@@ -5,17 +5,9 @@ import Modal from './Modal';
 import useFileStore from '../../store';
 import { calculateCoordinates } from '../utils/coordinateUtils';
 import { handleFiles } from '../utils/fileUtils';
+import { PackedImage } from '../utils/types';
 
 import fileImageIcon from '../assets/images/file-image-regular.svg';
-
-interface PackedImage {
-  img: HTMLImageElement;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotated: boolean;
-}
 
 function ImageList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);

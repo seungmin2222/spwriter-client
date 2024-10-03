@@ -41,6 +41,13 @@ export interface Toast {
   message: string;
 }
 
+export interface Sprite {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export type AlignElement = 'bin-packing' | 'top-bottom' | 'left-right';
 
 export type FileStore = FileStoreState & FileStoreActions;

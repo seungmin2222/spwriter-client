@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ImageList from './ImageList';
 import SpriteMain from './SpriteMain';
+
 import xMarkIcon from '../assets/images/circle-xmark-regular.svg';
 
 function App() {

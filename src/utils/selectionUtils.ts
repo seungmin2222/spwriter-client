@@ -1,6 +1,6 @@
-import { PackedImage } from './types';
 import { processImage } from './imageProcessing';
 import { calculateCoordinates, sortAndSetCoordinates } from './coordinateUtils';
+import { PackedImage } from './types';
 
 export const cloneSelectedImages = (
   coordinates: PackedImage[],

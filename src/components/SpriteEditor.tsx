@@ -13,7 +13,8 @@ import analyzeSpritesSheet from '../utils/spriteAnalyzer';
 import { resizeSelectedImages } from '../utils/selectionUtils.js';
 import { calculateCoordinates } from '../utils/coordinateUtils.js';
 import { handleDragOverFiles, handleFiles } from '../utils/fileUtils.js';
-import { PackedImage } from '../utils/types.js';
+import { PackedImage, Sprite } from '../utils/types.js';
+
 import fileImageIcon from '../assets/images/file-image-regular.svg';
 
 interface Size {
@@ -24,13 +25,6 @@ interface Size {
 interface Position {
   x: number;
   y: number;
-}
-
-interface Sprite {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
 }
 
 type MouseEventWithNativeEvent =
