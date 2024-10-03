@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import ResizeModal from './ResizeModal';
 import Toast from './Toast';
 import Modal from './Modal';
+import ImageItem from './ImageItem';
 import useFileStore from '../../store';
+import handleResizeConfirmUtil from '../utils/imageResizeUtils';
+import deleteImagesUtil from '../utils/imageDeleteUtils';
 import { calculateCoordinates } from '../utils/coordinateUtils';
 import { handleFiles } from '../utils/fileUtils';
 import { PackedImage } from '../utils/types';
@@ -54,104 +57,21 @@ function ImageList() {
   };
 
   const handleResizeConfirm = () => {
-    const width = parseInt(modalWidth, 10);
-    const height = parseInt(modalHeight, 10);
-
-    if (
-      Number.isNaN(width) ||
-      Number.isNaN(height) ||
-      width <= 0 ||
-      height <= 0
-    ) {
-      generateToast('유효한 너비와 높이를 입력해주세요.');
-      return;
-    }
-
-    addHistory(coordinates);
-
-    const newSelectedFiles = new Set<HTMLImageElement>();
-
-    const processImage = async (
-      coord: PackedImage,
-      transformCallback: (
-        ctx: CanvasRenderingContext2D,
-        canvas: HTMLCanvasElement
-      ) => void
-    ): Promise<HTMLImageElement> => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Failed to get canvas context');
-
-      canvas.width = coord.img.width;
-      canvas.height = coord.img.height;
-
-      await transformCallback(ctx, canvas);
-
-      const processedImg = new Image();
-      processedImg.src = canvas.toDataURL();
-
-      return new Promise<HTMLImageElement>(resolve => {
-        processedImg.onload = () => resolve(processedImg);
-      });
-    };
-
-    const resizePromises = coordinates.map(async (coord: PackedImage) => {
-      if (selectedFiles.has(coord.img)) {
-        const resizedImg: HTMLImageElement = await processImage(
-          coord,
-          (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-            const newCanvas = canvas;
-            newCanvas.width = width;
-            newCanvas.height = height;
-            ctx.drawImage(coord.img, 0, 0, width, height);
-          }
-        );
-
-        newSelectedFiles.add(resizedImg);
-
-        const createPackedImage = (
-          img: HTMLImageElement,
-          x: number,
-          y: number,
-          imageWidth: number,
-          imageHeight: number,
-          rotated: boolean
-        ): PackedImage => ({
-          img,
-          x,
-          y,
-          width,
-          height,
-          rotated,
-        });
-
-        return createPackedImage(
-          resizedImg,
-          coord.x,
-          coord.y,
-          width,
-          height,
-          coord.rotated
-        );
-      }
-
-      return coord;
-    });
-
-    Promise.all(resizePromises).then((updatedCoordinates: PackedImage[]) => {
-      const reorderedCoordinates = calculateCoordinates(
-        updatedCoordinates.map(coord => coord.img),
-        padding,
-        alignElement
-      );
-
-      setCoordinates(reorderedCoordinates);
-      setSelectedFiles(newSelectedFiles);
-      setResizeModalOpen(false);
-      setModalWidth('');
-      setModalHeight('');
-      generateToast('선택된 이미지의 크기가 조정되었습니다.');
-    });
+    handleResizeConfirmUtil(
+      modalWidth,
+      modalHeight,
+      coordinates,
+      selectedFiles,
+      addHistory,
+      setCoordinates,
+      setSelectedFiles,
+      setResizeModalOpen,
+      setModalWidth,
+      setModalHeight,
+      generateToast,
+      padding,
+      alignElement
+    );
   };
 
   const prevCoordinatesRef = useRef(coordinates);
@@ -198,21 +118,15 @@ function ImageList() {
   };
 
   const deleteImages = (imagesToDelete: Set<HTMLImageElement>): void => {
-    addHistory(coordinates);
-    setDeletingImages(new Set(imagesToDelete));
-
-    setTimeout(() => {
-      const updatedCoordinates = coordinates.filter(
-        coord => !imagesToDelete.has(coord.img)
-      );
-
-      setCoordinates(updatedCoordinates);
-      setSelectedFiles(new Set());
-      setDeletingImages(new Set());
-      generateToast(
-        `${imagesToDelete.size > 1 ? '선택된 이미지가' : '이미지가'} 삭제되었습니다.`
-      );
-    }, 400);
+    deleteImagesUtil(
+      imagesToDelete,
+      addHistory,
+      coordinates,
+      setCoordinates,
+      setSelectedFiles,
+      setDeletingImages,
+      generateToast
+    );
   };
 
   const deleteSelectedImages = () => {
@@ -313,57 +227,20 @@ function ImageList() {
     const isDeleting = deletingImages.has(image.img);
 
     return (
-      <div
+      <ImageItem
         key={index}
-        onClick={() => handleImageListClick(image)}
-        onKeyDown={e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            handleImageListClick(image);
-          }
-        }}
-        role="button"
-        tabIndex={0}
-        className={`flex w-full h-[70px] bg-[#f8f8f8] rounded-[1rem] transition-colors duration-300 shadow-sm border transition-border duration-250 ${
-          !isButtonHovered ? 'hover:bg-[#e9eaf1]' : ''
-        } ${isSelected ? 'border border-[#23212f]' : ''} ${
-          isDeleting ? 'animate-fadeOut' : 'animate-fadeIn'
-        }`}
-      >
-        <div className="flex w-[19%] items-center justify-center">
-          <img
-            src={image.img.src}
-            alt={`Thumbnail ${index}`}
-            className="max-h-[50px] p-[5px] border shadow-sm rounded-lg"
-          />
-        </div>
-        <div className="flex items-center w-[72%] h-full pl-[5px] text-[12px] leading-[24px] text-[#374151] overflow-hidden">
-          <pre className="text-[10px] leading-tight">
-            {generateCSS(image, index)}
-          </pre>
-        </div>
-
-        <button
-          type="button"
-          className="flex justify-center items-center w-[9%] h-full group"
-          onMouseEnter={() => setIsButtonHovered(true)}
-          onMouseLeave={() => setIsButtonHovered(false)}
-          onClick={e => {
-            e.stopPropagation();
-            setCurrentImage(image.img);
-            setDeleteConfirmationType('single');
-            setShowModal(true);
-          }}
-          aria-label="cross"
-        >
-          <svg
-            className="h-6 w-6 bg-[#241f3a] transition-colors duration-300 group-hover:bg-[#c53030] rounded-full"
-            viewBox="0 0 24 24"
-            fill="#ffffff"
-          >
-            <path d="M12 10.586l4.95-4.95 1.414 1.414L13.414 12l4.95 4.95-1.414 1.414L12 13.414l-4.95 4.95-1.414-1.414L10.586 12 5.636 7.05l1.414-1.414z" />
-          </svg>
-        </button>
-      </div>
+        image={image}
+        index={index}
+        isSelected={isSelected}
+        isDeleting={isDeleting}
+        isButtonHovered={isButtonHovered}
+        handleImageListClick={handleImageListClick}
+        generateCSS={generateCSS}
+        setIsButtonHovered={setIsButtonHovered}
+        setCurrentImage={setCurrentImage}
+        setDeleteConfirmationType={setDeleteConfirmationType}
+        setShowModal={setShowModal}
+      />
     );
   };
 
