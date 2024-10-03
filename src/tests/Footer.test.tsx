@@ -8,7 +8,7 @@ import {
   cloneSelectedImages,
   inversionSelectedImages,
   rotateSelectedImages,
-} from '../utils/selectionUtils';
+} from '../utils/imageSelectUtils';
 
 vi.mock('../../store', () => ({
   default: vi.fn(),

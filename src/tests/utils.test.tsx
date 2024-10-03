@@ -6,7 +6,7 @@ import {
 } from '../utils/coordinateUtils';
 import { trimImage } from '../utils/imageProcessing';
 import { handleFiles } from '../utils/fileUtils';
-import { resizeSelectedImages } from '../utils/selectionUtils';
+import { resizeSelectedImages } from '../utils/imageSelectUtils';
 import { PackedImage } from '../utils/types';
 
 interface ImageSize {

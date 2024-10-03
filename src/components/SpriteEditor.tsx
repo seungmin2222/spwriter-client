@@ -10,7 +10,7 @@ import {
   handleCanvasClick,
 } from '../utils/spriteEditorUtils.js';
 import analyzeSpritesSheet from '../utils/spriteAnalyzer';
-import { resizeSelectedImages } from '../utils/selectionUtils.js';
+import { resizeSelectedImages } from '../utils/imageSelectUtils.js';
 import { calculateCoordinates } from '../utils/coordinateUtils.js';
 import { handleDragOverFiles, handleFiles } from '../utils/fileUtils.js';
 import { PackedImage, Sprite } from '../utils/types.js';
