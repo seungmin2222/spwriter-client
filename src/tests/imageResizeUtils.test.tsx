@@ -3,7 +3,7 @@ import handleResizeConfirmUtil from '../utils/imageResizeUtils';
 import { PackedImage } from '../utils/types';
 
 describe('handleResizeConfirmUtil', () => {
-  it('should show toast when width or height is invalid', () => {
+  it('너비 또는 높이가 잘못된 경우 토스트 메시지를 보여줘야 합니다.', () => {
     const generateToast = vi.fn();
     const setCoordinates = vi.fn();
     const setSelectedFiles = vi.fn();
