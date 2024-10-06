@@ -68,15 +68,12 @@ function Navbar() {
             }}
           />
 
-          <label
-            htmlFor="fileInput"
-            className="flex items-center justify-center text-[18px] w-[8rem] h-full px-3 text-white font-semibold cursor-pointer"
-          >
+          <span className="flex items-center justify-center text-[18px] w-[8rem] h-full px-3 text-white font-semibold cursor-pointer">
             Open files
-          </label>
+          </span>
         </div>
         <div className="flex justify-center items-center w-[13rem] h-full space-x-1 border rounded-[1rem] shadow-sm bg-[#ffffff]">
-          <label htmlFor="paddingInput">Padding :</label>
+          <span>Padding :</span>
           <div className="flex items-center space-x-1">
             <input
               type="number"
@@ -89,12 +86,7 @@ function Navbar() {
           </div>
         </div>
         <div className="flex h-full justify-center p-2 border rounded-[1rem] shadow-sm bg-[#ffffff]">
-          <label
-            htmlFor="align-elements"
-            className="flex h-full p-1 items-center"
-          >
-            정렬 옵션 :
-          </label>
+          <span className="flex h-full p-1 items-center">정렬 옵션 :</span>
           <select
             id="align-elements"
             value={alignElement}
