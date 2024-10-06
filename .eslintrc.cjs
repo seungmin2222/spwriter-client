@@ -46,16 +46,8 @@ const globals = require('globals');
      plugins: ['react', 'prettier', 'react-hooks', '@typescript-eslint'],
      rules: {
       'no-plusplus': 'off',
-      '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-use-before-define': 'off',
-      'import/no-extraneous-dependencies': 'off',
-      'jsx-a11y/label-has-associated-control': 'off',
-      'max-classes-per-file': 'off',
       'jsx-a11y/no-noninteractive-element-interactions': 'warn',
-      'jsx-a11y/alt-text': 'warn',
-      'jsx-a11y/no-noninteractive-tabindex': 'warn',
-      'jsx-a11y/no-noninteractive-element-interactions': 'off',
-      'plugin:import/typescript': 'off',
       "no-restricted-syntax": ["off"]
      },
      settings: {
