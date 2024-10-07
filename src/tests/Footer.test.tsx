@@ -14,7 +14,7 @@ vi.mock('../../store', () => ({
   default: vi.fn(),
 }));
 
-vi.mock('../utils/selectionUtils', () => ({
+vi.mock('../utils/imageSelectUtils', () => ({
   cloneSelectedImages: vi.fn(),
   inversionSelectedImages: vi.fn(),
   rotateSelectedImages: vi.fn(),

@@ -33,10 +33,6 @@ vi.mock('../utils/selectionUtils', () => ({
   ),
 }));
 
-vi.mock('../utils/coordinateUtils', () => ({
-  calculateCoordinates: vi.fn(() => [{ x: 0, y: 0, width: 50, height: 50 }]),
-}));
-
 vi.mock('../utils/spriteAnalyzer', () => ({
   default: vi.fn(() => [{ x: 0, y: 0, width: 50, height: 50 }]),
 }));

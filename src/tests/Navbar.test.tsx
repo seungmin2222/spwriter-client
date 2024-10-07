@@ -75,8 +75,8 @@ describe('Navbar', () => {
   it('정렬 요소 옵션을 올바르게 렌더링합니다', () => {
     render(<Navbar />);
 
-    const selectElement: HTMLSelectElement =
-      screen.getByLabelText('정렬 옵션 :');
+    const spanElement = screen.getByText('정렬 옵션 :');
+    const selectElement = spanElement.nextElementSibling as HTMLSelectElement;
     const options = selectElement.querySelectorAll('option');
 
     expect(options).toHaveLength(3);
@@ -91,7 +91,11 @@ describe('Navbar', () => {
 
     render(<Navbar />);
 
-    const paddingInput: HTMLInputElement = screen.getByLabelText('Padding :');
+    const paddingLabel = screen.getByText('Padding :');
+    const paddingInput = paddingLabel.nextElementSibling?.querySelector(
+      'input'
+    ) as HTMLInputElement;
+
     fireEvent.change(paddingInput, { target: { value: '0' } });
 
     expect(addToast).toHaveBeenCalledWith(
@@ -102,8 +106,9 @@ describe('Navbar', () => {
   it('정렬 요소에 대해 선택된 옵션을 설정합니다', () => {
     render(<Navbar />);
 
-    const selectElement: HTMLSelectElement =
-      screen.getByLabelText('정렬 옵션 :');
+    const alignLabel = screen.getByText('정렬 옵션 :');
+    const selectElement = alignLabel.nextElementSibling as HTMLSelectElement;
+
     fireEvent.change(selectElement, { target: { value: 'bin-packing' } });
 
     expect(selectElement.value).toBe('bin-packing');
@@ -113,6 +118,7 @@ describe('Navbar', () => {
     vi.useFakeTimers();
     const setToast = vi.fn();
     const toast = { id: 1, message: 'Test toast' };
+
     useFileStore.setState({ toast, setToast });
 
     render(<Navbar />);
@@ -167,7 +173,8 @@ describe('Navbar', () => {
 
     render(<Navbar />);
 
-    const fileInput: HTMLInputElement = screen.getByLabelText('Open files');
+    const openFilesSpan = screen.getByText('Open files');
+    const fileInput = openFilesSpan.previousElementSibling as HTMLInputElement;
     const files: File[] = [
       new File(['sprite'], 'chucknorris.png', { type: 'image/png' }),
     ];
