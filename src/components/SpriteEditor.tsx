@@ -29,7 +29,7 @@ interface Position {
 
 type MouseEventWithNativeEvent =
   | MouseEvent
-  | (React.MouseEvent<HTMLDivElement> & { nativeEvent: MouseEvent });
+  | React.MouseEvent<HTMLCanvasElement>;
 
 function SpriteEditor() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -497,9 +497,6 @@ function SpriteEditor() {
       data-testid="sprite-editor"
       onDrop={handleDrop}
       onDragOver={handleDragOverFiles}
-      onMouseDown={handleCanvasMouseDown}
-      onMouseMove={handleCanvasMouseMove}
-      onMouseUp={handleCanvasMouseUp}
       role="application"
       aria-label="Sprite Editor Canvas"
     >
@@ -525,7 +522,14 @@ function SpriteEditor() {
         </div>
       ) : (
         <>
-          <canvas ref={canvasRef} className="flex" data-testid="canvas" />
+          <canvas
+            ref={canvasRef}
+            className="flex"
+            data-testid="canvas"
+            onMouseDown={handleCanvasMouseDown}
+            onMouseMove={handleCanvasMouseMove}
+            onMouseUp={handleCanvasMouseUp}
+          />
           {coordinates.length === 1 && (
             <button
               type="button"
