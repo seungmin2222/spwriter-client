@@ -22,6 +22,8 @@ const globals = require('globals');
        'postcss.config.js',
        'tailwind.config.js',
        'README.md',
+        'setupTests.ts',
+        'vite.config.ts',
      ],
      overrides: [
        {
