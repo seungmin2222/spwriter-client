@@ -27,10 +27,6 @@ interface Position {
   y: number;
 }
 
-type MouseEventWithNativeEvent =
-  | MouseEvent
-  | React.MouseEvent<HTMLCanvasElement>;
-
 function SpriteEditor() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const coordinates = useFileStore(state => state.coordinates) || [];
@@ -45,16 +41,13 @@ function SpriteEditor() {
   const alignElement = useFileStore(state => state.alignElement);
   const addToast = useFileStore(state => state.addToast);
 
-  const [isResizing, setIsResizing] = useState<boolean>(false);
-  const [resizing, setResizing] = useState<PackedImage | null>(null);
-  const [startPos, setStartPos] = useState<Position>({ x: 0, y: 0 });
-  const [originalSize, setOriginalSize] = useState<Size>({
-    width: 0,
-    height: 0,
-  });
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [dragStart, setDragStart] = useState<Position>({ x: 0, y: 0 });
-  const [dragEnd, setDragEnd] = useState<Position>({ x: 0, y: 0 });
+  const isResizingRef = useRef<boolean>(false);
+  const resizingRef = useRef<PackedImage | null>(null);
+  const startPosRef = useRef<Position>({ x: 0, y: 0 });
+  const originalSizeRef = useRef<Size>({ width: 0, height: 0 });
+  const isDraggingRef = useRef<boolean>(false);
+  const dragStartRef = useRef<Position>({ x: 0, y: 0 });
+  const dragEndRef = useRef<Position>({ x: 0, y: 0 });
   const [isExtracting, setIsExtracting] = useState<boolean>(false);
   const [isShiftPressed, setIsShiftPressed] = useState<boolean>(false);
   const [tooltip, setTooltip] = useState<{
@@ -78,28 +71,6 @@ function SpriteEditor() {
   }, [coordinates, padding, selectedFiles, files, alignElement]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-
-    if (canvas) {
-      const handleMouseMove = (e: MouseEvent) => handleCanvasMouseMove(e);
-      const handleMouseUp = (e: MouseEvent) => handleCanvasMouseUp(e);
-      const handleMouseDown = (e: MouseEvent) => handleCanvasMouseDown(e);
-
-      canvas.addEventListener('mousemove', handleMouseMove);
-      canvas.addEventListener('mouseup', handleMouseUp);
-      canvas.addEventListener('mousedown', handleMouseDown);
-
-      return () => {
-        canvas.removeEventListener('mousemove', handleMouseMove);
-        canvas.removeEventListener('mouseup', handleMouseUp);
-        canvas.removeEventListener('mousedown', handleMouseDown);
-      };
-    }
-
-    return undefined;
-  }, [isResizing, resizing, startPos]);
-
-  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Shift') setIsShiftPressed(true);
     };
@@ -116,11 +87,10 @@ function SpriteEditor() {
     };
   }, []);
 
-  const handleCanvasMouseDown = (e: MouseEventWithNativeEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!canvasRef.current) return;
 
-    const rect = canvas.getBoundingClientRect();
+    const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
@@ -135,55 +105,63 @@ function SpriteEditor() {
 
           if (dist <= coord.circle.radius) {
             clickedOnResizeHandle = true;
-            setResizing(coord);
-            setStartPos({ x, y });
-            setOriginalSize({ width: coord.width, height: coord.height });
-            setIsResizing(true);
-            setIsDragging(false);
+            resizingRef.current = coord;
+            startPosRef.current = { x, y };
+            originalSizeRef.current = {
+              width: coord.width,
+              height: coord.height,
+            };
+            isResizingRef.current = true;
+            isDraggingRef.current = false;
           }
         }
       });
     }
 
     if (!clickedOnResizeHandle) {
-      setIsResizing(false);
-      setIsDragging(true);
-      setDragStart({ x, y });
-      setDragEnd({ x, y });
+      isResizingRef.current = false;
+      isDraggingRef.current = true;
+      dragStartRef.current = { x, y };
+      dragEndRef.current = { x, y };
     }
+
+    setTooltip({ show: false, x: 0, y: 0 });
+
+    window.addEventListener('mousemove', handleWindowMouseMove);
+    window.addEventListener('mouseup', handleWindowMouseUp);
   };
 
-  const handleCanvasMouseMove = (e: MouseEventWithNativeEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  const handleCanvasMouseMove = (e: MouseEvent | React.MouseEvent) => {
+    if (!canvasRef.current) return;
 
-    const rect = canvas.getBoundingClientRect();
+    const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    if (isResizing && resizing) {
-      const deltaX = x - startPos.x;
-      const deltaY = y - startPos.y;
+    if (isResizingRef.current && resizingRef.current) {
+      const deltaX = x - startPosRef.current.x;
+      const deltaY = y - startPosRef.current.y;
 
       let newWidth: number;
       let newHeight: number;
 
       if (isShiftPressed) {
-        const aspectRatio = originalSize.width / originalSize.height;
+        const aspectRatio =
+          originalSizeRef.current.width / originalSizeRef.current.height;
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
-          newWidth = Math.max(originalSize.width + deltaX, 10);
+          newWidth = Math.max(originalSizeRef.current.width + deltaX, 10);
           newHeight = newWidth / aspectRatio;
         } else {
-          newHeight = Math.max(originalSize.height + deltaY, 10);
+          newHeight = Math.max(originalSizeRef.current.height + deltaY, 10);
           newWidth = newHeight * aspectRatio;
         }
       } else {
-        newWidth = Math.max(originalSize.width + deltaX, 10);
-        newHeight = Math.max(originalSize.height + deltaY, 10);
+        newWidth = Math.max(originalSizeRef.current.width + deltaX, 10);
+        newHeight = Math.max(originalSizeRef.current.height + deltaY, 10);
       }
 
       const updatedCoordinates = coordinates.map((coord: PackedImage) => {
-        if (coord === resizing) {
+        if (coord === resizingRef.current) {
           return {
             ...coord,
             width: newWidth,
@@ -201,9 +179,9 @@ function SpriteEditor() {
         padding,
         alignElement
       );
-    } else if (isDragging) {
+    } else if (isDraggingRef.current) {
       const currentDragEnd = { x, y };
-      setDragEnd(currentDragEnd);
+      dragEndRef.current = currentDragEnd;
       drawImages(
         canvasRef.current,
         coordinates,
@@ -212,45 +190,44 @@ function SpriteEditor() {
         alignElement
       );
       drawSelectionBox(
-        canvas,
-        canvas.getContext('2d'),
-        dragStart,
+        canvasRef.current,
+        canvasRef.current.getContext('2d'),
+        dragStartRef.current,
         currentDragEnd
       );
-    }
+    } else {
+      let cursorStyle: string = 'default';
+      let showTooltip: boolean = false;
+      let tooltipX: number = 0;
+      let tooltipY: number = 0;
 
-    let cursorStyle: string = 'default';
-    let showTooltip: boolean = false;
-    let tooltipX: number = 0;
-    let tooltipY: number = 0;
-
-    if (Array.isArray(coordinates)) {
-      coordinates.forEach((coord: PackedImage) => {
-        if (coord.circle) {
-          const dist = Math.sqrt(
-            (x - coord.circle.x) ** 2 + (y - coord.circle.y) ** 2
-          );
-          if (dist <= coord.circle.radius) {
-            cursorStyle = 'nwse-resize';
-            showTooltip = true;
-            tooltipX = x;
-            tooltipY = y;
+      if (Array.isArray(coordinates)) {
+        coordinates.forEach((coord: PackedImage) => {
+          if (coord.circle) {
+            const dist = Math.sqrt(
+              (x - coord.circle.x) ** 2 + (y - coord.circle.y) ** 2
+            );
+            if (dist <= coord.circle.radius) {
+              cursorStyle = 'nwse-resize';
+              showTooltip = true;
+              tooltipX = x;
+              tooltipY = y;
+            }
           }
-        }
-      });
-    }
+        });
+      }
 
-    canvas.style.cursor = cursorStyle;
-    setTooltip({ show: showTooltip, x: tooltipX, y: tooltipY });
+      canvasRef.current.style.cursor = cursorStyle;
+      setTooltip({ show: showTooltip, x: tooltipX, y: tooltipY });
+    }
   };
 
-  const handleCanvasMouseUp = (e: MouseEventWithNativeEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  const handleCanvasMouseUp = (e: MouseEvent) => {
+    if (!canvasRef.current) return;
 
-    if (isResizing) {
-      setIsResizing(false);
-      setResizing(null);
+    if (isResizingRef.current) {
+      isResizingRef.current = false;
+      resizingRef.current = null;
       if (changeCoordinates) {
         addHistory(coordinates);
         setCoordinates(changeCoordinates);
@@ -292,17 +269,17 @@ function SpriteEditor() {
           }
         );
       }
-    } else if (isDragging) {
-      setIsDragging(false);
+    } else if (isDraggingRef.current) {
+      isDraggingRef.current = false;
       if (
-        Math.abs(dragEnd.x - dragStart.x) > 5 ||
-        Math.abs(dragEnd.y - dragStart.y) > 5
+        Math.abs(dragEndRef.current.x - dragStartRef.current.x) > 5 ||
+        Math.abs(dragEndRef.current.y - dragStartRef.current.y) > 5
       ) {
         const newSelectedFiles = selectImagesInBox(
           coordinates,
           selectedFiles,
-          dragStart,
-          dragEnd
+          dragStartRef.current,
+          dragEndRef.current
         );
         setSelectedFiles(newSelectedFiles);
         drawImages(
@@ -313,9 +290,8 @@ function SpriteEditor() {
           alignElement
         );
       } else {
-        const event = e instanceof MouseEvent ? e : e.nativeEvent;
         handleCanvasClick(
-          event,
+          e,
           canvasRef.current,
           coordinates,
           selectedFiles,
@@ -337,7 +313,24 @@ function SpriteEditor() {
         alignElement
       );
     }
+
+    window.removeEventListener('mousemove', handleWindowMouseMove);
+    window.removeEventListener('mouseup', handleWindowMouseUp);
   };
+
+  const handleWindowMouseMove = useCallback(
+    (e: MouseEvent) => {
+      handleCanvasMouseMove(e);
+    },
+    [handleCanvasMouseMove]
+  );
+
+  const handleWindowMouseUp = useCallback(
+    (e: MouseEvent) => {
+      handleCanvasMouseUp(e);
+    },
+    [handleCanvasMouseUp]
+  );
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -528,7 +521,6 @@ function SpriteEditor() {
             data-testid="canvas"
             onMouseDown={handleCanvasMouseDown}
             onMouseMove={handleCanvasMouseMove}
-            onMouseUp={handleCanvasMouseUp}
           />
           {coordinates.length === 1 && (
             <button
