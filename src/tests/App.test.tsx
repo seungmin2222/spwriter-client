@@ -52,6 +52,6 @@ describe('App component', () => {
         );
       })
     ).toBeInTheDocument();
-    expect(screen.getByAltText('xMarkIcon Icon')).toBeInTheDocument();
+    expect(document.querySelector('.xMarkIcon')).toBeInTheDocument();
   });
 });
