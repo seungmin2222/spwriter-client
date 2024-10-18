@@ -15,8 +15,6 @@ import { calculateCoordinates } from '../utils/coordinateUtils.js';
 import { handleDragOverFiles, handleFiles } from '../utils/fileUtils.js';
 import { PackedImage, Sprite } from '../utils/types.js';
 
-import fileImageIcon from '../assets/images/file-image-regular.svg';
-
 interface Size {
   width: number;
   height: number;
@@ -502,7 +500,7 @@ function SpriteEditor() {
             onClick={handleClick}
           >
             이미지 파일을 드래그하여 놓거나 클릭하여 선택하세요.
-            <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
+            <div className="fileImageIcon  ml-2" />
           </button>
           <input
             type="file"

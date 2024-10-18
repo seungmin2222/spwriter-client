@@ -6,12 +6,6 @@ import {
   rotateSelectedImages,
 } from '../utils/imageSelectUtils';
 
-import rotateIcon from '../assets/images/arrows-spin-solid.svg';
-import inversionIcon from '../assets/images/right-left-solid.svg';
-import cloneIcon from '../assets/images/copy-regular.svg';
-import leftIcon from '../assets/images/historyBack.png';
-import rightIcon from '../assets/images/historyReturn.png';
-
 function Footer() {
   const coordinates = useFileStore(state => state.coordinates);
   const setCoordinates = useFileStore(state => state.setCoordinates);
@@ -92,7 +86,7 @@ function Footer() {
           title="회전"
         >
           <div className="relative flex items-center justify-center">
-            <img src={rotateIcon} alt="Rotate Icon" className="h-6 w-6" />
+            <div className="rotateIcon" />
             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 90° 회전
@@ -108,7 +102,7 @@ function Footer() {
           title="반전"
         >
           <div className="relative flex items-center justify-center">
-            <img src={inversionIcon} alt="Inversion Icon" className="h-6 w-6" />
+            <div className="inversionIcon" />
             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 좌우 반전
@@ -124,7 +118,7 @@ function Footer() {
           title="복제"
         >
           <div className="relative flex items-center justify-center">
-            <img src={cloneIcon} alt="Clone Icon" className="h-6 w-6" />
+            <div className="cloneIcon" />
             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 이미지 복제
@@ -142,11 +136,7 @@ function Footer() {
           title="실행 취소"
         >
           <div className="relative flex items-center justify-center">
-            <img
-              src={leftIcon}
-              alt="Undo"
-              className="h-6 w-6 invert hue-rotate-180"
-            />
+            <div className="leftIcon filter invert brightness-100" />
             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 실행 취소
@@ -162,11 +152,7 @@ function Footer() {
           title="다시 실행"
         >
           <div className="relative flex items-center justify-center">
-            <img
-              src={rightIcon}
-              alt="Redo"
-              className="h-6 w-6 invert hue-rotate-180"
-            />
+            <div className="rightIcon filter invert brightness-100" />
             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
               <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
                 다시 실행

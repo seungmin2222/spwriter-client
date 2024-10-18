@@ -1,7 +1,7 @@
 # Spwriter
 
 <div align="center">
-  <img src="./src/assets/images/spwriterFull.png">
+  <img src="./src/assets/images/readmeImages/spwriterFull.png">
 
 SPWRITER는 개발자와 디자이너를 위한 고급 이미지 스프라이트 툴로,<br>
 'Sprite'와 'Writer'를 결합한 이름에서 알 수 있듯이 단순한 스프라이트 생성을 넘어섭니다.<br>

@@ -4,8 +4,6 @@ import useFileStore from '../../store';
 import { handleFiles } from '../utils/fileUtils';
 import { downloadUtility, handlePaddingChangeUtility } from '../utils/navUtils';
 
-import downloadIcon from '../assets/images/download-solid.svg';
-
 function Navbar() {
   const fileName = useFileStore(state => state.fileName);
   const setFileName = useFileStore(state => state.setFileName);
@@ -120,8 +118,9 @@ function Navbar() {
             type="button"
             onClick={handleDownload}
             className="p-[0.7rem] rounded-full bg-[#241f3a] hover:bg-[#565465] text-white transition-colors duration-300"
+            aria-label="Download"
           >
-            <img src={downloadIcon} alt="Download Icon" className="h-6 w-6" />
+            <div className="downloadImg" />
           </button>
         </div>
       </div>

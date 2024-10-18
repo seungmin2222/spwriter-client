@@ -10,8 +10,6 @@ import { calculateCoordinates } from '../utils/coordinateUtils';
 import { handleFiles } from '../utils/fileUtils';
 import { PackedImage } from '../utils/types';
 
-import fileImageIcon from '../assets/images/file-image-regular.svg';
-
 function ImageList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -340,7 +338,7 @@ function ImageList() {
               }}
             >
               이미지 파일을 드래그하여 놓거나 클릭하여 선택하세요.
-              <img src={fileImageIcon} alt="파일 아이콘" className="h-7 ml-2" />
+              <div className="fileImageIcon ml-2" />
             </span>
             <input
               type="file"

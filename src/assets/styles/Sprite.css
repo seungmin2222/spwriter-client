@@ -1,0 +1,53 @@
+.xMarkIcon {
+  width: 40px;
+  height: 40px;
+  background: url('../images/spriteImg.png') -3px -3px;
+}
+
+.fileImageIcon {
+  width: 21px;
+  height: 28px;
+  background: url('../images/spriteImg.png') -46px -3px;
+}
+
+.downloadImg {
+  width: 24px;
+  height: 24px;
+  background: url('../images/spriteImg.png') -70px -3px;
+}
+
+.leftIcon {
+  width: 24px;
+  height: 24px;
+  background: url('../images/spriteImg.png') -97px -3px;
+}
+
+.rightIcon {
+  width: 24px;
+  height: 24px;
+  background: url('../images/spriteImg.png') -124px -3px;
+}
+
+.rotateIcon {
+  width: 24px;
+  height: 24px;
+  background: url('../images/spriteImg.png') -205px -3px;
+}
+
+.inversionIcon {
+  width: 24px;
+  height: 24px;
+  background: url('../images/spriteImg.png') -151px -3px;
+}
+
+.cloneIcon {
+  width: 24px;
+  height: 24px;
+  background: url('../images/spriteImg.png') -178px -3px;
+}
+
+.crossIcon {
+  width: 12px;
+  height: 12px;
+  background: url('../images/spriteImg.png') -232px -3px;
+}

@@ -75,13 +75,9 @@ function ImageItem({
         }}
         aria-label="cross"
       >
-        <svg
-          className="h-6 w-6 bg-[#241f3a] transition-colors duration-300 group-hover:bg-[#c53030] rounded-full"
-          viewBox="0 0 24 24"
-          fill="#ffffff"
-        >
-          <path d="M12 10.586l4.95-4.95 1.414 1.414L13.414 12l4.95 4.95-1.414 1.414L12 13.414l-4.95 4.95-1.414-1.414L10.586 12 5.636 7.05l1.414-1.414z" />
-        </svg>
+        <div className="flex justify-center items-center h-6 w-6 bg-[#241f3a] transition-colors duration-300 group-hover:bg-[#c53030] rounded-full">
+          <div className="crossIcon filter brightness-0 invert " />
+        </div>
       </button>
     </div>
   );
