@@ -117,10 +117,16 @@ function Navbar() {
           <button
             type="button"
             onClick={handleDownload}
-            className="p-[0.7rem] rounded-full bg-[#241f3a] hover:bg-[#565465] text-white transition-colors duration-300"
+            className="relative p-[0.7rem] rounded-full bg-[#241f3a] hover:bg-[#565465] text-white transition-colors duration-300 group"
             aria-label="Download"
           >
             <div className="downloadImg" />
+            <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
+              <div className="w-0 h-0 border-l-8 border-r-8 border-b-8 border-b-gray-700 border-l-transparent border-r-transparent" />
+              <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
+                스프라이트 시트 생성
+              </span>
+            </div>
           </button>
         </div>
       </div>
