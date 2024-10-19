@@ -11,8 +11,26 @@ export const cloneSelectedImages = (
 ) => {
   const newCoordinates: PackedImage[] = [...coordinates];
 
+  const generateUniqueFileName = (
+    originalName: string,
+    coordinatesList: PackedImage[]
+  ): string => {
+    let copyFileName = `${originalName}-Copy`;
+    let copyNumber = 1;
+
+    coordinatesList.forEach(c => {
+      if (c.fileName === copyFileName) {
+        copyFileName = `${originalName}-Copy-${copyNumber}`;
+        copyNumber++;
+      }
+    });
+
+    return copyFileName;
+  };
+
   const clonePromises = Array.from(selectedFiles).map(img => {
     const index = coordinates.findIndex(coord => coord.img === img);
+
     if (index !== -1) {
       const coord = coordinates[index];
       const newImg = new Image();
@@ -20,9 +38,15 @@ export const cloneSelectedImages = (
 
       return new Promise<HTMLImageElement>(resolve => {
         newImg.onload = () => {
+          const originalFileName = coord.fileName || 'image';
+          const copyFileName = generateUniqueFileName(
+            originalFileName,
+            newCoordinates
+          );
+
           newCoordinates.push({
             img: newImg,
-            fileName: coord.fileName,
+            fileName: copyFileName,
             width: coord.width,
             height: coord.height,
             x: 0,
@@ -33,6 +57,7 @@ export const cloneSelectedImages = (
         };
       });
     }
+
     return Promise.resolve(new Image());
   });
 
@@ -117,8 +142,10 @@ export const rotateSelectedImages = (
 
       selectedFiles.delete(coord.img);
       selectedFiles.add(rotatedImg);
+
       return updatedCoord;
     }
+
     return coord;
   });
 
@@ -170,6 +197,7 @@ export const resizeSelectedImages = (
 
         return updatedCoord;
       }
+
       return coord;
     }
   );
@@ -177,6 +205,7 @@ export const resizeSelectedImages = (
   return Promise.all(updatedCoordinatesPromises).then(newCoordinates => {
     sortAndSetCoordinates(newCoordinates, setCoordinates);
     setSelectedFiles(new Set(selectedFiles));
+
     return { newCoordinates, resizedImage };
   });
 };
