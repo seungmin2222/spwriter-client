@@ -1,5 +1,6 @@
 export interface PackedImage {
   img: HTMLImageElement;
+  fileName: string;
   x: number;
   y: number;
   width: number;

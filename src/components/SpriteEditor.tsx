@@ -168,6 +168,7 @@ function SpriteEditor() {
         }
         return coord;
       });
+
       changeCoordinates = updatedCoordinates;
       setCoordinates(updatedCoordinates);
       drawImages(
@@ -242,11 +243,21 @@ function SpriteEditor() {
             newCoordinates: PackedImage[];
             resizedImage: PackedImage | null;
           }) => {
+            const images: HTMLImageElement[] = [];
+            const fileNames: string[] = [];
+
+            newCoordinates.forEach((coord: PackedImage) => {
+              images.push(coord.img);
+              fileNames.push(coord.fileName);
+            });
+
             const calculatedCoordinates = calculateCoordinates(
-              newCoordinates.map((coord: PackedImage) => coord.img),
+              images,
+              fileNames,
               padding,
               alignElement
             );
+
             setCoordinates(calculatedCoordinates);
             drawImages(
               canvasRef.current,
@@ -440,11 +451,11 @@ function SpriteEditor() {
         });
       })
     );
-
     setFiles(prevFiles => [...prevFiles, ...filteredFiles]);
 
     const newCoordinates = calculateCoordinates(
       htmlImageElements,
+      filteredFiles.map(file => file.name.split('.')[0]),
       padding,
       alignElement
     );

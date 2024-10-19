@@ -69,11 +69,11 @@ const handleResizeConfirmUtil = (
           ctx.drawImage(coord.img, 0, 0, width, height);
         }
       );
-
       newSelectedFiles.add(resizedImg);
 
       const createPackedImage = (
         img: HTMLImageElement,
+        fileName: string,
         x: number,
         y: number,
         imageWidth: number,
@@ -81,6 +81,7 @@ const handleResizeConfirmUtil = (
         rotated: boolean
       ): PackedImage => ({
         img,
+        fileName,
         x,
         y,
         width,
@@ -90,6 +91,7 @@ const handleResizeConfirmUtil = (
 
       return createPackedImage(
         resizedImg,
+        coord.fileName,
         coord.x,
         coord.y,
         width,
@@ -102,8 +104,17 @@ const handleResizeConfirmUtil = (
   });
 
   Promise.all(resizePromises).then((updatedCoordinates: PackedImage[]) => {
+    const images: HTMLImageElement[] = [];
+    const fileNames: string[] = [];
+
+    updatedCoordinates.forEach(coord => {
+      images.push(coord.img);
+      fileNames.push(coord.fileName);
+    });
+
     const reorderedCoordinates = calculateCoordinates(
-      updatedCoordinates.map(coord => coord.img),
+      images,
+      fileNames,
       padding,
       alignElement
     );

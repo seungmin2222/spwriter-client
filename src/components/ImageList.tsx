@@ -76,8 +76,17 @@ function ImageList() {
 
   useEffect(() => {
     if (Array.isArray(coordinates) && coordinates.length > 0) {
+      const images: HTMLImageElement[] = [];
+      const fileNames: string[] = [];
+
+      coordinates.forEach(coord => {
+        images.push(coord.img);
+        fileNames.push(coord.fileName);
+      });
+
       const newCoordinates = calculateCoordinates(
-        coordinates.map(coord => coord.img),
+        images,
+        fileNames,
         padding,
         alignElement
       );
@@ -144,8 +153,8 @@ function ImageList() {
     setShowModal(false);
   };
 
-  const generateCSS = (image: PackedImage, index: number): string =>
-    `.sprite-${index} {
+  const generateCSS = (image: PackedImage): string =>
+    `.${image.fileName} {
   width: ${image.width}px;
   height: ${image.height}px;
   background: url('${
@@ -214,7 +223,7 @@ function ImageList() {
       generateToast('선택된 이미지가 없습니다.');
     } else {
       const cssText = selectedCoordinates
-        .map(coord => generateCSS(coord, coordinates.indexOf(coord)))
+        .map(coord => generateCSS(coord))
         .join('\n');
       copyToClipboard(cssText);
     }
