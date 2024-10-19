@@ -1,12 +1,20 @@
 import AdvancedBinPack from './AdvancedBinPack';
 import { PackedImage } from './types';
 
-const sortImages = (imagesToSort: HTMLImageElement[]): HTMLImageElement[] => {
-  return [...imagesToSort].sort((a, b) => {
-    const aPerimeter = 2 * (a.width + a.height);
-    const bPerimeter = 2 * (b.width + b.height);
-    const aArea = a.width * a.height;
-    const bArea = b.width * b.height;
+const sortImages = (
+  images: HTMLImageElement[],
+  fileNames: string[]
+): { img: HTMLImageElement; fileName: string }[] => {
+  const imagesWithFileNames = images.map((img, index) => ({
+    img,
+    fileName: fileNames[index],
+  }));
+
+  return imagesWithFileNames.sort((a, b) => {
+    const aPerimeter = 2 * (a.img.width + a.img.height);
+    const bPerimeter = 2 * (b.img.width + b.img.height);
+    const aArea = a.img.width * a.img.height;
+    const bArea = b.img.width * b.img.height;
     return bPerimeter * Math.sqrt(bArea) - aPerimeter * Math.sqrt(aArea);
   });
 };
@@ -25,6 +33,7 @@ const optimizeCanvasSize = (packedImages: PackedImage[], padding: number) => {
 
 const arrangeImages = (
   images: HTMLImageElement[],
+  fileNames: string[],
   initialPadding: number,
   isVertical = false
 ): PackedImage[] => {
@@ -33,13 +42,14 @@ const arrangeImages = (
   );
 
   let offset = initialPadding;
-  return sortedImages.map(img => {
+  return sortedImages.map((img, index) => {
     const coord: PackedImage = {
+      img,
+      fileName: fileNames[index],
       x: isVertical ? initialPadding : offset,
       y: isVertical ? offset : initialPadding,
       width: img.width,
       height: img.height,
-      img,
       rotated: false,
     };
     offset += (isVertical ? img.height : img.width) + initialPadding;
@@ -49,11 +59,19 @@ const arrangeImages = (
 
 export const calculateCoordinates = (
   images: HTMLImageElement[],
+  fileNames: string[],
   initialPadding: number,
   alignElement: 'bin-packing' | 'top-bottom' | 'left-right'
 ): PackedImage[] => {
   if (alignElement === 'bin-packing') {
-    const sortedImages = sortImages(images);
+    const sortedImagesWithFileNames = sortImages(images, fileNames);
+    const sortedImages: HTMLImageElement[] = [];
+    const sortedFileNames: string[] = [];
+
+    sortedImagesWithFileNames.forEach(item => {
+      sortedImages.push(item.img);
+      sortedFileNames.push(item.fileName);
+    });
 
     const totalArea = sortedImages.reduce(
       (sum, img) =>
@@ -78,12 +96,13 @@ export const calculateCoordinates = (
           const node = packer.insert(img.width, img.height);
           if (node) {
             packedImages.push({
+              img,
+              fileName: sortedFileNames[sortedImages.indexOf(img)],
               x: node.x,
               y: node.y,
               width: node.width,
               height: node.height,
               rotated: node.rotated,
-              img,
             });
           } else {
             allPacked = false;
@@ -116,25 +135,29 @@ export const calculateCoordinates = (
       const node = packer.insert(img.width, img.height);
       if (node) {
         finalPackedImages.push({
+          img,
+          fileName: sortedFileNames[sortedImages.indexOf(img)],
           x: node.x,
           y: node.y,
           width: node.width,
           height: node.height,
           rotated: node.rotated,
-          img,
         });
       }
     }
 
-    return finalPackedImages;
+    return finalPackedImages.map((packedImage, index) => ({
+      ...packedImage,
+      fileName: sortedFileNames[index],
+    }));
   }
 
   if (alignElement === 'top-bottom') {
-    return arrangeImages(images, initialPadding, true);
+    return arrangeImages(images, fileNames, initialPadding, true);
   }
 
   if (alignElement === 'left-right') {
-    return arrangeImages(images, initialPadding);
+    return arrangeImages(images, fileNames, initialPadding);
   }
 
   return [];

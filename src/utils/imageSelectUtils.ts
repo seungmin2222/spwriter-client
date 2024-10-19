@@ -22,6 +22,7 @@ export const cloneSelectedImages = (
         newImg.onload = () => {
           newCoordinates.push({
             img: newImg,
+            fileName: coord.fileName,
             width: coord.width,
             height: coord.height,
             x: 0,
@@ -36,12 +37,21 @@ export const cloneSelectedImages = (
   });
 
   Promise.all(clonePromises).then(() => {
-    const allImages = newCoordinates.map(coord => coord.img);
+    const allImages: HTMLImageElement[] = [];
+    const fileNames: string[] = [];
+
+    newCoordinates.forEach(coord => {
+      allImages.push(coord.img);
+      fileNames.push(coord.fileName);
+    });
+
     const recalculatedCoordinates = calculateCoordinates(
       allImages,
+      fileNames,
       padding,
       alignElement
     );
+
     sortAndSetCoordinates(recalculatedCoordinates, setCoordinates);
   });
 };
