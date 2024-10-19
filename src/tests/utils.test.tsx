@@ -127,9 +127,15 @@ describe('Image Processing Functions', () => {
         { width: 50, height: 50 },
         { width: 75, height: 75 },
       ];
+      const fileName: string[] = ['img-0', 'img-1', 'img-2'];
 
       const htmlImages = images.map(imageSizeToHTMLImageElement);
-      const result = calculateCoordinates(htmlImages, 10, 'bin-packing');
+      const result = calculateCoordinates(
+        htmlImages,
+        fileName,
+        10,
+        'bin-packing'
+      );
       expect(result).toHaveLength(3);
       expect(result[0].x).toBeDefined();
       expect(result[0].y).toBeDefined();
@@ -147,8 +153,15 @@ describe('Image Processing Functions', () => {
         { width: 100, height: 100 },
         { width: 50, height: 50 },
       ];
+      const fileName: string[] = ['img-0', 'img-1', 'img-2'];
       const htmlImages = images.map(imageSizeToHTMLImageElement);
-      const result = calculateCoordinates(htmlImages, 10, 'top-bottom');
+
+      const result = calculateCoordinates(
+        htmlImages,
+        fileName,
+        10,
+        'top-bottom'
+      );
       expect(result).toHaveLength(2);
       expect(result[1].y).toBeGreaterThan(result[0].y);
     });
@@ -158,8 +171,14 @@ describe('Image Processing Functions', () => {
         { width: 100, height: 100 },
         { width: 50, height: 50 },
       ];
+      const fileName: string[] = ['img-0', 'img-1', 'img-2'];
       const htmlImages = images.map(imageSizeToHTMLImageElement);
-      const result = calculateCoordinates(htmlImages, 10, 'left-right');
+      const result = calculateCoordinates(
+        htmlImages,
+        fileName,
+        10,
+        'left-right'
+      );
       expect(result).toHaveLength(2);
       expect(result[1].x).toBeGreaterThan(result[0].x);
     });
@@ -169,28 +188,31 @@ describe('Image Processing Functions', () => {
     it('좌표를 면적별로 정렬하고 설정해야 합니다', () => {
       const coords: PackedImage[] = [
         {
+          img: imageSizeToHTMLImageElement({ width: 50, height: 50 }),
+          fileName: 'img-0',
           width: 50,
           height: 50,
           x: 0,
           y: 0,
           rotated: false,
-          img: imageSizeToHTMLImageElement({ width: 50, height: 50 }),
         },
         {
+          img: imageSizeToHTMLImageElement({ width: 50, height: 50 }),
+          fileName: 'img-1',
           width: 100,
           height: 100,
           x: 0,
           y: 0,
           rotated: false,
-          img: imageSizeToHTMLImageElement({ width: 100, height: 100 }),
         },
         {
+          img: imageSizeToHTMLImageElement({ width: 50, height: 50 }),
+          fileName: 'img-3',
           width: 75,
           height: 75,
           x: 0,
           y: 0,
           rotated: false,
-          img: imageSizeToHTMLImageElement({ width: 75, height: 75 }),
         },
       ];
       const setCoordinates = vi.fn();
@@ -241,6 +263,7 @@ describe('Image Processing Functions', () => {
       const coordinates: PackedImage[] = [
         {
           img: imageSizeToHTMLImageElement({ width: 100, height: 100 }),
+          fileName: 'img-0',
           width: 100,
           height: 100,
           x: 0,

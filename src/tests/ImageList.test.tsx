@@ -62,6 +62,7 @@ describe('ImageList component', () => {
         width: 100,
         height: 100,
       }),
+      fileName: 'image1',
       width: 100,
       height: 100,
       x: 0,
@@ -74,6 +75,7 @@ describe('ImageList component', () => {
         width: 100,
         height: 100,
       }),
+      fileName: 'image2',
       width: 100,
       height: 100,
       x: 0,
@@ -81,6 +83,9 @@ describe('ImageList component', () => {
       rotated: false,
     },
   ];
+
+  mockCoordinates[0].img.src = 'image1.png';
+  mockCoordinates[1].img.src = 'image2.png';
 
   beforeEach(() => {
     const mockContext = {
@@ -195,7 +200,7 @@ describe('ImageList component', () => {
 
       await waitFor(() => {
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-          expect.stringContaining('.sprite-0')
+          expect.stringContaining('.image1')
         );
       });
     });
