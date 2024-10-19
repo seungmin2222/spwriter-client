@@ -11,22 +11,7 @@ export const cloneSelectedImages = (
 ) => {
   const newCoordinates: PackedImage[] = [...coordinates];
 
-  const generateUniqueFileName = (
-    originalName: string,
-    coordinatesList: PackedImage[]
-  ): string => {
-    let copyFileName = `${originalName}-Copy`;
-    let copyNumber = 1;
-
-    coordinatesList.forEach(c => {
-      if (c.fileName === copyFileName) {
-        copyFileName = `${originalName}-Copy-${copyNumber}`;
-        copyNumber++;
-      }
-    });
-
-    return copyFileName;
-  };
+  const generateUniqueFileName = createFileName();
 
   const clonePromises = Array.from(selectedFiles).map(img => {
     const index = coordinates.findIndex(coord => coord.img === img);
@@ -208,4 +193,20 @@ export const resizeSelectedImages = (
 
     return { newCoordinates, resizedImage };
   });
+};
+
+const createFileName = () => {
+  return (originalName: string, coordinatesList: PackedImage[]): string => {
+    let copyFileName = `${originalName}-copy`;
+    let copyNumber = 1;
+
+    coordinatesList.forEach(c => {
+      if (c.fileName === copyFileName) {
+        copyFileName = `${originalName}-copy-${copyNumber}`;
+        copyNumber++;
+      }
+    });
+
+    return copyFileName;
+  };
 };
