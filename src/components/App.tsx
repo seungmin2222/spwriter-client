@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../assets/styles/Sprite.css';
+import '../assets/styles/Sprites.css';
 
 import ImageList from './ImageList';
 import SpriteMain from './SpriteMain';
