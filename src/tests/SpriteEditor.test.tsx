@@ -61,6 +61,7 @@ describe('SpriteEditor', () => {
       coordinates: [
         {
           img: imgElement,
+          fileName: 'img',
           x: 0,
           y: 0,
           width: 100,
@@ -148,6 +149,7 @@ describe('SpriteEditor', () => {
 
     mockStore.coordinates.push({
       img: imgElement2,
+      fileName: 'img',
       x: 120,
       y: 120,
       width: 100,

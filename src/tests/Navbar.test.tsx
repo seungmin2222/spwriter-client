@@ -138,7 +138,15 @@ describe('Navbar', () => {
     const addToast = vi.fn();
     useFileStore.setState({
       coordinates: [
-        { img: new Image(), width: 50, height: 50, x: 0, y: 0, rotated: false },
+        {
+          img: new Image(),
+          fileName: 'img',
+          width: 50,
+          height: 50,
+          x: 0,
+          y: 0,
+          rotated: false,
+        },
       ],
       addToast,
     });

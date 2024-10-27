@@ -39,6 +39,7 @@ describe('useFileStore', () => {
     const mockCoordinates: PackedImage[] = [
       {
         img: new Image(),
+        fileName: 'img',
         x: 0,
         y: 0,
         width: 100,
@@ -95,6 +96,7 @@ describe('useFileStore', () => {
   it('크기 조정된 이미지를 설정해야 합니다', () => {
     const mockResizedImage: PackedImage = {
       img: new Image(),
+      fileName: 'img',
       x: 0,
       y: 0,
       width: 100,
@@ -120,6 +122,7 @@ describe('useFileStore', () => {
     const prevCoordinates: PackedImage[] = [
       {
         img: new Image(),
+        fileName: 'img',
         x: 0,
         y: 0,
         width: 100,
@@ -139,6 +142,7 @@ describe('useFileStore', () => {
     const initialCoordinates: PackedImage[] = [
       {
         img: new Image(),
+        fileName: 'img',
         x: 0,
         y: 0,
         width: 100,
@@ -149,6 +153,7 @@ describe('useFileStore', () => {
     const newCoordinates: PackedImage[] = [
       {
         img: new Image(),
+        fileName: 'img',
         x: 1,
         y: 1,
         width: 100,
@@ -173,6 +178,7 @@ describe('useFileStore', () => {
     const initialCoordinates: PackedImage[] = [
       {
         img: new Image(),
+        fileName: 'img',
         x: 0,
         y: 0,
         width: 100,
@@ -183,6 +189,7 @@ describe('useFileStore', () => {
     const newCoordinates: PackedImage[] = [
       {
         img: new Image(),
+        fileName: 'img',
         x: 1,
         y: 1,
         width: 100,
