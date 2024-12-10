@@ -40,15 +40,15 @@ function Navbar() {
 
   return (
     <nav
-      className="flex justify-between w-auto h-[5%] min-h-[50px] m-5 text-[17px] font-medium rounded-t-[2.375rem] select-none"
+      className="m-5 flex h-[5%] min-h-[50px] w-auto select-none justify-between rounded-t-[2.375rem] text-[17px] font-medium"
       data-testid="navbar"
     >
       <div className="flex h-[100%] gap-4">
-        <div className="relative inline-block bg-[#241f3a] hover:bg-[#565465] duration-300 rounded-[1rem]">
+        <div className="relative inline-block rounded-[1rem] bg-[#241f3a] duration-300 hover:bg-[#565465]">
           <input
             type="file"
             id="fileInput"
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
             multiple
             onChange={({ target: { files } }) => {
               if (files) {
@@ -66,11 +66,11 @@ function Navbar() {
             }}
           />
 
-          <span className="flex items-center justify-center text-[18px] w-[8rem] h-full px-3 text-white font-semibold cursor-pointer">
+          <span className="flex h-full w-[8rem] cursor-pointer items-center justify-center px-3 text-[18px] font-semibold text-white">
             Open files
           </span>
         </div>
-        <div className="flex justify-center items-center w-[13rem] h-full space-x-1 border rounded-[1rem] shadow-sm bg-[#ffffff]">
+        <div className="flex h-full w-[13rem] items-center justify-center space-x-1 rounded-[1rem] border bg-[#ffffff] shadow-sm">
           <span>Padding :</span>
           <div className="flex items-center space-x-1">
             <input
@@ -78,13 +78,13 @@ function Navbar() {
               id="paddingInput"
               value={padding}
               onChange={handlePaddingChange}
-              className="w-16 p-1 border rounded-[0.5rem] text-center"
+              className="w-16 rounded-[0.5rem] border p-1 text-center"
             />
             <span>px</span>
           </div>
         </div>
-        <div className="flex h-full justify-center p-2 border rounded-[1rem] shadow-sm bg-[#ffffff]">
-          <span className="flex h-full p-1 items-center">정렬 옵션 :</span>
+        <div className="flex h-full justify-center rounded-[1rem] border bg-[#ffffff] p-2 shadow-sm">
+          <span className="flex h-full items-center p-1">정렬 옵션 :</span>
           <select
             id="align-elements"
             value={alignElement}
@@ -106,10 +106,10 @@ function Navbar() {
         </div>
       </div>
       <div className="flex w-[26%]">
-        <div className="flex items-center space-x-2 h-auto w-full">
+        <div className="flex h-auto w-full items-center space-x-2">
           <input
             type="text"
-            className="flex-grow h-auto p-2 bg-[#f8f8f8] border-b-2 border-gray-400 focus-within:border-[#241f3a] focus:outline-none"
+            className="h-auto flex-grow border-b-2 border-gray-400 bg-[#f8f8f8] p-2 focus-within:border-[#241f3a] focus:outline-none"
             placeholder="파일 이름을 입력해주세요."
             value={fileName}
             onChange={e => setFileName(e.target.value)}
@@ -117,13 +117,13 @@ function Navbar() {
           <button
             type="button"
             onClick={handleDownload}
-            className="relative p-[0.7rem] rounded-full bg-[#241f3a] hover:bg-[#565465] text-white transition-colors duration-300 group"
+            className="group relative rounded-full bg-[#241f3a] p-[0.7rem] text-white transition-colors duration-300 hover:bg-[#565465]"
             aria-label="Download"
           >
             <div className="downloadImg" />
-            <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
-              <div className="w-0 h-0 border-l-8 border-r-8 border-b-8 border-b-gray-700 border-l-transparent border-r-transparent" />
-              <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
+            <div className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 flex -translate-x-1/2 transform flex-col items-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <div className="h-0 w-0 border-b-8 border-l-8 border-r-8 border-b-gray-700 border-l-transparent border-r-transparent" />
+              <span className="whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-sm text-white">
                 스프라이트 시트 생성
               </span>
             </div>

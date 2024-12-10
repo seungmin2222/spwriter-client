@@ -495,7 +495,7 @@ function SpriteEditor() {
 
   return (
     <div
-      className="relative w-full h-[84%] overflow-auto sprite-editor"
+      className="sprite-editor relative h-[84%] w-full overflow-auto"
       data-testid="sprite-editor"
       onDrop={handleDrop}
       onDragOver={handleDragOverFiles}
@@ -503,15 +503,15 @@ function SpriteEditor() {
       aria-label="Sprite Editor Canvas"
     >
       {coordinates.length === 0 ? (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex h-full items-center justify-center">
           <button
             tabIndex={0}
             type="button"
-            className="flex bg-[#f8f8fd] text-[#6b7280] text-xl border rounded-[1rem] p-3 animate-fadeIn select-none cursor-pointer"
+            className="flex animate-fadeIn cursor-pointer select-none rounded-[1rem] border bg-[#f8f8fd] p-3 text-xl text-[#6b7280]"
             onClick={handleClick}
           >
             이미지 파일을 드래그하여 놓거나 클릭하여 선택하세요.
-            <div className="fileImageIcon  ml-2" />
+            <div className="fileImageIcon ml-2" />
           </button>
           <input
             type="file"
@@ -536,8 +536,8 @@ function SpriteEditor() {
               type="button"
               onClick={extractSpritesFromSheet}
               disabled={isExtracting}
-              className={`absolute top-4 right-4 bg-[#241f3a] hover:bg-[#565465] text-white font-bold py-2 px-4 rounded-[1rem] animate-fadeIn duration-300 ${
-                isExtracting ? 'opacity-50 cursor-not-allowed' : ''
+              className={`absolute right-4 top-4 animate-fadeIn rounded-[1rem] bg-[#241f3a] px-4 py-2 font-bold text-white duration-300 hover:bg-[#565465] ${
+                isExtracting ? 'cursor-not-allowed opacity-50' : ''
               }`}
             >
               {isExtracting ? '추출 중...' : '스프라이트 시트 추출'}
@@ -547,7 +547,7 @@ function SpriteEditor() {
       )}
       {tooltip.show && (
         <div
-          className="absolute bg-[#241f3a] text-white p-2 rounded-[1rem] text-sm z-10 animate-fadeInFast"
+          className="absolute z-10 animate-fadeInFast rounded-[1rem] bg-[#241f3a] p-2 text-sm text-white"
           style={{ left: tooltip.x + 10, top: tooltip.y + 10 }}
         >
           Shift 키를 누른 채로 리사이즈하면 비율이 유지됩니다.

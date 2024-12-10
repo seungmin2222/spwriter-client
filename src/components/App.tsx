@@ -48,8 +48,8 @@ function App() {
 
   if (isMobile) {
     return (
-      <div className="flex items-center justify-center w-screen h-screen text-center p-4">
-        <div className="p-6 bg-[#f8f8fd] text-[#6b7280] rounded-2xl flex flex-col items-center">
+      <div className="flex h-screen w-screen items-center justify-center p-4 text-center">
+        <div className="flex flex-col items-center rounded-2xl bg-[#f8f8fd] p-6 text-[#6b7280]">
           <div className="xMarkIcon" />
           <h1 className="text-2xl">
             죄송합니다. <br />
@@ -62,7 +62,7 @@ function App() {
 
   return (
     <div
-      className="flex justify-between w-screen h-screen bg-gradient-to-r from-[#dbd9e9] to-[#e5e2ed] p-[2%]"
+      className="flex h-screen w-screen justify-between bg-gradient-to-r from-[#dbd9e9] to-[#e5e2ed] p-[2%]"
       data-testid="app"
     >
       <ImageList />

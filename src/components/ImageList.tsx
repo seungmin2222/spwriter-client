@@ -273,42 +273,42 @@ function ImageList() {
 
   return (
     <aside
-      className="flex flex-col w-[26%] h-full min-w-[370px] mr-[2%] text-gray-700 bg-[#f7f7f7] rounded-[2.375rem] shadow-md"
+      className="mr-[2%] flex h-full w-[26%] min-w-[370px] flex-col rounded-[2.375rem] bg-[#f7f7f7] text-gray-700 shadow-md"
       data-testid="image-list"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
-      <header className="flex justify-center items-center w-auto h-[5%] m-5  text-3xl font-semibold text-[#1f2937] select-none">
+      <header className="m-5 flex h-[5%] w-auto select-none items-center justify-center text-3xl font-semibold text-[#1f2937]">
         Image List
       </header>
       {coordinates.length > 0 && (
-        <div className="flex w-full h-[5%] items-center mb-3 px-[20px] border-[#e2e8f0] transition-opacity duration-500 animate-fadeIn select-none">
+        <div className="mb-3 flex h-[5%] w-full animate-fadeIn select-none items-center border-[#e2e8f0] px-[20px] transition-opacity duration-500">
           <div className="flex w-full justify-between">
             <div>
               <button
                 type="button"
-                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#25203b] transition-colors"
+                className="mr-2 rounded-md border p-1 shadow-sm transition-colors hover:bg-[#25203b] hover:text-[white]"
                 onClick={handleSelectAll}
               >
                 전체 선택
               </button>
               <button
                 type="button"
-                className="p-1 border mr-2 rounded-md shadow-sm hover:bg-[#c9c7d2] transition-colors duration-300"
+                className="mr-2 rounded-md border p-1 shadow-sm transition-colors duration-300 hover:bg-[#c9c7d2]"
                 onClick={handleDeselectAll}
               >
                 전체 해제
               </button>
               <button
                 type="button"
-                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#25203b] transition-colors duration-300"
+                className="mr-2 rounded-md border p-1 shadow-sm transition-colors duration-300 hover:bg-[#25203b] hover:text-[white]"
                 onClick={copySelectedCoordinates}
               >
                 선택좌표 복사
               </button>
               <button
                 type="button"
-                className="p-1 border mr-2 rounded-md shadow-sm hover:text-[white] hover:bg-[#25203b] transition-colors duration-300"
+                className="mr-2 rounded-md border p-1 shadow-sm transition-colors duration-300 hover:bg-[#25203b] hover:text-[white]"
                 onClick={handleResizeImages}
               >
                 크기 조정
@@ -316,7 +316,7 @@ function ImageList() {
             </div>
             <button
               type="button"
-              className="p-1 border rounded-md shadow-sm hover:text-[white] hover:bg-[#c53030] transition-colors duration-300"
+              className="rounded-md border p-1 shadow-sm transition-colors duration-300 hover:bg-[#c53030] hover:text-[white]"
               onClick={handleOpenModal}
             >
               선택삭제
@@ -325,7 +325,7 @@ function ImageList() {
         </div>
       )}
       <section
-        className={`flex flex-col w-full h-[80%] px-[20px] pb-[20px] text-lg font-light space-y-3 overflow-y-auto ${
+        className={`flex h-[80%] w-full flex-col space-y-3 overflow-y-auto px-[20px] pb-[20px] text-lg font-light ${
           Array.isArray(coordinates) && coordinates.length > 0
             ? ''
             : 'justify-center'
@@ -336,7 +336,7 @@ function ImageList() {
         ) : (
           <div className="flex w-full justify-center border-[#e2e8f0] transition-opacity duration-500">
             <span
-              className="flex bg-[#f8f8fd] text-[#6b7280] text-[15px] border rounded-[1rem] p-2 animate-fadeIn select-none cursor-pointer"
+              className="flex animate-fadeIn cursor-pointer select-none rounded-[1rem] border bg-[#f8f8fd] p-2 text-[15px] text-[#6b7280]"
               onClick={handleClick}
               role="button"
               tabIndex={0}

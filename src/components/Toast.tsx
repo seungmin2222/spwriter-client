@@ -28,7 +28,7 @@ function Toast({ id, message, onClose }: ToastProps) {
   return (
     <div
       data-testid="toast"
-      className={`fixed bottom-16 left-[63%] transform -translate-x-1/2 bg-[#241f3a] font-bold text-white px-4 py-2 z-50 rounded-[1rem] shadow-lg transition-opacity duration-300 ${
+      className={`fixed bottom-16 left-[63%] z-50 -translate-x-1/2 transform rounded-[1rem] bg-[#241f3a] px-4 py-2 font-bold text-white shadow-lg transition-opacity duration-300 ${
         visible ? 'opacity-100' : 'opacity-0'
       }`}
     >

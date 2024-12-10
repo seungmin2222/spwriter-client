@@ -75,7 +75,7 @@ function Footer() {
 
   return (
     <footer
-      className="flex justify-between items-center w-full h-[9%] p-[3%] rounded-[2rem] select-none"
+      className="flex h-[9%] w-full select-none items-center justify-between rounded-[2rem] p-[3%]"
       data-testid="footer"
     >
       <div className="flex space-x-4">
@@ -87,11 +87,11 @@ function Footer() {
         >
           <div className="relative flex items-center justify-center">
             <div className="rotateIcon" />
-            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
-              <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
+            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 flex -translate-x-1/2 transform flex-col items-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <span className="whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-sm text-white">
                 90° 회전
               </span>
-              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700" />
+              <div className="h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-gray-700" />
             </div>
           </div>
         </button>
@@ -103,11 +103,11 @@ function Footer() {
         >
           <div className="relative flex items-center justify-center">
             <div className="inversionIcon" />
-            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
-              <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
+            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 flex -translate-x-1/2 transform flex-col items-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <span className="whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-sm text-white">
                 좌우 반전
               </span>
-              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700" />
+              <div className="h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-gray-700" />
             </div>
           </div>
         </button>
@@ -119,11 +119,11 @@ function Footer() {
         >
           <div className="relative flex items-center justify-center">
             <div className="cloneIcon" />
-            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
-              <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
+            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 flex -translate-x-1/2 transform flex-col items-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <span className="whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-sm text-white">
                 이미지 복제
               </span>
-              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700" />
+              <div className="h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-gray-700" />
             </div>
           </div>
         </button>
@@ -136,12 +136,12 @@ function Footer() {
           title="실행 취소"
         >
           <div className="relative flex items-center justify-center">
-            <div className="leftIcon filter invert brightness-100" />
-            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
-              <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
+            <div className="leftIcon brightness-100 invert filter" />
+            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 flex -translate-x-1/2 transform flex-col items-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <span className="whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-sm text-white">
                 실행 취소
               </span>
-              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700" />
+              <div className="h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-gray-700" />
             </div>
           </div>
         </button>
@@ -152,12 +152,12 @@ function Footer() {
           title="다시 실행"
         >
           <div className="relative flex items-center justify-center">
-            <div className="rightIcon filter invert brightness-100" />
-            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
-              <span className="text-sm bg-gray-700 text-white rounded py-1 px-2 whitespace-nowrap">
+            <div className="rightIcon brightness-100 invert filter" />
+            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 flex -translate-x-1/2 transform flex-col items-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <span className="whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-sm text-white">
                 다시 실행
               </span>
-              <div className="w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-700" />
+              <div className="h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-gray-700" />
             </div>
           </div>
         </button>
