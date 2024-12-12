@@ -9,14 +9,10 @@ interface ImageItemProps {
   isButtonHovered: boolean;
   handleImageListClick: (image: PackedImage) => void;
   generateCSS: (image: PackedImage, index: number) => string;
-  setIsButtonHovered: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentImage: React.Dispatch<
-    React.SetStateAction<HTMLImageElement | null>
-  >;
-  setDeleteConfirmationType: React.Dispatch<
-    React.SetStateAction<'single' | 'batch' | null>
-  >;
-  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsButtonHovered: (bool: boolean) => void;
+  setCurrentImage: (image: HTMLImageElement | null) => void;
+  setDeleteConfirmationType: (type: 'single' | 'batch' | null) => void;
+  setShowModal: (bool: boolean) => void;
 }
 
 function ImageItem({
