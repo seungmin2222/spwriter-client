@@ -440,7 +440,7 @@ function SpriteEditor() {
       })
     );
 
-    const filteredFiles = newFiles.filter(file => file !== null) as File[];
+    const filteredFiles = newFiles.filter(file => file !== null);
 
     const htmlImageElements = await Promise.all(
       filteredFiles.map(file => {
