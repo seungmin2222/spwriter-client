@@ -273,7 +273,7 @@ function ImageList() {
 
   return (
     <aside
-      className="mr-[2%] flex h-full w-[26%] min-w-[370px] flex-col rounded-[2.375rem] bg-[#f7f7f7] text-gray-700 shadow-md"
+      className="mr-[2%] flex h-full w-[26%] min-w-[460px] flex-col rounded-[2.375rem] bg-[#f7f7f7] text-gray-700 shadow-md"
       data-testid="image-list"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -283,7 +283,7 @@ function ImageList() {
       </header>
       {coordinates.length > 0 && (
         <div className="mb-3 flex h-[5%] w-full animate-fadeIn select-none items-center border-[#e2e8f0] px-[20px] transition-opacity duration-500">
-          <div className="flex w-full justify-between">
+          <div className="flex w-full min-w-[430px] justify-between">
             <div>
               <button
                 type="button"
