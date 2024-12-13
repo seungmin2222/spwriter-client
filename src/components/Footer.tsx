@@ -133,10 +133,14 @@ function Footer() {
           type="button"
           className={buttonStyle}
           onClick={handleUndo}
+          aria-label="실행 취소"
           title="실행 취소"
         >
           <div className="relative flex items-center justify-center">
-            <div className="leftIcon brightness-100 invert filter" />
+            <div
+              className="leftIcon brightness-100 invert filter"
+              aria-hidden="true"
+            />
             <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 flex -translate-x-1/2 transform flex-col items-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <span className="whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-sm text-white">
                 실행 취소
@@ -149,10 +153,14 @@ function Footer() {
           type="button"
           className={buttonStyle}
           onClick={handleRedo}
+          aria-label="다시 실행"
           title="다시 실행"
         >
           <div className="relative flex items-center justify-center">
-            <div className="rightIcon brightness-100 invert filter" />
+            <div
+              className="rightIcon brightness-100 invert filter"
+              aria-hidden="true"
+            />
             <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 flex -translate-x-1/2 transform flex-col items-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <span className="whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-sm text-white">
                 다시 실행

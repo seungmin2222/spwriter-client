@@ -44,7 +44,10 @@ function Navbar() {
       data-testid="navbar"
     >
       <div className="flex h-[100%] gap-4">
-        <div className="relative inline-block rounded-[1rem] bg-[#241f3a] duration-300 hover:bg-[#565465]">
+        <label
+          htmlFor="fileInput"
+          className="relative inline-block rounded-[1rem] bg-[#241f3a] duration-300 hover:bg-[#565465]"
+        >
           <input
             type="file"
             id="fileInput"
@@ -65,14 +68,16 @@ function Navbar() {
               }
             }}
           />
-
           <span className="flex h-full w-[8rem] cursor-pointer items-center justify-center px-3 text-[18px] font-semibold text-white">
             Open files
           </span>
-        </div>
+        </label>
         <div className="flex h-full w-[13rem] items-center justify-center space-x-1 rounded-[1rem] border bg-[#ffffff] shadow-sm">
-          <span>Padding :</span>
-          <div className="flex items-center space-x-1">
+          <label
+            className="flex items-center gap-[10px] space-x-1"
+            htmlFor="paddingInput"
+          >
+            Padding :
             <input
               type="number"
               id="paddingInput"
@@ -81,12 +86,15 @@ function Navbar() {
               className="w-16 rounded-[0.5rem] border p-1 text-center"
             />
             <span>px</span>
-          </div>
+          </label>
         </div>
         <div className="flex h-full justify-center rounded-[1rem] border bg-[#ffffff] p-2 shadow-sm">
-          <span className="flex h-full items-center p-1">정렬 옵션 :</span>
+          <span id="alignLabel" className="flex h-full items-center p-1">
+            정렬 옵션 :
+          </span>
           <select
             id="align-elements"
+            aria-labelledby="alignLabel"
             value={alignElement}
             onChange={({ target: { value } }) => {
               if (
