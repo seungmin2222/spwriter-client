@@ -303,10 +303,10 @@ const newImages = await Promise.all(
   </tr>
   <tr>
     <td align="center">
-    <img width="400" height="75" alt="beforeImage" src="./src/assets/images/readmeImages/beforeImage.png">
+    <img width="400" height="75" alt="afterImage" src="./src/assets/images/readmeImages/afterImage.png">
     </td>
     <td align="center">
-    <img width="400" height="75" alt="afterImage" src="./src/assets/images/readmeImages/afterImage.png">
+    <img width="400" height="75" alt="beforeImage" src="./src/assets/images/readmeImages/beforeImage.png">
     </td>
   </tr>
 </table>
