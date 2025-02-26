@@ -461,6 +461,32 @@ const generateCSS = (image, index) =>
    - calculateCoordinates 함수가 새로운 이미지 세트에 대해 빠르게 새로운 레이아웃을 계산할 수 있습니다.
    - binWidth와 binHeight를 동적으로 조정하는 로직을 통해 다양한 이미지 세트에 유연하게 대응할 수 있습니다.
      <br><br>
+5. 스카이 라인 알고리즘 동작 원리
+
+<table style="border-collapse: collapse; width: 60%; margin: 0 auto;">
+ <tr>
+    <td style="text-align: center; border: 1px solid black;">
+      <strong>box를 3개 채운 시점의 node들</strong>
+    </td>
+    <td style="text-align: center; border: 1px solid black;">
+       <strong>box를 3개 채운 시점의 node들</strong>
+    </td>
+    <td style="text-align: center; border: 1px solid black;">
+      <strong>추적되지 않는 공간의 예시</strong>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align: center; border: 1px solid black;">
+      <img width="300" alt="binPacking1" src='https://github.com/user-attachments/assets/5525171f-2996-4c18-bd50-4f226d0e29d0'>
+    </td>
+    <td style="text-align: center; border: 1px solid black;">
+      <img width="379" alt="binPacking2" src="https://github.com/user-attachments/assets/d137fca8-6b34-493e-b73c-c2fb9adaa675">
+    </td>
+    <td style="text-align: center; border: 1px solid black;">
+      <img width="460" alt="binPacking3" src="https://github.com/user-attachments/assets/9609a41f-288d-4422-a54a-e888be8c4611">
+    </td>
+  </tr>
+</table>
 
 ### 3) 이미지 배치 과정에서 마주친 주요 도전 과제와 해결 방법
 
@@ -1612,7 +1638,8 @@ export const = analyzeSpritesSheet(imageData, width, height) => {
 
 #### 참고 이미지
 
-<img width="615" alt="floodFillImage" src="./src/assets/images/readmeImages/floodFillImage.png">
+<img width="275" alt="Image" src="https://github.com/user-attachments/assets/8e65e8e2-135f-481a-b4d8-10fb1414de97" />
+<img width="275" alt="Image" src="https://github.com/user-attachments/assets/e8adf302-264e-4783-97c6-56d7a4cc3c63" />
 
 <br>
 
