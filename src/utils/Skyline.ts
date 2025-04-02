@@ -67,7 +67,7 @@ class Skyline {
       }
     }
     return bestY !== Infinity
-      ? new Rectangle(bestX, bestY, width, height)
+      ? Rectangle.createFromSegment(bestX, bestY, width, height)
       : null;
   }
 }
