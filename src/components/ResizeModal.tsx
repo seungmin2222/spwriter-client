@@ -45,18 +45,39 @@ function ResizeModal({
 
   if (!isOpen) return null;
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (e.currentTarget === e.target) {
+      onClose();
+    }
+  };
+
+  const handleBackdropKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      onClose();
+    }
+  };
+
   return (
     <div
-      className="fixed inset-0 z-50 flex h-full w-full items-center justify-center overflow-y-auto bg-black bg-opacity-50"
+      className="fixed inset-0 z-50 flex h-full w-full items-center justify-center"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="modal-title"
     >
+      <button
+        type="button"
+        className="fixed inset-0 h-full w-full cursor-default bg-black bg-opacity-50"
+        onClick={handleBackdropClick}
+        onKeyDown={handleBackdropKeyDown}
+        aria-label="Close modal"
+      />
       <div
-        className="w-[23rem] rounded-[1rem] border bg-white p-6 shadow-lg"
+        className="relative z-10 w-[23rem] rounded-[1rem] border bg-white p-6 shadow-lg"
         role="document"
       >
         <div className="text-center">
-          <h3 className="mb-4 text-xl leading-6 text-gray-900">
+          <h3 id="modal-title" className="mb-4 text-xl leading-6 text-gray-900">
             이미지 크기를 조정하시겠습니까?
           </h3>
           <div className="mb-4">
@@ -92,12 +113,6 @@ function ResizeModal({
           </div>
         </div>
       </div>
-      <button
-        type="button"
-        onClick={onClose}
-        className="fixed inset-0 h-full w-full cursor-default focus:outline-none"
-        aria-label="Close modal"
-      />
     </div>
   );
 }

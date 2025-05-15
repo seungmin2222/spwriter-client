@@ -45,21 +45,41 @@ function Modal({
 
   if (!showModal) return null;
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (e.currentTarget === e.target) {
+      handleClose();
+    }
+  };
+
+  const handleBackdropKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      handleClose();
+    }
+  };
+
   return (
     <div
       ref={modalRef}
-      className="fixed inset-0 z-50 flex h-full w-full items-center justify-center overflow-y-auto bg-black bg-opacity-50"
-      data-testid="modal"
+      className="fixed inset-0 z-50 flex h-full w-full items-center justify-center"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="modal-title"
       tabIndex={-1}
     >
-      <div
-        className="w-80 rounded-[1rem] border bg-white p-6 shadow-lg"
-        role="document"
-      >
+      <button
+        type="button"
+        className="fixed inset-0 h-full w-full cursor-default bg-black bg-opacity-50"
+        onClick={handleBackdropClick}
+        onKeyDown={handleBackdropKeyDown}
+        aria-label="Close modal"
+        tabIndex={0}
+      />
+      <div className="relative z-10 w-80 rounded-[1rem] border bg-white p-6 shadow-lg">
         <div className="text-center">
-          <h3 className="mb-6 text-xl leading-6 text-gray-900">{message}</h3>
+          <h3 id="modal-title" className="mb-6 text-xl leading-6 text-gray-900">
+            {message}
+          </h3>
           <div>
             <button
               type="button"
