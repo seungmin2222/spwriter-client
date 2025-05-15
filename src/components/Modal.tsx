@@ -61,7 +61,7 @@ function Modal({
   return (
     <div
       ref={modalRef}
-      className="fixed inset-0 z-50 flex h-full w-full items-center justify-center"
+      className="fixed inset-0 z-50 flex h-full w-full select-none items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"

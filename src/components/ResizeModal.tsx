@@ -76,7 +76,7 @@ function ResizeModal({
         className="relative z-10 w-[23rem] rounded-[1rem] border bg-white p-6 shadow-lg"
         role="document"
       >
-        <div className="text-center">
+        <div className="select-none text-center">
           <h3 id="modal-title" className="mb-4 text-xl leading-6 text-gray-900">
             이미지 크기를 조정하시겠습니까?
           </h3>
