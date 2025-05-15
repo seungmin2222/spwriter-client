@@ -1,5 +1,5 @@
-import { processImage } from './imageProcessing';
 import { calculateCoordinates, sortAndSetCoordinates } from './coordinateUtils';
+import { processImage } from './imageProcessing';
 import { PackedImage } from './types';
 
 export const cloneSelectedImages = (

@@ -1,8 +1,8 @@
 import React from 'react';
-import Toast from './Toast';
 import useFileStore from '../../store';
 import { handleFiles } from '../utils/fileUtils';
 import { downloadUtility, handlePaddingChangeUtility } from '../utils/navUtils';
+import Toast from './Toast';
 
 function Navbar() {
   const fileName = useFileStore(state => state.fileName);

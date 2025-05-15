@@ -1,18 +1,18 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import useFileStore from '../../store.js';
 
-import {
-  drawSelectionBox,
-  drawImages,
-  scrollToResizedImage,
-  selectImagesInBox,
-  clearSelectionBox,
-  handleCanvasClick,
-} from '../utils/spriteEditorUtils.js';
-import analyzeSpritesSheet from '../utils/spriteAnalyzer';
-import { resizeSelectedImages } from '../utils/imageSelectUtils.js';
 import { calculateCoordinates } from '../utils/coordinateUtils.js';
 import { handleDragOverFiles, handleFiles } from '../utils/fileUtils.js';
+import { resizeSelectedImages } from '../utils/imageSelectUtils.js';
+import analyzeSpritesSheet from '../utils/spriteAnalyzer';
+import {
+  clearSelectionBox,
+  drawImages,
+  drawSelectionBox,
+  handleCanvasClick,
+  scrollToResizedImage,
+  selectImagesInBox,
+} from '../utils/spriteEditorUtils.js';
 import { PackedImage, Sprite } from '../utils/types.js';
 
 interface Size {

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
-import { AlignElement, PackedImage } from './types';
 import { calculateCoordinates } from './coordinateUtils';
+import { AlignElement, PackedImage } from './types';
 
 const handleResizeConfirmUtil = (
   modalWidth: string,
